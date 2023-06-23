@@ -1,6 +1,8 @@
 # Callis PI tool
 
-Simple tool to track your PI planet extractors. Login with your characters and hit refresh.
+Simple tool to track your PI planet extractors. Login with your characters and enjoy the PI!
+
+Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://discord.gg/MDapvGyw)
 
 ## [Avanto hosted PI tool](https://pi.avanto.tk)
 
@@ -14,6 +16,12 @@ Features:
   - When the cycle will end
   - Highlight the planet if extractor has stopped or has not been started.
 - Backup to download characters to a file (restore not implemented yet)
+
+## Basic usage
+
+1. Login with your characters
+2. Group the character to accounts by clicking on the character name and setting the account name
+3. Make sure your extractors are running!
 
 ## Security
 

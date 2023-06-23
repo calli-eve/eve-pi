@@ -102,6 +102,7 @@ export const PlanetCard = ({
         alt=""
         width={120}
         height={120}
+        style={{ borderRadius: 8, marginRight: 4 }}
       />
       {extractors.some((e) => {
         if (!e) return true;

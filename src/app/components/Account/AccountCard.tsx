@@ -19,7 +19,11 @@ export const AccountCard = ({
         margin: 1,
       }}
     >
-      <Typography paddingLeft={2}>Account: {characters[0].account}</Typography>
+      <Typography style={{ fontSize: "0.8rem" }} paddingLeft={2}>
+        {characters[0].account !== "-"
+          ? `Account: ${characters[0].account}`
+          : ""}
+      </Typography>
       {characters.map((c) => (
         <Stack
           key={c.character.characterId}

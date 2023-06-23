@@ -7,7 +7,7 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 import { CharacterDialog } from "./CharacterDialog";
 import { AccessToken } from "@/types";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { EVE_IMAGE_URL } from "@/const";
 import { CharacterContext } from "@/app/context/Context";
 
@@ -39,18 +39,21 @@ export const CharacterRow = ({ character }: { character: AccessToken }) => {
         closeDialog={() => setSelectedCharacter(undefined)}
       />
       <Box
-        onClick={() => setSelectedCharacter(character)}
         display="flex"
         flexDirection="column"
+        maxWidth={120}
+        onClick={() => setSelectedCharacter(character)}
       >
         <Image
           src={`${EVE_IMAGE_URL}/characters/${character.character.characterId}/portrait?size=128`}
           alt=""
           width={120}
           height={120}
-          style={{ marginBottom: "0.2rem" }}
+          style={{ marginBottom: "0.2rem", borderRadius: 8 }}
         />
-        {character.character.name}
+        <Button style={{ padding: 3, fontSize: "0.5rem" }} variant="outlined">
+          {character.character.name}
+        </Button>
       </Box>
     </StackItem>
   );

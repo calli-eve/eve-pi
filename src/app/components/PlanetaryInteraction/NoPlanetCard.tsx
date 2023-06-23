@@ -13,7 +13,13 @@ const StackItem = styled(Stack)(({ theme }) => ({
 export const NoPlanetCard = ({}: {}) => {
   return (
     <StackItem alignItems="flex-start" height="100%">
-      <Image src={`/noplanet.png`} alt="" width={120} height={120} />
+      <Image
+        src={`/noplanet.png`}
+        alt=""
+        width={120}
+        height={120}
+        style={{ borderRadius: 8, marginRight: 4 }}
+      />
       <Image
         width={64}
         height={64}

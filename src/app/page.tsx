@@ -18,85 +18,78 @@ const Home = () => {
   const searchParams = useSearchParams();
   const code = searchParams && searchParams.get("code");
 
-  // Initialize SSO env
-  useEffect(() => {
-    fetch("api/env")
-      .then((r) => r.json())
-      .then((j) => {
-        setEnvironment({
-          EVE_SSO_CLIENT_ID: j.EVE_SSO_CLIENT_ID,
-          EVE_SSO_CALLBACK_URL: j.EVE_SSO_CALLBACK_URL,
-        });
-      });
-  }, []);
-
   // Memoize chracter state manipulations
-  const addCharacter = useCallback((character: AccessToken) => {
-    setCharacters((chars) => [
-      ...chars.filter(
-        (c) => c.character.characterId !== character.character.characterId
-      ),
-      character,
-    ]);
-  }, []);
 
-  const deleteCharacter = useCallback(
-    (character: AccessToken) => {
-      setCharacters(
-        characters.filter(
-          (c) => character.character.characterId !== c.character.characterId
-        )
-      );
-    },
-    [characters]
-  );
+  const deleteCharacter = (character: AccessToken) => {
+    const charactersToSave = characters.filter(
+      (c) => character.character.characterId !== c.character.characterId
+    );
+    setCharacters(charactersToSave);
+    saveCharacters(charactersToSave);
+  };
 
-  const updateCharacter = useCallback(
-    (character: AccessToken, updates: CharacterUpdate) => {
-      setCharacters(
-        characters.map((c) => {
-          if (c.character.characterId === character.character.characterId)
-            return {
-              ...c,
-              ...(updates.account ? { account: updates.account } : {}),
-            };
-          return c;
-        })
-      );
-    },
-    [characters]
-  );
+  const updateCharacter = (
+    character: AccessToken,
+    updates: CharacterUpdate
+  ) => {
+    const charactersToSave = characters.map((c) => {
+      if (c.character.characterId === character.character.characterId)
+        return {
+          ...c,
+          ...(updates.account ? { account: updates.account } : {}),
+        };
+      return c;
+    });
+    setCharacters(charactersToSave);
+    saveCharacters(charactersToSave);
+  };
 
-  const refreshSession = useCallback((characters: AccessToken[]) => {
-    Promise.all(characters.map((c) => refreshToken(c)))
-      .then(setCharacters)
-      .finally(() => setSessionReady(true));
-  }, []);
+  const refreshSession = (characters: AccessToken[]) => {
+    return Promise.all(characters.map((c) => refreshToken(c)));
+  };
 
-  // Handle EVE SSO callback
-  useEffect(() => {
+  const handleCallback = async (
+    characters: AccessToken[]
+  ): Promise<AccessToken[]> => {
     if (code) {
       window.history.replaceState(null, "", "/");
-      fetch(`api/token?code=${code}`)
-        .then((res) => res.json())
-        .then(addCharacter)
-        .catch();
+      const res = await fetch(`api/token?code=${code}`);
+      return [...characters, await res.json()];
     }
-  }, [code, addCharacter]);
+    return Promise.resolve(characters);
+  };
 
-  // Initialise saved characters
-  useEffect(() => {
+  const initializeCharacters = useCallback((): AccessToken[] => {
     const localStorageCharacters = localStorage.getItem("characters");
     if (localStorageCharacters) {
       const characterArray: AccessToken[] = JSON.parse(localStorageCharacters);
-      setCharacters(characterArray);
+      return characterArray;
     }
+    return [];
   }, []);
 
-  // Update saved characters to local storage on state change
-  useEffect(() => {
+  const saveCharacters = (characters: AccessToken[]): AccessToken[] => {
     localStorage.setItem("characters", JSON.stringify(characters));
-  }, [characters]);
+    return characters;
+  };
+
+  // Initialize EVE PI
+  useEffect(() => {
+    fetch("api/env")
+      .then((r) => r.json())
+      .then((env) => {
+        setEnvironment({
+          EVE_SSO_CLIENT_ID: env.EVE_SSO_CLIENT_ID,
+          EVE_SSO_CALLBACK_URL: env.EVE_SSO_CALLBACK_URL,
+        });
+      })
+      .then(initializeCharacters)
+      .then(refreshSession)
+      .then(handleCallback)
+      .then(saveCharacters)
+      .then(setCharacters)
+      .then(() => setSessionReady(true));
+  }, []);
 
   return (
     <SessionContext.Provider

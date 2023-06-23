@@ -13,6 +13,7 @@ Features:
 - Track extractor status
   - When the cycle will end
   - Highlight the planet if extractor has stopped or has not been started.
+- Backup to download characters to a file (restore not implemented yet)
 
 ## Security
 

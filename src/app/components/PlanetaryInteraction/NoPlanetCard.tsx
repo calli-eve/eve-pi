@@ -11,14 +11,8 @@ const StackItem = styled(Stack)(({ theme }) => ({
 
 export const NoPlanetCard = ({}: {}) => {
   return (
-    <StackItem alignItems="flex-start" className="poop" height="100%">
-      <Image
-        src={`/noplanet.png`}
-        alt=""
-        width={120}
-        height={120}
-        style={{ marginBottom: "0.2rem" }}
-      />
+    <StackItem alignItems="flex-start" height="100%">
+      <Image src={`/noplanet.png`} alt="" width={120} height={120} />
       <Image
         width={64}
         height={64}

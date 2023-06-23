@@ -10,6 +10,7 @@ import Countdown from "react-countdown";
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
   padding: 0,
+  margin: "0 !important",
   textAlign: "left",
   justifyContent: "center",
   alignItems: "center",
@@ -95,13 +96,12 @@ export const PlanetCard = ({
     getPlanet(character, planet).then(setPlanetInfo);
   }, [planet, character]);
   return (
-    <StackItem alignItems="flex-start" className="poop" height="100%">
+    <StackItem alignItems="flex-start" height="100%">
       <Image
         src={`/${planet.planet_type}.png`}
         alt=""
         width={120}
         height={120}
-        style={{ marginBottom: "0.2rem" }}
       />
       {extractors.some((e) => {
         if (!e) return true;

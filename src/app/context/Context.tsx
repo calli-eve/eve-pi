@@ -5,10 +5,12 @@ export const CharacterContext = createContext<{
   characters: AccessToken[];
   deleteCharacter: (character: AccessToken) => void;
   updateCharacter: (character: AccessToken, update: CharacterUpdate) => void;
+  restoreCharacters: (characters: AccessToken[]) => void;
 }>({
   characters: [],
   deleteCharacter: () => {},
   updateCharacter: () => {},
+  restoreCharacters: () => {},
 });
 
 export const SessionContext = createContext<{

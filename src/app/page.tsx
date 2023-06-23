@@ -73,6 +73,10 @@ const Home = () => {
     return characters;
   };
 
+  const restoreCharacters = (characters: AccessToken[]) => {
+    refreshSession(characters).then(saveCharacters).then(setCharacters);
+  };
+
   // Initialize EVE PI
   useEffect(() => {
     fetch("api/env")
@@ -106,6 +110,7 @@ const Home = () => {
           characters,
           deleteCharacter,
           updateCharacter,
+          restoreCharacters,
         }}
       >
         <MainGrid sessionReady={sessionReady} />

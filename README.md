@@ -23,6 +23,22 @@ Features:
 2. Group the character to accounts by clicking on the character name and setting the account name
 3. Make sure your extractors are running!
 
+## Backing up or moving character list to another device
+
+Because everything is stored in the browser there is no way to populate the list. To help with this EVE PI provides Backup and Restore functionality using basic JSON file.
+
+To dowload your list:
+
+1. Click Dowload button in the top button bar
+2. Find your backup json file in your Downloads folder
+
+To restore your list:
+
+**Take note that restoring the list will overwrite any local list that you have!**
+
+1. Click Restore button in the top button bar
+2. Use the dialog to select the file you previously dowloaded to restore the list.
+
 ## Security
 
 All eve sso information is stored in your browser and refresh token is encrypted with apps EVE SSO secret. Backend processes only the token exchange, refresh and revoke that need the EVE_SSO_SECRET. Everything else is handled in frontend.

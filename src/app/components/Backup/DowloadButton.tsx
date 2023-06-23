@@ -1,4 +1,4 @@
-import { CharacterContext } from "@/app/context/Context";
+import { CharacterContext, SessionContext } from "@/app/context/Context";
 import { Button } from "@mui/material";
 import { useContext } from "react";
 
@@ -9,7 +9,7 @@ export const DowloadButton = () => {
       href={`data:text/json;charset=utf-8,${encodeURIComponent(
         JSON.stringify(characters)
       )}`}
-      download="pi-avanto-tk-characters.json"
+      download={`eve-pi-characters.json`}
     >
       Backup
     </Button>

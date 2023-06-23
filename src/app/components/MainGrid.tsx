@@ -7,6 +7,7 @@ import { CharacterContext } from "../context/Context";
 import { DowloadButton } from "./Backup/DowloadButton";
 import { DiscordButton } from "./Discord/DiscordButton";
 import { GitHubButton } from "./Github/GitHubButton";
+import { UploadButton } from "./Backup/UploadButton";
 
 interface Grouped {
   [key: string]: AccessToken[];
@@ -28,6 +29,7 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
           <Stack direction="row" spacing={1}>
             <LoginButton />
             <DowloadButton />
+            <UploadButton />
             <DiscordButton />
             <GitHubButton />
           </Stack>

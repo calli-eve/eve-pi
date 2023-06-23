@@ -1,0 +1,37 @@
+{
+  "name": "eve-pi",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "esi-swagger": "npx swagger-typescript-api -p https://esi.evetech.net/latest/swagger.json -o ./src -n esi-api.ts"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource/roboto": "^5.0.3",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.5",
+    "@types/node": "20.3.1",
+    "@types/react": "18.2.12",
+    "@types/react-dom": "18.2.5",
+    "autoprefixer": "10.4.14",
+    "crypto-js": "^4.1.1",
+    "eslint": "8.42.0",
+    "eslint-config-next": "13.4.5",
+    "luxon": "^3.3.0",
+    "next": "13.4.5",
+    "react": "18.2.0",
+    "react-countdown": "^2.3.5",
+    "react-dom": "18.2.0",
+    "sharp": "^0.32.1",
+    "typescript": "5.1.3"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
+    "@types/luxon": "^3.3.0"
+  }
+}

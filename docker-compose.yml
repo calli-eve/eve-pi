@@ -1,0 +1,13 @@
+---
+version: "2.1"
+services:
+  eve-pi:
+    build: .
+    container_name: eve-pi
+    environment:
+      - EVE_SSO_CLIENT_ID=${EVE_SSO_CLIENT_ID}
+      - EVE_SSO_CALLBACK_URL=${EVE_SSO_CALLBACK_URL}
+      - EVE_SSO_SECRET=${EVE_SSO_SECRET}
+    ports:
+      - 3000:3000
+    restart: unless-stopped

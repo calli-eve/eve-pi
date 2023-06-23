@@ -1,0 +1,10 @@
+.env*
+.git
+.gitignore
+.github
+*.md
+node_modules
+npm-debug.log
+docker
+scripts
+.next

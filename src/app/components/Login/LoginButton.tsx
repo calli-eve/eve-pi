@@ -1,11 +1,11 @@
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import { LoginDialog } from "./LoginDialog";
 
 export const LoginButton = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   return (
-    <>
+    <Box>
       <Button
         style={{ width: "100%" }}
         variant="contained"
@@ -17,6 +17,6 @@ export const LoginButton = () => {
         open={loginDialogOpen}
         closeDialog={() => setLoginDialogOpen(false)}
       />
-    </>
+    </Box>
   );
 };

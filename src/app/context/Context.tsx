@@ -13,7 +13,7 @@ export const CharacterContext = createContext<{
 
 export const SessionContext = createContext<{
   sessionReady: boolean;
-  refreshSession: () => void;
+  refreshSession: (characters: AccessToken[]) => void;
   setSessionReady: Dispatch<SetStateAction<boolean>>;
   EVE_SSO_CALLBACK_URL: string;
   EVE_SSO_CLIENT_ID: string;

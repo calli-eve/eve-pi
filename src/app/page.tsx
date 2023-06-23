@@ -67,6 +67,12 @@ const Home = () => {
     [characters]
   );
 
+  const refreshSession = useCallback((characters: AccessToken[]) => {
+    Promise.all(characters.map((c) => refreshToken(c)))
+      .then(setCharacters)
+      .finally(() => setSessionReady(true));
+  }, []);
+
   // Handle EVE SSO callback
   useEffect(() => {
     if (code) {
@@ -91,12 +97,6 @@ const Home = () => {
   useEffect(() => {
     localStorage.setItem("characters", JSON.stringify(characters));
   }, [characters]);
-
-  const refreshSession = () => {
-    Promise.all(characters.map((c) => refreshToken(c)))
-      .then(setCharacters)
-      .finally(() => setSessionReady(true));
-  };
 
   return (
     <SessionContext.Provider

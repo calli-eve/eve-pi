@@ -44,7 +44,7 @@ export const CharacterRow = ({ character }: { character: AccessToken }) => {
         flexDirection="column"
       >
         <Image
-          src={`${EVE_IMAGE_URL}/characters/${character.character.characterId}/portrait?size=64`}
+          src={`${EVE_IMAGE_URL}/characters/${character.character.characterId}/portrait?size=128`}
           alt=""
           width={120}
           height={120}

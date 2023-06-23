@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { Box, Grid, Stack } from "@mui/material";
 import { LoginButton } from "./Login/LoginButton";
-import { RefreshButton } from "./Login/RefreshButton";
 import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
 import { CharacterContext } from "../context/Context";
@@ -25,7 +24,6 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
         <Grid item xs={2}>
           <Stack direction="row" spacing={1}>
             <LoginButton />
-            <RefreshButton />
           </Stack>
         </Grid>
       </Grid>

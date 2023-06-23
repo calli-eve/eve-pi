@@ -13,10 +13,11 @@ export const LoginDialog = ({
   open: boolean;
   closeDialog: () => void;
 }) => {
+  const DEFAULT_SCOPES_TO_SELECT = ["esi-planets.manage_planets.v1"];
   const [scopes] = useState<string[]>(["esi-planets.manage_planets.v1"]);
-  const [selectedScopes, setSelectedScopes] = useState<string[]>([
-    "esi-planets.manage_planets.v1",
-  ]);
+  const [selectedScopes, setSelectedScopes] = useState<string[]>(
+    DEFAULT_SCOPES_TO_SELECT
+  );
   const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
   const [loginUrl, setLoginUrl] = useState<string | undefined>(undefined);
 

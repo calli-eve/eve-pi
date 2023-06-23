@@ -51,7 +51,7 @@ export const CharacterRow = ({ character }: { character: AccessToken }) => {
           height={120}
           style={{ marginBottom: "0.2rem", borderRadius: 8 }}
         />
-        <Button style={{ padding: 3, fontSize: "0.5rem" }} variant="outlined">
+        <Button style={{ padding: 3, fontSize: "0.6rem" }} variant="outlined">
           {character.character.name}
         </Button>
       </Box>

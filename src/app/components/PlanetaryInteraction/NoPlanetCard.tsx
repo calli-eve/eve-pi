@@ -3,6 +3,7 @@ import Image from "next/image";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
+  margin: "0 !important",
   padding: 0,
   textAlign: "left",
   justifyContent: "center",

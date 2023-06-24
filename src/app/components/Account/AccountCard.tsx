@@ -13,10 +13,8 @@ export const AccountCard = ({
   return (
     <Box
       sx={{
-        background: "#262626",
         padding: 1,
-        borderRadius: 1,
-        margin: 1,
+        borderBottom: "solid 1px gray",
       }}
     >
       <Typography style={{ fontSize: "0.8rem" }} paddingLeft={2}>

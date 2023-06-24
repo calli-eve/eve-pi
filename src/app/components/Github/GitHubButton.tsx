@@ -1,14 +1,17 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 export const GitHubButton = () => {
   return (
     <Box>
-      <Button
-        href="https://github.com/calli-eve/eve-pi"
-        target="_blank"
-        style={{ width: "100%" }}
-      >
-        GitHub
-      </Button>
+      <Tooltip title="Checkout the source of this app">
+        <Button
+          href="https://github.com/calli-eve/eve-pi"
+          target="_blank"
+          style={{ width: "100%" }}
+          sx={{ my: 2, color: "white", display: "block" }}
+        >
+          GitHub
+        </Button>
+      </Tooltip>
     </Box>
   );
 };

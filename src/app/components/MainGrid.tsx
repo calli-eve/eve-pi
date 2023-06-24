@@ -7,14 +7,9 @@ import {
   ThemeProvider,
   createTheme,
 } from "@mui/material";
-import { LoginButton } from "./Login/LoginButton";
 import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
 import { CharacterContext } from "../context/Context";
-import { DowloadButton } from "./Backup/DowloadButton";
-import { DiscordButton } from "./Discord/DiscordButton";
-import { GitHubButton } from "./Github/GitHubButton";
-import { UploadButton } from "./Backup/UploadButton";
 import ResponsiveAppBar from "./AppBar/AppBar";
 
 interface Grouped {

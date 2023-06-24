@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, styled } from "@mui/material";
-import Image from "next/image";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,

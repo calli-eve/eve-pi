@@ -25,7 +25,7 @@ const PinsCanvas3D = ({
 
     const CAMERA_FOV = 20;
     const CAMERA_NEAR = 10;
-    const CAMERA_FAR = 500;
+    const CAMERA_FAR = 4000;
     const CAMERA_X = 0;
     const CAMERA_Y = 0;
     const CAMERA_Z = 220;

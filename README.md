@@ -7,6 +7,7 @@ Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://d
 ## [Avanto hosted PI tool](https://pi.avanto.tk)
 
 ![Screenshot of PI tool](https://github.com/calli-eve/eve-pi/blob/main/images/eve-pi.png)
+![3D render of a planet](https://github.com/calli-eve/eve-pi/blob/main/images/3dplanet.png)
 
 Features:
 
@@ -17,6 +18,7 @@ Features:
   - Highlight the planet if extractor has stopped or has not been started.
 - Backup to download characters to a file
 - Rstore from a file. Must be from the same instance!
+- View the 3D render of the planet with your PI setup by clicking the planet
 
 ## Basic usage
 
@@ -73,3 +75,12 @@ EVE_SSO_CALLBACK_URL=Callback URL (This should be the domain you are hosting at 
 ## Hosting
 
 Easiest way to host is deploy the app through Vercel https://vercel.com. Login with github, point to eve-pi repository, setup the env variables and the app should work out of the box.
+
+## Planetary coordinate system
+
+ESI PI planet info endpoint returns pin coorinates. These coordinates seem to work like this:
+
+Latitude starts from 0 at the north pole and ends at Pi (3.141...) at the south pole.
+Longitude starts at some point from 0 and ends at Tau (6.283...) after going around the planet.
+
+To translate the coordinates to 2D plane one could use Azimuthal equidistant projection. With this service we will just render a webgl sphere and place the pins directly on it. To access the render click the planet icon.

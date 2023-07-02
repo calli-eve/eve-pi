@@ -1,11 +1,20 @@
-import { Stack, Typography, styled } from "@mui/material";
+import { Stack, Tooltip, Typography, styled } from "@mui/material";
 import Image from "next/image";
 import { AccessToken, Planet } from "@/types";
 import { Api } from "@/esi-api";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
 import Countdown from "react-countdown";
+import PinsCanvas3D from "./PinsCanvas3D";
+import Slide from "@mui/material/Slide";
+import { TransitionProps } from "@mui/material/transitions";
+import Dialog from "@mui/material/Dialog";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Button from "@mui/material/Button";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -16,40 +25,42 @@ const StackItem = styled(Stack)(({ theme }) => ({
   alignItems: "center",
 }));
 
+export interface Pin {
+  contents?: {
+    amount: number;
+    type_id: number;
+  }[];
+  expiry_time?: string;
+  extractor_details?: {
+    cycle_time?: number;
+    head_radius?: number;
+    heads: {
+      head_id: number;
+      latitude: number;
+      longitude: number;
+    }[];
+    product_type_id?: number;
+    qty_per_cycle?: number;
+  };
+  factory_details?: {
+    schematic_id: number;
+  };
+  install_time?: string;
+  last_cycle_start?: string;
+  latitude: number;
+  longitude: number;
+  pin_id: number;
+  schematic_id?: number;
+  type_id: number;
+}
+
 export interface PlanetInfo {
   links: {
     destination_pin_id: number;
     link_level: number;
     source_pin_id: number;
   }[];
-  pins: {
-    contents?: {
-      amount: number;
-      type_id: number;
-    }[];
-    expiry_time?: string;
-    extractor_details?: {
-      cycle_time?: number;
-      head_radius?: number;
-      heads: {
-        head_id: number;
-        latitude: number;
-        longitude: number;
-      }[];
-      product_type_id?: number;
-      qty_per_cycle?: number;
-    };
-    factory_details?: {
-      schematic_id: number;
-    };
-    install_time?: string;
-    last_cycle_start?: string;
-    latitude: number;
-    longitude: number;
-    pin_id: number;
-    schematic_id?: number;
-    type_id: number;
-  }[];
+  pins: Pin[];
   routes: {
     content_type_id: number;
     destination_pin_id: number;
@@ -59,6 +70,27 @@ export interface PlanetInfo {
     waypoints?: number[];
   }[];
 }
+
+export interface PlanetInfoUniverse {
+  name: string;
+  planet_id: number;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  system_id: number;
+  type_id: number;
+}
+
+const Transition = forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const PlanetCard = ({
   planet,
@@ -70,6 +102,21 @@ export const PlanetCard = ({
   const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
     undefined
   );
+
+  const [planetInfoUniverse, setPlanetInfoUniverse] = useState<
+    PlanetInfoUniverse | undefined
+  >(undefined);
+
+  const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
+
+  const handle3DrenderOpen = () => {
+    setPlanetRenderOpen(true);
+  };
+
+  const handle3DrenderClose = () => {
+    setPlanetRenderOpen(false);
+  };
+
   const extractors =
     (planetInfo &&
       planetInfo.pins
@@ -92,17 +139,29 @@ export const PlanetCard = ({
     ).data;
     return planetInfo;
   };
+
+  const getPlanetUniverse = async (
+    planet: Planet
+  ): Promise<PlanetInfoUniverse> => {
+    const api = new Api();
+    const planetInfo = (
+      await api.universe.getUniversePlanetsPlanetId(planet.planet_id)
+    ).data;
+    return planetInfo;
+  };
   useEffect(() => {
     getPlanet(character, planet).then(setPlanetInfo);
+    getPlanetUniverse(planet).then(setPlanetInfoUniverse);
   }, [planet, character]);
   return (
-    <StackItem alignItems="flex-start" height="100%">
+    <StackItem alignItems="flex-start" height="100%" position="relative">
       <Image
         src={`/${planet.planet_type}.png`}
         alt=""
         width={120}
         height={120}
         style={{ borderRadius: 8, marginRight: 4 }}
+        onClick={handle3DrenderOpen}
       />
       {extractors.some((e) => {
         if (!e) return true;
@@ -118,6 +177,11 @@ export const PlanetCard = ({
           style={{ position: "absolute" }}
         />
       )}
+      <div style={{ position: "absolute", top: 5, left: 10 }}>
+        <Typography fontSize="0.8rem">{planetInfoUniverse?.name}</Typography>
+        <Typography fontSize="0.8rem">L{planet.upgrade_level}</Typography>
+      </div>
+
       {extractors.map((e, idx) => {
         const inPast = () => {
           if (!e) return true;
@@ -142,6 +206,32 @@ export const PlanetCard = ({
           </Typography>
         );
       })}
+      <Dialog
+        fullScreen
+        open={planetRenderOpen}
+        onClose={handle3DrenderClose}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handle3DrenderClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              {planetInfoUniverse?.name}
+            </Typography>
+            <Button autoFocus color="inherit" onClick={handle3DrenderClose}>
+              Close
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <PinsCanvas3D planetInfo={planetInfo} />
+      </Dialog>
     </StackItem>
   );
 };

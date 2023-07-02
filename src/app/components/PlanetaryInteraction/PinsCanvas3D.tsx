@@ -56,6 +56,7 @@ const PinsCanvas3D = ({
 
       const controls = new OrbitControls(camera, renderer.domElement);
       camera.position.set(CAMERA_X, CAMERA_Y, CAMERA_Z);
+      controls.rotateSpeed *= -1;
       controls.update();
 
       const scene = new THREE.Scene();

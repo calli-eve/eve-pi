@@ -13,10 +13,7 @@ const PinsCanvas3D = ({
 }) => {
   useEffect(() => {
     if (!planetInfo) return;
-    const pinsWithoutCommandCentes =
-      planetInfo?.pins.filter(
-        (p) => !commandCenterIds.some((c) => c === p.type_id)
-      ) ?? [];
+    const pins = planetInfo?.pins ?? [];
 
     const CANVAS = document.querySelector("#canvas") as HTMLCanvasElement;
 
@@ -27,7 +24,7 @@ const PinsCanvas3D = ({
     const SCENE_BACKGROUND_COLOR = 0x000000;
 
     const CAMERA_FOV = 20;
-    const CAMERA_NEAR = 100;
+    const CAMERA_NEAR = 10;
     const CAMERA_FAR = 500;
     const CAMERA_X = 0;
     const CAMERA_Y = 0;
@@ -56,7 +53,6 @@ const PinsCanvas3D = ({
 
       const controls = new OrbitControls(camera, renderer.domElement);
       camera.position.set(CAMERA_X, CAMERA_Y, CAMERA_Z);
-      controls.rotateSpeed *= -1;
       controls.update();
 
       const scene = new THREE.Scene();
@@ -68,7 +64,7 @@ const PinsCanvas3D = ({
       const vector = new THREE.Vector3();
       const vectorPI = new THREE.Vector3();
 
-      pinsWithoutCommandCentes.forEach((p) => {
+      pins.forEach((p) => {
         const dotGeometryPI = new THREE.CircleGeometry(DOT_SIZE, 9);
         const phi = p.latitude;
         const theta = p.longitude;

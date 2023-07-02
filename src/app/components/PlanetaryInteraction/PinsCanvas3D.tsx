@@ -70,7 +70,8 @@ const PinsCanvas3D = ({
         const theta = p.longitude;
         vectorPI.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
         dotGeometryPI.lookAt(vectorPI);
-        dotGeometryPI.translate(vectorPI.x, vectorPI.y, vectorPI.z);
+        dotGeometryPI.translate(vectorPI.x, vectorPI.y, vectorPI.z - 0.1);
+        console.log(vectorPI.z);
         dotGeometriesPI.push(dotGeometryPI);
       });
 

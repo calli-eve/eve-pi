@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
 import { AccessToken, CharacterUpdate } from "../../../types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, KeyboardEvent } from "react";
 import TextField from "@mui/material/TextField";
 import { revokeToken } from "@/esi-sso";
 
@@ -27,6 +27,13 @@ export const CharacterDialog = ({
       .catch((e) => console.log("Logout failed"));
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter") {
+      character && updateCharacter(character, { account });
+      closeDialog();
+    }
+  };
+
   return (
     <Dialog open={character !== undefined} onClose={closeDialog}>
       <DialogTitle>{character && character.character.name}</DialogTitle>
@@ -37,6 +44,7 @@ export const CharacterDialog = ({
         value={account ?? ""}
         sx={{ margin: 1 }}
         onChange={(event) => setAccount(event.target.value)}
+        onKeyDown={handleKeyDown}
       />
       <DialogActions>
         <Button

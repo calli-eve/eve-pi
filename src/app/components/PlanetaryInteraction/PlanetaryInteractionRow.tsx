@@ -7,7 +7,7 @@ import { NoPlanetCard } from "./NoPlanetCard";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
-  padding: theme.spacing(2),
+  padding: theme.custom.compactMode ? theme.spacing(1) : theme.spacing(2),
   textAlign: "left",
   justifyContent: "center",
   alignItems: "center",

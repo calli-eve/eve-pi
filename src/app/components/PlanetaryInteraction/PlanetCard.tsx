@@ -1,4 +1,4 @@
-import { Stack, Typography, styled } from "@mui/material";
+import { Stack, Typography, styled, useTheme } from "@mui/material";
 import Image from "next/image";
 import { AccessToken, Planet } from "@/types";
 import { Api } from "@/esi-api";
@@ -15,7 +15,6 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
-import { SessionContext } from "@/app/context/Context";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -110,7 +109,7 @@ export const PlanetCard = ({
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
 
-  const { compactMode } = useContext(SessionContext);
+  const theme = useTheme();
 
   const handle3DrenderOpen = () => {
     setPlanetRenderOpen(true);
@@ -171,13 +170,13 @@ export const PlanetCard = ({
       alignItems="flex-start"
       height="100%"
       position="relative"
-      minHeight={compactMode ? "100px" : "170px"}
+      minHeight={theme.custom.cardMinHeight}
     >
       <Image
         src={`/${planet.planet_type}.png`}
         alt=""
-        width={compactMode ? 80 : 120}
-        height={compactMode ? 80 : 120}
+        width={theme.custom.cardImageSize}
+        height={theme.custom.cardImageSize}
         style={{ borderRadius: 8, marginRight: 4 }}
         onClick={handle3DrenderOpen}
       />
@@ -196,8 +195,12 @@ export const PlanetCard = ({
         />
       )}
       <div style={{ position: "absolute", top: 5, left: 10 }}>
-        <Typography fontSize="0.8rem">{planetInfoUniverse?.name}</Typography>
-        <Typography fontSize="0.8rem">L{planet.upgrade_level}</Typography>
+        <Typography fontSize={theme.custom.smallText}>
+          {planetInfoUniverse?.name}
+        </Typography>
+        <Typography fontSize={theme.custom.smallText}>
+          L{planet.upgrade_level}
+        </Typography>
       </div>
 
       {extractors.map((e, idx) => {
@@ -205,7 +208,7 @@ export const PlanetCard = ({
           <Typography
             key={`${e}-${idx}-${character.character.characterId}`}
             color={timeColor(e)}
-            fontSize="0.8rem"
+            fontSize={theme.custom.smallText}
           >
             {e ? (
               <Countdown

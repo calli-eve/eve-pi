@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Box,
   CssBaseline,
@@ -15,11 +15,24 @@ interface Grouped {
   [key: string]: AccessToken[];
 }
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+declare module "@mui/material/styles" {
+  interface Theme {
+    custom: {
+      compactMode: boolean;
+      smallText: string;
+      cardImageSize: number;
+      cardMinHeight: number;
+    };
+  }
+  interface ThemeOptions {
+    custom?: {
+      compactMode?: boolean;
+      smallText?: string;
+      cardImageSize?: number;
+      cardMinHeight?: number;
+    };
+  }
+}
 
 export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
   const { characters } = useContext(CharacterContext);
@@ -31,6 +44,35 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
   }, {});
 
   const { compactMode } = useContext(SessionContext);
+  const [darkTheme, setDarkTheme] = useState(
+    createTheme({
+      palette: {
+        mode: "dark",
+      },
+      custom: {
+        compactMode,
+        smallText: compactMode ? "0.6rem" : "0.8rem",
+        cardImageSize: compactMode ? 80 : 120,
+        cardMinHeight: compactMode ? 100 : 170,
+      },
+    })
+  );
+
+  useEffect(() => {
+    setDarkTheme(
+      createTheme({
+        palette: {
+          mode: "dark",
+        },
+        custom: {
+          compactMode,
+          smallText: compactMode ? "0.6rem" : "0.8rem",
+          cardImageSize: compactMode ? 80 : 120,
+          cardMinHeight: compactMode ? 100 : 170,
+        },
+      })
+    );
+  }, [compactMode]);
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -41,7 +83,8 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
           {Object.values(groupByAccount).map((g, id) => (
             <Grid
               item
-              xs={compactMode ? 6 : 12}
+              xs={12}
+              sm={compactMode ? 6 : 12}
               key={`account-${id}-${g[0].account}`}
             >
               <AccountCard characters={g} sessionReady={sessionReady} />

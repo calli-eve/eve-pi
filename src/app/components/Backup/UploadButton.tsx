@@ -10,7 +10,7 @@ export const UploadButton = () => {
         <Button
           style={{ width: "100%" }}
           onClick={() => setUploadDialogOpen(true)}
-          sx={{ my: 2, color: "white", display: "block" }}
+          sx={{ color: "white", display: "block" }}
         >
           Restore
         </Button>

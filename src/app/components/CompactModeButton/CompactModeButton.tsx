@@ -10,7 +10,6 @@ export const CompactModeButton = () => {
         value="check"
         selected={compactMode}
         onChange={toggleCompactMode}
-        style={{ margin: "1rem 0" }}
       >
         Compact mode
       </ToggleButton>

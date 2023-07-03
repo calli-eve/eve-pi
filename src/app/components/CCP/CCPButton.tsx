@@ -11,7 +11,7 @@ export const CCPButton = () => {
           href="https://community.eveonline.com/support/policies/eve-online-content-creation-terms-of-use-en/"
           target="_blank"
           style={{ width: "100%" }}
-          sx={{ my: 2, color: "white", display: "block" }}
+          sx={{ color: "white", display: "block" }}
         >
           CCP ©
         </Button>

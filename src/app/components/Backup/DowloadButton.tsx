@@ -11,7 +11,7 @@ export const DowloadButton = () => {
           JSON.stringify(characters)
         )}`}
         download={`eve-pi-characters.json`}
-        sx={{ my: 2, color: "white", display: "block" }}
+        sx={{ color: "white", display: "block" }}
       >
         Backup
       </Button>

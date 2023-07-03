@@ -7,7 +7,7 @@ export const DiscordButton = () => {
           href="https://discord.gg/MDapvGyw"
           target="_blank"
           style={{ width: "100%" }}
-          sx={{ my: 2, color: "white", display: "block" }}
+          sx={{ color: "white", display: "block" }}
         >
           Discord
         </Button>

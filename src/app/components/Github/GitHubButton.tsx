@@ -7,7 +7,7 @@ export const GitHubButton = () => {
           href="https://github.com/calli-eve/eve-pi"
           target="_blank"
           style={{ width: "100%" }}
-          sx={{ my: 2, color: "white", display: "block" }}
+          sx={{ color: "white", display: "block" }}
         >
           GitHub
         </Button>

@@ -85,6 +85,7 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
               item
               xs={12}
               sm={compactMode ? 6 : 12}
+              xl={compactMode ? 3 : 12}
               key={`account-${id}-${g[0].account}`}
             >
               <AccountCard characters={g} sessionReady={sessionReady} />

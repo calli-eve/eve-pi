@@ -9,7 +9,7 @@ export const LoginButton = () => {
       <Tooltip title="Login with your EVE characters to track your planets">
         <Button
           style={{ width: "100%" }}
-          sx={{ my: 2, color: "white", display: "block" }}
+          sx={{ color: "white", display: "block" }}
           onClick={() => setLoginDialogOpen(true)}
         >
           Login

@@ -15,7 +15,6 @@ export const UploadDialog = ({
 }) => {
   const [file, setFile] = useState();
 
-  const fileReader = new FileReader();
   const { restoreCharacters } = useContext(CharacterContext);
 
   const error = new Error("Invalid input");
@@ -33,6 +32,7 @@ export const UploadDialog = ({
     return characters;
   };
   useEffect(() => {
+    const fileReader = new FileReader();
     if (file) {
       fileReader.onload = (event) => {
         if (!event || event.target === null) return;

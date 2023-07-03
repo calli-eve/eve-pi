@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import {
   Box,
   CssBaseline,
@@ -23,7 +23,6 @@ const darkTheme = createTheme({
 
 export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
   const { characters } = useContext(CharacterContext);
-  const { compactMode } = useContext(SessionContext);
   const groupByAccount = characters.reduce<Grouped>((group, character) => {
     const { account } = character;
     group[account ?? ""] = group[account ?? ""] ?? [];
@@ -31,25 +30,23 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
     return group;
   }, {});
 
+  const { compactMode } = useContext(SessionContext);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Box sx={{ flexGrow: 1 }}>
         <ResponsiveAppBar />
         <Grid container spacing={1}>
-          <Grid
-            item
-            xs={12}
-            style={{ display: compactMode ? "flex" : "block" }}
-          >
-            {Object.values(groupByAccount).map((g, id) => (
-              <AccountCard
-                key={`account-${id}-${g[0].account}`}
-                characters={g}
-                sessionReady={sessionReady}
-              />
-            ))}
-          </Grid>
+          {Object.values(groupByAccount).map((g, id) => (
+            <Grid
+              item
+              xs={compactMode ? 6 : 12}
+              key={`account-${id}-${g[0].account}`}
+            >
+              <AccountCard characters={g} sessionReady={sessionReady} />
+            </Grid>
+          ))}
         </Grid>
       </Box>
     </ThemeProvider>

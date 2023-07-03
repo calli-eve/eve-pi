@@ -21,8 +21,9 @@ const StackItem = styled(Stack)(({ theme }) => ({
   padding: 0,
   margin: "0 !important",
   textAlign: "left",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   alignItems: "center",
+  minHeight: "170px",
 }));
 
 export interface Pin {

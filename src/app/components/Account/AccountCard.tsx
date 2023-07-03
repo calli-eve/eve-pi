@@ -24,7 +24,7 @@ export const AccountCard = ({
       <Typography style={{ fontSize: "0.8rem" }} paddingLeft={2}>
         {characters[0].account !== "-"
           ? `Account: ${characters[0].account}`
-          : ""}
+          : "No account name"}
       </Typography>
       {characters.map((c) => (
         <Stack

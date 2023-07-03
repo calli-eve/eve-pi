@@ -1,10 +1,17 @@
 import React, { useEffect } from "react";
-import { PlanetInfo, PlanetInfoUniverse } from "./PlanetCard";
+import { PlanetInfo } from "./PlanetCard";
 import * as THREE from "three";
 import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const commandCenterIds = [2254, 2524, 2525, 2533, 2534, 2549, 2550, 2551];
+
+export interface ExtractorHead {
+  parent_id: number;
+  head_id: number;
+  latitude: number;
+  longitude: number;
+}
 
 const PinsCanvas3D = ({
   planetInfo,
@@ -14,6 +21,19 @@ const PinsCanvas3D = ({
   useEffect(() => {
     if (!planetInfo) return;
     const pins = planetInfo?.pins ?? [];
+    const extractors: ExtractorHead[] = [];
+
+    planetInfo.pins.forEach((p) => {
+      if (
+        !p.extractor_details?.heads &&
+        p.extractor_details?.heads.length === 0
+      )
+        return;
+
+      p.extractor_details?.heads.forEach((h) => {
+        extractors.push({ ...h, parent_id: p.pin_id });
+      });
+    });
 
     const CANVAS = document.querySelector("#canvas") as HTMLCanvasElement;
 
@@ -35,7 +55,9 @@ const PinsCanvas3D = ({
     const LONGITUDE_COUNT = 80;
 
     const DOT_SIZE = 0.2;
-    const DOT_COLOR = 0x36454f;
+    const DOT_COLOR_GLOBE = 0x36454f;
+    const DOT_COLOR_STRUCTURE = 0xfdda0d;
+    const DOT_COLOR_HEAD = 0x00ffff;
 
     const renderScene = () => {
       const renderer = new THREE.WebGLRenderer({
@@ -60,9 +82,25 @@ const PinsCanvas3D = ({
 
       const dotGeometries: THREE.CircleGeometry[] = [];
       const dotGeometriesPI: THREE.CircleGeometry[] = [];
+      const dotGeometriesHead: THREE.CircleGeometry[] = [];
 
       const vector = new THREE.Vector3();
       const vectorPI = new THREE.Vector3();
+      const vectorHead = new THREE.Vector3();
+
+      extractors.forEach((h) => {
+        const dotGeometryHead = new THREE.CircleGeometry(0.4, 9);
+        const phi = h.latitude;
+        const theta = h.longitude;
+        vectorHead.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
+        dotGeometryHead.lookAt(vectorHead);
+        dotGeometryHead.translate(
+          vectorHead.x,
+          vectorHead.y,
+          vectorHead.z - 0.2
+        );
+        dotGeometriesHead.push(dotGeometryHead);
+      });
 
       pins.forEach((p) => {
         const dotGeometryPI = new THREE.CircleGeometry(DOT_SIZE, 9);
@@ -70,7 +108,7 @@ const PinsCanvas3D = ({
         const theta = p.longitude;
         vectorPI.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
         dotGeometryPI.lookAt(vectorPI);
-        dotGeometryPI.translate(vectorPI.x, vectorPI.y, vectorPI.z - 0.1);
+        dotGeometryPI.translate(vectorPI.x, vectorPI.y, vectorPI.z - 0.2);
         dotGeometriesPI.push(dotGeometryPI);
       });
 
@@ -92,20 +130,33 @@ const PinsCanvas3D = ({
       const mergedDotGeometriesPI =
         BufferGeometryUtils.mergeBufferGeometries(dotGeometriesPI);
 
+      const mergedDotGeometriesHead =
+        BufferGeometryUtils.mergeBufferGeometries(dotGeometriesHead);
+
       const dotMaterial = new THREE.MeshBasicMaterial({
-        color: DOT_COLOR,
+        color: DOT_COLOR_GLOBE,
         side: THREE.DoubleSide,
       });
 
       const dotMaterialPI = new THREE.MeshBasicMaterial({
-        color: 0xfdda0d,
+        color: DOT_COLOR_STRUCTURE,
+        side: THREE.DoubleSide,
+      });
+
+      const dotMaterialHead = new THREE.MeshBasicMaterial({
+        color: DOT_COLOR_HEAD,
         side: THREE.DoubleSide,
       });
       const dotMesh = new THREE.Mesh(mergedDotGeometries, dotMaterial);
       const dotMeshPI = new THREE.Mesh(mergedDotGeometriesPI, dotMaterialPI);
+      const dotMeshHead = new THREE.Mesh(
+        mergedDotGeometriesHead,
+        dotMaterialHead
+      );
 
       scene.add(dotMesh);
       scene.add(dotMeshPI);
+      scene.add(dotMeshHead);
 
       const animate = (time: number) => {
         time *= 0.001;

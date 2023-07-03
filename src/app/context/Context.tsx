@@ -19,10 +19,14 @@ export const SessionContext = createContext<{
   setSessionReady: Dispatch<SetStateAction<boolean>>;
   EVE_SSO_CALLBACK_URL: string;
   EVE_SSO_CLIENT_ID: string;
+  compactMode: boolean;
+  toggleCompactMode: () => void;
 }>({
   sessionReady: false,
   refreshSession: () => {},
   setSessionReady: () => {},
   EVE_SSO_CALLBACK_URL: "",
   EVE_SSO_CLIENT_ID: "",
+  compactMode: false,
+  toggleCompactMode: () => {},
 });

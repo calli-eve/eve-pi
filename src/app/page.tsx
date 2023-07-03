@@ -14,6 +14,7 @@ const Home = () => {
   const [characters, setCharacters] = useState<AccessToken[]>([]);
   const [sessionReady, setSessionReady] = useState(false);
   const [environment, setEnvironment] = useState<Env | undefined>(undefined);
+  const [compactMode, setCompactMode] = useState(false);
 
   const searchParams = useSearchParams();
   const code = searchParams && searchParams.get("code");
@@ -77,6 +78,20 @@ const Home = () => {
     refreshSession(characters).then(saveCharacters).then(setCharacters);
   };
 
+  const toggleCompactMode = () => {
+    setCompactMode(!compactMode);
+  };
+
+  useEffect(() => {
+    const storedCompactMode = localStorage.getItem("compactMode");
+    if (!storedCompactMode) return;
+    storedCompactMode === "true" ? setCompactMode(true) : false;
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("compactMode", compactMode ? "true" : "false");
+  }, [compactMode]);
+
   // Initialize EVE PI
   useEffect(() => {
     fetch("api/env")
@@ -103,6 +118,8 @@ const Home = () => {
         refreshSession,
         EVE_SSO_CALLBACK_URL: environment?.EVE_SSO_CALLBACK_URL ?? "",
         EVE_SSO_CLIENT_ID: environment?.EVE_SSO_CLIENT_ID ?? "",
+        compactMode,
+        toggleCompactMode,
       }}
     >
       <CharacterContext.Provider

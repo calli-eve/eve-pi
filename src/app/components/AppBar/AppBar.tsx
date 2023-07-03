@@ -15,6 +15,7 @@ import { UploadButton } from "../Backup/UploadButton";
 import { DiscordButton } from "../Discord/DiscordButton";
 import { GitHubButton } from "../Github/GitHubButton";
 import { CCPButton } from "../CCP/CCPButton";
+import { CompactModeButton } from "../CompactModeButton/CompactModeButton";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -120,13 +121,17 @@ function ResponsiveAppBar() {
           >
             EVE PI
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+          <Box
+            sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
+            style={{ display: "flex", alignItems: "center" }}
+          >
             <LoginButton />
             <DowloadButton />
             <UploadButton />
             <DiscordButton />
             <GitHubButton />
             <CCPButton />
+            <CompactModeButton />
           </Box>
         </Toolbar>
       </Container>

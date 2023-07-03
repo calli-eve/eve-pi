@@ -1,4 +1,4 @@
-import { CharacterContext, SessionContext } from "@/app/context/Context";
+import { CharacterContext } from "@/app/context/Context";
 import { Button, Tooltip } from "@mui/material";
 import { useContext } from "react";
 

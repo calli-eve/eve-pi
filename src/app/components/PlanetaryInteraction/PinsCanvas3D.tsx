@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { PlanetInfo } from "./PlanetCard";
 import * as THREE from "three";
 import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
@@ -18,6 +18,8 @@ const PinsCanvas3D = ({
 }: {
   planetInfo: PlanetInfo | undefined;
 }) => {
+  const animationRef = useRef<number>(0);
+
   useEffect(() => {
     if (!planetInfo) return;
     const pins = planetInfo?.pins ?? [];
@@ -65,17 +67,6 @@ const PinsCanvas3D = ({
         antialias: SCENE_ANTIALIAS,
         alpha: SCENE_ALPHA,
       });
-
-      const camera = new THREE.PerspectiveCamera(
-        CAMERA_FOV,
-        CANVAS.width / CANVAS.height,
-        CAMERA_NEAR,
-        CAMERA_FAR
-      );
-
-      const controls = new OrbitControls(camera, renderer.domElement);
-      camera.position.set(CAMERA_X, CAMERA_Y, CAMERA_Z);
-      controls.update();
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(SCENE_BACKGROUND_COLOR);
@@ -125,17 +116,18 @@ const PinsCanvas3D = ({
       }
 
       const mergedDotGeometries =
-        BufferGeometryUtils.mergeBufferGeometries(dotGeometries);
+        BufferGeometryUtils.mergeGeometries(dotGeometries);
 
       const mergedDotGeometriesPI =
-        BufferGeometryUtils.mergeBufferGeometries(dotGeometriesPI);
+        BufferGeometryUtils.mergeGeometries(dotGeometriesPI);
 
       const mergedDotGeometriesHead =
-        BufferGeometryUtils.mergeBufferGeometries(dotGeometriesHead);
+        BufferGeometryUtils.mergeGeometries(dotGeometriesHead);
 
       const dotMaterial = new THREE.MeshBasicMaterial({
         color: DOT_COLOR_GLOBE,
         side: THREE.DoubleSide,
+        wireframe: true,
       });
 
       const dotMaterialPI = new THREE.MeshBasicMaterial({
@@ -158,15 +150,27 @@ const PinsCanvas3D = ({
       scene.add(dotMeshPI);
       scene.add(dotMeshHead);
 
+      const camera = new THREE.PerspectiveCamera(
+        CAMERA_FOV,
+        CANVAS.width / CANVAS.height,
+        CAMERA_NEAR,
+        CAMERA_FAR
+      );
+      camera.position.set(CAMERA_X, CAMERA_Y, CAMERA_Z);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.maxDistance = 300;
+      controls.minDistance = 60;
+      controls.update();
+
       const animate = (time: number) => {
         time *= 0.001;
         controls.update();
         renderer.render(scene, camera);
-
-        requestAnimationFrame(animate);
+        animationRef.current = requestAnimationFrame(animate);
       };
 
-      requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
     };
 
     const setCanvasSize = () => {
@@ -178,8 +182,8 @@ const PinsCanvas3D = ({
 
     setCanvasSize();
 
-    // When the window isresized, redraw the scene.
     window.addEventListener("resize", setCanvasSize);
+    return () => cancelAnimationFrame(animationRef.current);
   }, [planetInfo]);
 
   return <canvas id="canvas"></canvas>;

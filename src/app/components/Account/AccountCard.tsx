@@ -18,7 +18,6 @@ export const AccountCard = ({
       sx={{
         padding: 1,
         borderBottom: compactMode ? "" : "solid 1px gray",
-        borderRight: compactMode ? "solid 1px gray" : "",
       }}
     >
       <Typography style={{ fontSize: "0.8rem" }} paddingLeft={2}>

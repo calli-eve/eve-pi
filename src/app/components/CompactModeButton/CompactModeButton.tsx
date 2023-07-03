@@ -5,7 +5,7 @@ import { useContext } from "react";
 export const CompactModeButton = () => {
   const { compactMode, toggleCompactMode } = useContext(SessionContext);
   return (
-    <Tooltip title="Export your EVE PI list to transfer to another device or backup">
+    <Tooltip title="Toggle compact layout for widescreen">
       <ToggleButton
         value="check"
         selected={compactMode}

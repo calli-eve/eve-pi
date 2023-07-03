@@ -84,3 +84,7 @@ Latitude starts from 0 at the north pole and ends at Pi (3.141...) at the south 
 Longitude starts at some point from 0 and ends at Tau (6.283...) after going around the planet.
 
 To translate the coordinates to 2D plane one could use Azimuthal equidistant projection. With this service we will just render a webgl sphere and place the pins directly on it. To access the render click the planet icon.
+
+## CCP Copyright notice related to all CCP owned assets
+
+EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights are reserved worldwide. All other trademarks are the property of their respective owners. EVE Online, the EVE logo, EVE and all associated logos and designs are the intellectual property of CCP hf. All artwork, screenshots, characters, vehicles, storylines, world facts or other recognizable features of the intellectual property relating to these trademarks are likewise the intellectual property of CCP hf. CCP hf. has granted permission to [insert your name or site name] to use EVE Online and all associated logos and designs for promotional and information purposes on its website but does not endorse, and is not in any way affiliated with, [insert name or site name]. CCP is in no way responsible for the content on or functioning of this website, nor can it be liable for any damage arising from the use of this website.

@@ -9,7 +9,7 @@ import { CharacterDialog } from "./CharacterDialog";
 import { AccessToken } from "@/types";
 import { Box, Button } from "@mui/material";
 import { EVE_IMAGE_URL } from "@/const";
-import { CharacterContext } from "@/app/context/Context";
+import { CharacterContext, SessionContext } from "@/app/context/Context";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -25,7 +25,7 @@ export const CharacterRow = ({ character }: { character: AccessToken }) => {
   >(undefined);
 
   const { deleteCharacter, updateCharacter } = useContext(CharacterContext);
-
+  const { compactMode } = useContext(SessionContext);
   return (
     <StackItem
       key={character.character.characterId}
@@ -47,8 +47,8 @@ export const CharacterRow = ({ character }: { character: AccessToken }) => {
         <Image
           src={`${EVE_IMAGE_URL}/characters/${character.character.characterId}/portrait?size=128`}
           alt=""
-          width={120}
-          height={120}
+          width={compactMode ? 80 : 120}
+          height={compactMode ? 80 : 120}
           style={{ marginBottom: "0.2rem", borderRadius: 8 }}
         />
         <Button style={{ padding: 3, fontSize: "0.6rem" }} variant="outlined">

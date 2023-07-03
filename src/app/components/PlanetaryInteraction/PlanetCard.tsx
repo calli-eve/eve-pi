@@ -1,8 +1,8 @@
-import { Stack, Tooltip, Typography, styled } from "@mui/material";
+import { Stack, Typography, styled } from "@mui/material";
 import Image from "next/image";
 import { AccessToken, Planet } from "@/types";
 import { Api } from "@/esi-api";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useContext, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
 import Countdown from "react-countdown";
@@ -15,6 +15,7 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
+import { SessionContext } from "@/app/context/Context";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -23,7 +24,6 @@ const StackItem = styled(Stack)(({ theme }) => ({
   textAlign: "left",
   justifyContent: "flex-start",
   alignItems: "center",
-  minHeight: "170px",
 }));
 
 export interface Pin {
@@ -110,6 +110,8 @@ export const PlanetCard = ({
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
 
+  const { compactMode } = useContext(SessionContext);
+
   const handle3DrenderOpen = () => {
     setPlanetRenderOpen(true);
   };
@@ -150,17 +152,32 @@ export const PlanetCard = ({
     ).data;
     return planetInfo;
   };
+
+  const timeColor = (extractorDate: string | undefined): string => {
+    if (!extractorDate) return "red";
+    const dateExtractor = DateTime.fromISO(extractorDate);
+    const dateNow = DateTime.now();
+    if (dateExtractor < dateNow) return "red";
+    if (dateExtractor.minus({ hours: 24 }) < dateNow) return "yellow";
+    return "green";
+  };
+
   useEffect(() => {
     getPlanet(character, planet).then(setPlanetInfo);
     getPlanetUniverse(planet).then(setPlanetInfoUniverse);
   }, [planet, character]);
   return (
-    <StackItem alignItems="flex-start" height="100%" position="relative">
+    <StackItem
+      alignItems="flex-start"
+      height="100%"
+      position="relative"
+      minHeight={compactMode ? "100px" : "170px"}
+    >
       <Image
         src={`/${planet.planet_type}.png`}
         alt=""
-        width={120}
-        height={120}
+        width={compactMode ? 80 : 120}
+        height={compactMode ? 80 : 120}
         style={{ borderRadius: 8, marginRight: 4 }}
         onClick={handle3DrenderOpen}
       />
@@ -184,17 +201,11 @@ export const PlanetCard = ({
       </div>
 
       {extractors.map((e, idx) => {
-        const inPast = () => {
-          if (!e) return true;
-          const dateExtractor = DateTime.fromISO(e);
-          const dateNow = DateTime.now();
-          return dateExtractor < dateNow;
-        };
-
         return (
           <Typography
             key={`${e}-${idx}-${character.character.characterId}`}
-            color={inPast() ? "red" : "white"}
+            color={timeColor(e)}
+            fontSize="0.8rem"
           >
             {e ? (
               <Countdown

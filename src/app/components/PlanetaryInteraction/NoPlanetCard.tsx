@@ -1,4 +1,6 @@
+import { SessionContext } from "@/app/context/Context";
 import { Box, Stack, Typography, styled } from "@mui/material";
+import { useContext } from "react";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -7,19 +9,23 @@ const StackItem = styled(Stack)(({ theme }) => ({
   textAlign: "left",
   justifyContent: "flex-start",
   alignItems: "center",
-  minHeight: "170px",
 }));
 
 export const NoPlanetCard = ({}: {}) => {
+  const { compactMode } = useContext(SessionContext);
   return (
-    <StackItem alignItems="flex-start" height="100%">
+    <StackItem
+      alignItems="flex-start"
+      height="100%"
+      minHeight={compactMode ? "100px" : "170px"}
+    >
       <Box
-        width={120}
-        height={120}
+        width={compactMode ? 80 : 120}
+        height={compactMode ? 80 : 120}
         border="solid 1px black"
         style={{ borderRadius: 8, marginRight: 4 }}
       />
-      <Typography>No planet</Typography>
+      <Typography fontSize="0.8rem">No planet</Typography>
     </StackItem>
   );
 };

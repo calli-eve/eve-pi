@@ -48,18 +48,17 @@ const PinsCanvas3D = ({
     const CAMERA_FOV = 20;
     const CAMERA_NEAR = 10;
     const CAMERA_FAR = 4000;
-    const CAMERA_X = 0;
-    const CAMERA_Y = 0;
-    const CAMERA_Z = 220;
 
     const SPHERE_RADIUS = 30;
     const LATITUDE_COUNT = 40;
     const LONGITUDE_COUNT = 80;
 
     const DOT_SIZE = 0.2;
+    const DOT_SIZE_EXTRACTOR = 0.4;
     const DOT_COLOR_GLOBE = 0x36454f;
     const DOT_COLOR_STRUCTURE = 0xfdda0d;
     const DOT_COLOR_HEAD = 0x00ffff;
+    const DOT_COLOR_CC = 0xff8080;
 
     const renderScene = () => {
       const renderer = new THREE.WebGLRenderer({
@@ -74,34 +73,53 @@ const PinsCanvas3D = ({
       const dotGeometries: THREE.CircleGeometry[] = [];
       const dotGeometriesPI: THREE.CircleGeometry[] = [];
       const dotGeometriesHead: THREE.CircleGeometry[] = [];
+      const dotGeometriesCommandCenter: THREE.CircleGeometry[] = [];
 
       const vector = new THREE.Vector3();
       const vectorPI = new THREE.Vector3();
       const vectorHead = new THREE.Vector3();
+      const vectorCommandCenter = new THREE.Vector3();
 
       extractors.forEach((h) => {
-        const dotGeometryHead = new THREE.CircleGeometry(0.4, 9);
+        const dotGeometryHead = new THREE.CircleGeometry(DOT_SIZE_EXTRACTOR, 9);
         const phi = h.latitude;
         const theta = h.longitude;
         vectorHead.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
         dotGeometryHead.lookAt(vectorHead);
-        dotGeometryHead.translate(
-          vectorHead.x,
-          vectorHead.y,
-          vectorHead.z - 0.2
-        );
+        dotGeometryHead.translate(vectorHead.x, vectorHead.y, vectorHead.z + 1);
         dotGeometriesHead.push(dotGeometryHead);
       });
 
-      pins.forEach((p) => {
-        const dotGeometryPI = new THREE.CircleGeometry(DOT_SIZE, 9);
-        const phi = p.latitude;
-        const theta = p.longitude;
-        vectorPI.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
-        dotGeometryPI.lookAt(vectorPI);
-        dotGeometryPI.translate(vectorPI.x, vectorPI.y, vectorPI.z - 0.2);
-        dotGeometriesPI.push(dotGeometryPI);
-      });
+      pins
+        .filter((p) => !commandCenterIds.some((c) => c === p.type_id))
+        .forEach((p) => {
+          const dotGeometryPI = new THREE.CircleGeometry(DOT_SIZE, 9);
+          const phi = p.latitude;
+          const theta = p.longitude;
+          vectorPI.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
+          dotGeometryPI.lookAt(vectorPI);
+          dotGeometryPI.translate(vectorPI.x, vectorPI.y, vectorPI.z);
+          dotGeometriesPI.push(dotGeometryPI);
+        });
+
+      pins
+        .filter((p) => commandCenterIds.some((c) => c === p.type_id))
+        .forEach((p) => {
+          const dotGeometryCommandCenter = new THREE.CircleGeometry(
+            DOT_SIZE,
+            9
+          );
+          const phi = p.latitude;
+          const theta = p.longitude;
+          vectorCommandCenter.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
+          dotGeometryCommandCenter.lookAt(vectorCommandCenter);
+          dotGeometryCommandCenter.translate(
+            vectorCommandCenter.x,
+            vectorCommandCenter.y,
+            vectorCommandCenter.z
+          );
+          dotGeometriesCommandCenter.push(dotGeometryCommandCenter);
+        });
 
       for (let lat = 0; lat < LATITUDE_COUNT; lat += 1) {
         for (let lng = 0; lng < LONGITUDE_COUNT; lng += 1) {
@@ -124,6 +142,10 @@ const PinsCanvas3D = ({
       const mergedDotGeometriesHead =
         BufferGeometryUtils.mergeGeometries(dotGeometriesHead);
 
+      const mergedDotGeometriesCC = BufferGeometryUtils.mergeGeometries(
+        dotGeometriesCommandCenter
+      );
+
       const dotMaterial = new THREE.MeshBasicMaterial({
         color: DOT_COLOR_GLOBE,
         side: THREE.DoubleSide,
@@ -139,6 +161,12 @@ const PinsCanvas3D = ({
         color: DOT_COLOR_HEAD,
         side: THREE.DoubleSide,
       });
+
+      const dotMaterialCC = new THREE.MeshBasicMaterial({
+        color: DOT_COLOR_CC,
+        side: THREE.DoubleSide,
+      });
+
       const dotMesh = new THREE.Mesh(mergedDotGeometries, dotMaterial);
       const dotMeshPI = new THREE.Mesh(mergedDotGeometriesPI, dotMaterialPI);
       const dotMeshHead = new THREE.Mesh(
@@ -146,9 +174,12 @@ const PinsCanvas3D = ({
         dotMaterialHead
       );
 
+      const dotMeshCC = new THREE.Mesh(mergedDotGeometriesCC, dotMaterialCC);
+
       scene.add(dotMesh);
       scene.add(dotMeshPI);
       scene.add(dotMeshHead);
+      scene.add(dotMeshCC);
 
       const camera = new THREE.PerspectiveCamera(
         CAMERA_FOV,
@@ -156,7 +187,7 @@ const PinsCanvas3D = ({
         CAMERA_NEAR,
         CAMERA_FAR
       );
-      camera.position.set(CAMERA_X, CAMERA_Y, CAMERA_Z);
+      camera.position.set(vectorPI.x, vectorPI.y, vectorPI.z);
 
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.maxDistance = 300;

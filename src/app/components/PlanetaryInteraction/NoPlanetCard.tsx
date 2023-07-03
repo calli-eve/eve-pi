@@ -5,8 +5,9 @@ const StackItem = styled(Stack)(({ theme }) => ({
   margin: "0 !important",
   padding: 0,
   textAlign: "left",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   alignItems: "center",
+  minHeight: "170px",
 }));
 
 export const NoPlanetCard = ({}: {}) => {

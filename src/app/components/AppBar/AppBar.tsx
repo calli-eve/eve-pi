@@ -14,6 +14,7 @@ import { DowloadButton } from "../Backup/DowloadButton";
 import { UploadButton } from "../Backup/UploadButton";
 import { DiscordButton } from "../Discord/DiscordButton";
 import { GitHubButton } from "../Github/GitHubButton";
+import { CCPButton } from "../CCP/CCPButton";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -95,6 +96,9 @@ function ResponsiveAppBar() {
               <MenuItem onClick={handleCloseNavMenu}>
                 <GitHubButton />
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <CCPButton />
+              </MenuItem>
             </Menu>
           </Box>
           <PublicIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
@@ -122,6 +126,7 @@ function ResponsiveAppBar() {
             <UploadButton />
             <DiscordButton />
             <GitHubButton />
+            <CCPButton />
           </Box>
         </Toolbar>
       </Container>

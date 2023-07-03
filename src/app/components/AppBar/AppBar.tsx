@@ -100,6 +100,9 @@ function ResponsiveAppBar() {
               <MenuItem onClick={handleCloseNavMenu}>
                 <CCPButton />
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <CompactModeButton />
+              </MenuItem>
             </Menu>
           </Box>
           <PublicIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
@@ -122,8 +125,11 @@ function ResponsiveAppBar() {
             EVE PI
           </Typography>
           <Box
-            sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
-            style={{ display: "flex", alignItems: "center" }}
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+            }}
           >
             <LoginButton />
             <DowloadButton />

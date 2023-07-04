@@ -22,6 +22,7 @@ declare module "@mui/material/styles" {
       smallText: string;
       cardImageSize: number;
       cardMinHeight: number;
+      stoppedPosition: number;
     };
   }
   interface ThemeOptions {
@@ -30,6 +31,7 @@ declare module "@mui/material/styles" {
       smallText?: string;
       cardImageSize?: number;
       cardMinHeight?: number;
+      stoppedPosition?: number;
     };
   }
 }
@@ -54,6 +56,7 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
         smallText: compactMode ? "0.6rem" : "0.8rem",
         cardImageSize: compactMode ? 80 : 120,
         cardMinHeight: compactMode ? 100 : 170,
+        stoppedPosition: compactMode ? 32 : 48,
       },
     })
   );
@@ -69,6 +72,7 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
           smallText: compactMode ? "0.6rem" : "0.8rem",
           cardImageSize: compactMode ? 80 : 120,
           cardMinHeight: compactMode ? 100 : 170,
+          stoppedPosition: compactMode ? 32 : 48,
         },
       })
     );

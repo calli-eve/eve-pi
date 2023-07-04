@@ -187,11 +187,11 @@ export const PlanetCard = ({
         return dateExtractor < dateNow;
       }) && (
         <Image
-          width={64}
-          height={64}
+          width={32}
+          height={32}
           src={`/stopped.png`}
           alt=""
-          style={{ position: "absolute" }}
+          style={{ position: "absolute", top: theme.custom.stoppedPosition }}
         />
       )}
       <div style={{ position: "absolute", top: 5, left: 10 }}>

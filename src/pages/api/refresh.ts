@@ -24,6 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         `${EVE_SSO_CLIENT_ID}:${EVE_SSO_SECRET}`
       ).toString("base64")}`,
       Host: "login.eveonline.com",
+      "User-Agent": "https://github.com/calli-eve/eve-pi",
     };
 
     try {

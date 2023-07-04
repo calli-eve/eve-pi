@@ -110,6 +110,14 @@ const Home = () => {
       .then(() => setSessionReady(true));
   }, []);
 
+  useEffect(() => {
+    const ESI_CACHE_TIME_MS = 600000;
+    const interval = setInterval(() => {
+      const characters = initializeCharacters();
+      refreshSession(characters).then(saveCharacters).then(setCharacters);
+    }, ESI_CACHE_TIME_MS);
+    return () => clearInterval(interval);
+  });
   return (
     <SessionContext.Provider
       value={{

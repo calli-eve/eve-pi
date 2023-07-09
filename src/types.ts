@@ -1,3 +1,5 @@
+import { Api } from "./esi-api";
+
 export interface AccessToken {
   access_token: string;
   expires_at: number;
@@ -17,25 +19,36 @@ export interface CharacterUpdate {
   account?: string;
 }
 
-export interface Planet {
-  last_update: string;
-  num_pins: number;
-  owner_id: number;
-  planet_id: number;
-  planet_type:
-    | "temperate"
-    | "barren"
-    | "oceanic"
-    | "ice"
-    | "gas"
-    | "lava"
-    | "storm"
-    | "plasma";
-  solar_system_id: number;
-  upgrade_level: number;
-}
+type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+export type Planet = ArrayElement<
+  EsiType<"v1", "getCharactersCharacterIdPlanets">
+>;
+
+export type PlanetInfoUniverse = EsiType<"v1", "getUniversePlanetsPlanetId">;
+
+export type PlanetInfo = EsiType<
+  "v3",
+  "getCharactersCharacterIdPlanetsPlanetId"
+>;
 
 export interface Env {
   EVE_SSO_CALLBACK_URL: string;
   EVE_SSO_CLIENT_ID: string;
 }
+
+type EsiApiVersionType = keyof InstanceType<typeof Api<unknown>>;
+type EsiApiPathType<V extends EsiApiVersionType> = keyof InstanceType<
+  typeof Api<unknown>
+>[V];
+type EsiApiResponseType<
+  V extends EsiApiVersionType,
+  T extends EsiApiPathType<V>
+> = Awaited<ReturnType<InstanceType<typeof Api<unknown>>[V][T]>>;
+export type EsiType<
+  V extends EsiApiVersionType,
+  T extends EsiApiPathType<V>
+> = EsiApiResponseType<V, T> extends { data: any }
+  ? EsiApiResponseType<V, T>["data"]
+  : never;

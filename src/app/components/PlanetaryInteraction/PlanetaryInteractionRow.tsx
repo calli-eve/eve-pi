@@ -16,7 +16,7 @@ const StackItem = styled(Stack)(({ theme }) => ({
 const getPlanets = async (character: AccessToken): Promise<Planet[]> => {
   const api = new Api();
   const planets = (
-    await api.characters.getCharactersCharacterIdPlanets(
+    await api.v1.getCharactersCharacterIdPlanets(
       character.character.characterId,
       {
         token: character.access_token,

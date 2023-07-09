@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { PlanetInfo } from "./PlanetCard";
 import * as THREE from "three";
 import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { PlanetInfo } from "@/types";
 
 const commandCenterIds = [2254, 2524, 2525, 2533, 2534, 2549, 2550, 2551];
 

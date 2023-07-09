@@ -1,8 +1,8 @@
 import { Stack, Typography, styled, useTheme } from "@mui/material";
 import Image from "next/image";
-import { AccessToken, Planet } from "@/types";
+import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
 import { Api } from "@/esi-api";
-import { forwardRef, useContext, useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
 import Countdown from "react-countdown";
@@ -24,64 +24,6 @@ const StackItem = styled(Stack)(({ theme }) => ({
   justifyContent: "flex-start",
   alignItems: "center",
 }));
-
-export interface Pin {
-  contents?: {
-    amount: number;
-    type_id: number;
-  }[];
-  expiry_time?: string;
-  extractor_details?: {
-    cycle_time?: number;
-    head_radius?: number;
-    heads: {
-      head_id: number;
-      latitude: number;
-      longitude: number;
-    }[];
-    product_type_id?: number;
-    qty_per_cycle?: number;
-  };
-  factory_details?: {
-    schematic_id: number;
-  };
-  install_time?: string;
-  last_cycle_start?: string;
-  latitude: number;
-  longitude: number;
-  pin_id: number;
-  schematic_id?: number;
-  type_id: number;
-}
-
-export interface PlanetInfo {
-  links: {
-    destination_pin_id: number;
-    link_level: number;
-    source_pin_id: number;
-  }[];
-  pins: Pin[];
-  routes: {
-    content_type_id: number;
-    destination_pin_id: number;
-    quantity: number;
-    route_id: number;
-    source_pin_id: number;
-    waypoints?: number[];
-  }[];
-}
-
-export interface PlanetInfoUniverse {
-  name: string;
-  planet_id: number;
-  position: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  system_id: number;
-  type_id: number;
-}
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -131,7 +73,7 @@ export const PlanetCard = ({
   ): Promise<PlanetInfo> => {
     const api = new Api();
     const planetInfo = (
-      await api.characters.getCharactersCharacterIdPlanetsPlanetId(
+      await api.v3.getCharactersCharacterIdPlanetsPlanetId(
         character.character.characterId,
         planet.planet_id,
         {
@@ -147,7 +89,7 @@ export const PlanetCard = ({
   ): Promise<PlanetInfoUniverse> => {
     const api = new Api();
     const planetInfo = (
-      await api.universe.getUniversePlanetsPlanetId(planet.planet_id)
+      await api.v1.getUniversePlanetsPlanetId(planet.planet_id)
     ).data;
     return planetInfo;
   };

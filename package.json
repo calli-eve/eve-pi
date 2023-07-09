@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "esi-swagger": "npx swagger-typescript-api -p https://esi.evetech.net/latest/swagger.json -o ./src -n esi-api.ts"
+    "esi-swagger": "npx swagger-typescript-api -p https://esi.evetech.net/_latest/swagger.json -o ./src -n esi-api.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

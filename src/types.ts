@@ -19,12 +19,7 @@ export interface CharacterUpdate {
   account?: string;
 }
 
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-
-export type Planet = ArrayElement<
-  EsiType<"v1", "getCharactersCharacterIdPlanets">
->;
+export type Planet = EsiType<"v1", "getCharactersCharacterIdPlanets">[number];
 
 export type PlanetInfoUniverse = EsiType<"v1", "getUniversePlanetsPlanetId">;
 

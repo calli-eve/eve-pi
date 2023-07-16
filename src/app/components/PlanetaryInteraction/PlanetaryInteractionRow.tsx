@@ -41,46 +41,62 @@ const PlanetaryIteractionTable = ({
   character: AccessToken;
   planets: Planet[];
 }) => {
+  const theme = useTheme();
+
   return (
     <StackItem width="100%">
       <TableContainer component={Paper}>
         <Table size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell width="13%">Planet</TableCell>
+              <TableCell width="13%">
+                <Typography fontSize={theme.custom.smallText}>
+                  Planet
+                </Typography>
+              </TableCell>
               <TableCell width="2%">
                 <Tooltip title="Command center upgrade level">
-                  <Typography>CC</Typography>
+                  <Typography fontSize={theme.custom.smallText}>CC</Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="20%">
                 <Tooltip title="Extractor status and products">
-                  <Typography>Extraction</Typography>
+                  <Typography fontSize={theme.custom.smallText}>
+                    Extraction
+                  </Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="20%">
                 <Tooltip title="What factories are producing">
-                  <Typography>Production</Typography>
+                  <Typography fontSize={theme.custom.smallText}>
+                    Production
+                  </Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="20%">
                 <Tooltip title="What imports factories need from outside">
-                  <Typography>Imports</Typography>
+                  <Typography fontSize={theme.custom.smallText}>
+                    Imports
+                  </Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="20%">
                 <Tooltip title="What exports factories are producing">
-                  <Typography>Exports</Typography>
+                  <Typography fontSize={theme.custom.smallText}>
+                    Exports
+                  </Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="5%">
                 <Tooltip title="How many units per hour factories are producing">
-                  <Typography>u/h</Typography>
+                  <Typography fontSize={theme.custom.smallText}>u/h</Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="5%">
                 <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
-                  <Typography>ISK/M</Typography>
+                  <Typography fontSize={theme.custom.smallText}>
+                    ISK/M
+                  </Typography>
                 </Tooltip>
               </TableCell>
             </TableRow>

@@ -295,10 +295,12 @@ export const PlanetTableRow = ({
               fontSize={theme.custom.smallText}
             >
               {`${(
-                ((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
+                (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
                   ?.prices.sell.min ?? 0) *
                   e.amount) /
-                1000000
+                  1000000) *
+                24 *
+                30
               ).toFixed(2)} M`}
             </Typography>
           ))}

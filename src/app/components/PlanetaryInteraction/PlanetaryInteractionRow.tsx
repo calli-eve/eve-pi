@@ -79,8 +79,8 @@ const PlanetaryIteractionTable = ({
                 </Tooltip>
               </TableCell>
               <TableCell width="5%">
-                <Tooltip title="How many million ISK per hour this planet is exporting (Jita sell min)">
-                  <Typography>MISK/h</Typography>
+                <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
+                  <Typography>ISK/M</Typography>
                 </Tooltip>
               </TableCell>
             </TableRow>

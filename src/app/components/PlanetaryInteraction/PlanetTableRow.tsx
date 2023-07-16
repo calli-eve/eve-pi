@@ -305,9 +305,11 @@ export const PlanetTableRow = ({
         </div>
       </TableCell>
       <TableCell>
-        <Button variant="contained" onClick={handle3DrenderOpen}>
-          3D
-        </Button>
+        <Tooltip title="Open 3D render of this planet">
+          <Button variant="contained" onClick={handle3DrenderOpen}>
+            3D
+          </Button>
+        </Tooltip>
       </TableCell>
       <Dialog
         fullScreen

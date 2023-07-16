@@ -1,6 +1,6 @@
 import { Api } from "@/esi-api";
 import { AccessToken, Planet } from "@/types";
-import { Stack, styled, useTheme } from "@mui/material";
+import { Stack, Tooltip, Typography, styled, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PlanetCard } from "./PlanetCard";
 import { NoPlanetCard } from "./NoPlanetCard";
@@ -48,13 +48,41 @@ const PlanetaryIteractionTable = ({
           <TableHead>
             <TableRow>
               <TableCell width="13%">Planet</TableCell>
-              <TableCell width="2%">CC</TableCell>
-              <TableCell width="20%">Extraction</TableCell>
-              <TableCell width="20%">Production</TableCell>
-              <TableCell width="20%">Imports</TableCell>
-              <TableCell width="20%">Exports</TableCell>
-              <TableCell width="5%">u/h</TableCell>
-              <TableCell width="5%">MISK/h</TableCell>
+              <TableCell width="2%">
+                <Tooltip title="Command center upgrade level">
+                  <Typography>CC</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="20%">
+                <Tooltip title="Extractor status and products">
+                  <Typography>Extraction</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="20%">
+                <Tooltip title="What factories are producing">
+                  <Typography>Production</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="20%">
+                <Tooltip title="What imports factories need from outside">
+                  <Typography>Imports</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="20%">
+                <Tooltip title="What exports factories are producing">
+                  <Typography>Exports</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="5%">
+                <Tooltip title="How many units per hour factories are producing">
+                  <Typography>u/h</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="5%">
+                <Tooltip title="How many million ISK per hour this planet is exporting (Jita sell min)">
+                  <Typography>MISK/h</Typography>
+                </Tooltip>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

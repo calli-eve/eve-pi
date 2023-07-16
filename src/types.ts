@@ -15,6 +15,17 @@ export interface Character {
   characterId: number;
 }
 
+export interface PlanetWithInfo extends Planet {
+  info: PlanetInfo;
+  infoUniverse: PlanetInfoUniverse;
+}
+export interface CharacterPlanets {
+  name: string;
+  characterId: number;
+  account?: string;
+  planets: PlanetWithInfo[];
+}
+
 export interface CharacterUpdate {
   account?: string;
 }

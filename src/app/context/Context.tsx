@@ -1,3 +1,4 @@
+import { EvePraisalResult } from "@/eve-praisal";
 import { AccessToken, CharacterUpdate } from "@/types";
 import { Dispatch, SetStateAction, createContext } from "react";
 
@@ -21,6 +22,7 @@ export const SessionContext = createContext<{
   EVE_SSO_CLIENT_ID: string;
   compactMode: boolean;
   toggleCompactMode: () => void;
+  piPrices: EvePraisalResult | undefined;
 }>({
   sessionReady: false,
   refreshSession: () => {},
@@ -29,4 +31,5 @@ export const SessionContext = createContext<{
   EVE_SSO_CLIENT_ID: "",
   compactMode: false,
   toggleCompactMode: () => {},
+  piPrices: undefined,
 });

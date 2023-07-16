@@ -9,12 +9,16 @@ import { MainGrid } from "./components/MainGrid";
 import { refreshToken } from "@/esi-sso";
 import { CharacterContext, SessionContext } from "./context/Context";
 import { useSearchParams } from "next/navigation";
+import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
 
 const Home = () => {
   const [characters, setCharacters] = useState<AccessToken[]>([]);
   const [sessionReady, setSessionReady] = useState(false);
   const [environment, setEnvironment] = useState<Env | undefined>(undefined);
   const [compactMode, setCompactMode] = useState(false);
+  const [piPrices, setPiPrices] = useState<EvePraisalResult | undefined>(
+    undefined
+  );
 
   const searchParams = useSearchParams();
   const code = searchParams && searchParams.get("code");
@@ -111,6 +115,12 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    fetchAllPrices()
+      .then(setPiPrices)
+      .catch(() => console.log("failed getting pi prices"));
+  }, []);
+
+  useEffect(() => {
     const ESI_CACHE_TIME_MS = 600000;
     const interval = setInterval(() => {
       const characters = initializeCharacters();
@@ -128,6 +138,7 @@ const Home = () => {
         EVE_SSO_CLIENT_ID: environment?.EVE_SSO_CLIENT_ID ?? "",
         compactMode,
         toggleCompactMode,
+        piPrices,
       }}
     >
       <CharacterContext.Provider

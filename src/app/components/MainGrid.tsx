@@ -10,6 +10,8 @@ import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
 import { CharacterContext, SessionContext } from "../context/Context";
 import ResponsiveAppBar from "./AppBar/AppBar";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@emotion/react";
 
 interface Grouped {
   [key: string]: AccessToken[];
@@ -91,7 +93,7 @@ export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
               sm={compactMode ? 6 : 12}
               key={`account-${id}-${g[0].account}`}
             >
-              <AccountCard characters={g} sessionReady={sessionReady} />
+              <AccountCard characters={g} />
             </Grid>
           ))}
         </Grid>

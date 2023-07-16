@@ -1,9 +1,17 @@
 import { Api } from "@/esi-api";
 import { AccessToken, Planet } from "@/types";
-import { Stack, styled } from "@mui/material";
+import { Stack, styled, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { PlanetCard } from "./PlanetCard";
 import { NoPlanetCard } from "./NoPlanetCard";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { PlanetTableRow } from "./PlanetTableRow";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -26,16 +34,51 @@ const getPlanets = async (character: AccessToken): Promise<Planet[]> => {
   return planets;
 };
 
-export const PlanetaryInteractionRow = ({
+const PlanetaryIteractionTable = ({
   character,
+  planets,
 }: {
   character: AccessToken;
+  planets: Planet[];
 }) => {
-  const [planets, setPlanets] = useState<Planet[]>([]);
-  useEffect(() => {
-    getPlanets(character).then(setPlanets).catch(console.log);
-  }, [character]);
+  return (
+    <StackItem width="100%">
+      <TableContainer component={Paper}>
+        <Table size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableCell width="13%">Planet</TableCell>
+              <TableCell width="2%">CC</TableCell>
+              <TableCell width="20%">Extraction</TableCell>
+              <TableCell width="20%">Production</TableCell>
+              <TableCell width="20%">Imports</TableCell>
+              <TableCell width="20%">Exports</TableCell>
+              <TableCell width="5%">u/h</TableCell>
+              <TableCell width="5%">MISK/h</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {planets.map((planet) => (
+              <PlanetTableRow
+                key={`${character.character.characterId}-${planet.planet_id}`}
+                planet={planet}
+                character={character}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </StackItem>
+  );
+};
 
+const PlanetaryInteractionIconsRow = ({
+  character,
+  planets,
+}: {
+  character: AccessToken;
+  planets: Planet[];
+}) => {
   return (
     <StackItem>
       <Stack spacing={2} direction="row" flexWrap="wrap">
@@ -53,5 +96,23 @@ export const PlanetaryInteractionRow = ({
         ))}
       </Stack>
     </StackItem>
+  );
+};
+
+export const PlanetaryInteractionRow = ({
+  character,
+}: {
+  character: AccessToken;
+}) => {
+  const [planets, setPlanets] = useState<Planet[]>([]);
+  const theme = useTheme();
+  useEffect(() => {
+    getPlanets(character).then(setPlanets).catch(console.log);
+  }, [character]);
+
+  return theme.custom.compactMode ? (
+    <PlanetaryInteractionIconsRow planets={planets} character={character} />
+  ) : (
+    <PlanetaryIteractionTable planets={planets} character={character} />
   );
 };

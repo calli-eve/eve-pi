@@ -79,8 +79,7 @@ export interface EvePraisalRequest {
   items: { amount: number; typeId: number }[];
 }
 
-const PRAISAL_URL =
-  "https://evepraisal.com/appraisal/structured.json?persist=no";
+const PRAISAL_URL = process.env.NEXT_PUBLIC_PRAISAL_URL ?? "";
 
 export const getPraisal = async (
   items: { quantity: number; type_id: number }[]

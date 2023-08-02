@@ -290,21 +290,22 @@ export const PlanetTableRow = ({
             textAlign: "end",
           }}
         >
-          {exports.map((e) => (
-            <Typography
-              key={`export-praisal-${character.character.characterId}-${planet.planet_id}-${e.typeId}`}
-              fontSize={theme.custom.smallText}
-            >
-              {`${(
-                (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
-                  ?.prices.sell.min ?? 0) *
-                  e.amount) /
-                  1000000) *
-                24 *
-                30
-              ).toFixed(2)} M`}
-            </Typography>
-          ))}
+          {exports.map((e) => {
+            const valueInMillions = (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
+              ?.prices.sell.min ?? 0) * e.amount) / 1000000) * 24 * 30;
+            const displayValue = valueInMillions >= 1000
+              ? `${(valueInMillions / 1000).toFixed(2)} B`
+              : `${valueInMillions.toFixed(2)} M`;
+
+            return (
+              <Typography
+                key={`export-praisal-${character.character.characterId}-${planet.planet_id}-${e.typeId}`}
+                fontSize={theme.custom.smallText}
+              >
+                {displayValue}
+              </Typography>
+            );
+          })}
         </div>
       </TableCell>
       <TableCell>

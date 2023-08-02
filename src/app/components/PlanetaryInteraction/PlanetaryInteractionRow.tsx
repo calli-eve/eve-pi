@@ -49,7 +49,7 @@ const PlanetaryIteractionTable = ({
         <Table size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell width="13%">
+              <TableCell width="8%">
                 <Typography fontSize={theme.custom.smallText}>
                   Planet
                 </Typography>
@@ -59,7 +59,7 @@ const PlanetaryIteractionTable = ({
                   <Typography fontSize={theme.custom.smallText}>CC</Typography>
                 </Tooltip>
               </TableCell>
-              <TableCell width="20%">
+              <TableCell width="24%">
                 <Tooltip title="Extractor status and products">
                   <Typography fontSize={theme.custom.smallText}>
                     Extraction
@@ -87,12 +87,12 @@ const PlanetaryIteractionTable = ({
                   </Typography>
                 </Tooltip>
               </TableCell>
-              <TableCell width="5%">
+              <TableCell width="2%">
                 <Tooltip title="How many units per hour factories are producing">
                   <Typography fontSize={theme.custom.smallText}>u/h</Typography>
                 </Tooltip>
               </TableCell>
-              <TableCell width="5%">
+              <TableCell width="4%" align="right">
                 <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
                   <Typography fontSize={theme.custom.smallText}>
                     ISK/M

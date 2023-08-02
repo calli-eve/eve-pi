@@ -195,12 +195,13 @@ export const PlanetTableRow = ({
             planet.planet_type.slice(1)
           } planet.`}
         >
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", minWidth: "8em" }}>
             <Image
               src={`/${planet.planet_type}.png`}
               alt=""
               width={theme.custom.cardImageSize / 6}
               height={theme.custom.cardImageSize / 6}
+              style={{marginRight: "5px"}}
             />
             {planetInfoUniverse?.name}
           </div>
@@ -288,7 +289,7 @@ export const PlanetTableRow = ({
         </div>
       </TableCell>
       <TableCell>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", minWidth: "4em", textAlign: "end" }}>
           {exports.map((e) => (
             <Typography
               key={`export-praisal-${character.character.characterId}-${planet.planet_id}-${e.typeId}`}

@@ -921,7 +921,11 @@ export const PI_SCHEMATICS = [
 ];
 
 export const FACTORY_IDS = () =>
-  PI_TYPES_ARRAY.filter((t) => t.name.indexOf("Industry Facility") !== -1);
+  PI_TYPES_ARRAY.filter(
+    (t) =>
+      t.name.indexOf("Industry Facility") !== -1 ||
+      t.name.indexOf("High-Tech Production Plant") !== -1
+  );
 
 export const STORAGE_IDS = () =>
   PI_TYPES_ARRAY.filter(

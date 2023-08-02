@@ -1,14 +1,7 @@
 import { Button, Tooltip, Typography, useTheme } from "@mui/material";
 import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
 import { Api } from "@/esi-api";
-import {
-  Dispatch,
-  SetStateAction,
-  forwardRef,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { forwardRef, useContext, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import {
   EXTRACTOR_TYPE_IDS,
@@ -201,7 +194,7 @@ export const PlanetTableRow = ({
               alt=""
               width={theme.custom.cardImageSize / 6}
               height={theme.custom.cardImageSize / 6}
-              style={{marginRight: "5px"}}
+              style={{ marginRight: "5px" }}
             />
             {planetInfoUniverse?.name}
           </div>
@@ -289,7 +282,14 @@ export const PlanetTableRow = ({
         </div>
       </TableCell>
       <TableCell>
-        <div style={{ display: "flex", flexDirection: "column", minWidth: "4em", textAlign: "end" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            minWidth: "4em",
+            textAlign: "end",
+          }}
+        >
           {exports.map((e) => (
             <Typography
               key={`export-praisal-${character.character.characterId}-${planet.planet_id}-${e.typeId}`}

@@ -224,7 +224,10 @@ export const PlanetTableRow = ({
                   )}
                 </Typography>
                 <Typography fontSize={theme.custom.smallText}>
-                  {PI_TYPES_MAP[e.extractor_details?.product_type_id ?? 0].name}
+                  {
+                    PI_TYPES_MAP[e.extractor_details?.product_type_id ?? 0]
+                      ?.name
+                  }
                 </Typography>
               </div>
             );
@@ -291,11 +294,17 @@ export const PlanetTableRow = ({
           }}
         >
           {exports.map((e) => {
-            const valueInMillions = (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
-              ?.prices.sell.min ?? 0) * e.amount) / 1000000) * 24 * 30;
-            const displayValue = valueInMillions >= 1000
-              ? `${(valueInMillions / 1000).toFixed(2)} B`
-              : `${valueInMillions.toFixed(2)} M`;
+            const valueInMillions =
+              (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
+                ?.prices.sell.min ?? 0) *
+                e.amount) /
+                1000000) *
+              24 *
+              30;
+            const displayValue =
+              valueInMillions >= 1000
+                ? `${(valueInMillions / 1000).toFixed(2)} B`
+                : `${valueInMillions.toFixed(2)} M`;
 
             return (
               <Typography

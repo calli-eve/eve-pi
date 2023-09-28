@@ -166,12 +166,16 @@ export const PlanetTableRow = ({
   };
 
   const timeColor = (extractorDate: string | undefined): string => {
-    if (!extractorDate) return "red";
+    if (!extractorDate) return "#AB324A";
     const dateExtractor = DateTime.fromISO(extractorDate);
     const dateNow = DateTime.now();
-    if (dateExtractor < dateNow) return "red";
-    if (dateExtractor.minus({ hours: 24 }) < dateNow) return "yellow";
-    return "green";
+    if (dateExtractor < dateNow) return "#AB324A";
+    if (dateExtractor.minus({ hours: 2 }) < dateNow) return "#9C4438";
+    if (dateExtractor.minus({ hours: 4 }) < dateNow) return "#765B21";
+    if (dateExtractor.minus({ hours: 8 }) < dateNow) return "#63620D";
+    if (dateExtractor.minus({ hours: 12 }) < dateNow) return "#2C6C2F";
+    if (dateExtractor.minus({ hours: 24 }) < dateNow) return "#2F695A";
+    return "#006596";
   };
 
   useEffect(() => {

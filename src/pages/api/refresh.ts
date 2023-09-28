@@ -1,7 +1,7 @@
 import { AccessToken } from "@/types";
 import { extractCharacterFromToken } from "@/utils";
-import { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto-js";
+import { NextApiRequest, NextApiResponse } from "next";
 
 const EVE_SSO_TOKEN_URL = "https://login.eveonline.com/v2/oauth/token";
 const EVE_SSO_CLIENT_ID = process.env.EVE_SSO_CLIENT_ID ?? "";
@@ -46,6 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         character,
         needsLogin: false,
         account: accessToken.account,
+        comment: accessToken.comment
       };
 
       console.log("Refresh", character.name, character.characterId);

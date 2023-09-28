@@ -16,9 +16,11 @@ export const CharacterDialog = ({
   updateCharacter: (characer: AccessToken, update: CharacterUpdate) => void;
 }) => {
   const [account, setAccount] = useState("");
+  const [comment, setComment] = useState("");
 
   useEffect(() => {
     if (character?.account) setAccount(character.account);
+    if (character?.comment) setComment(character.comment);
   }, [character]);
 
   const logout = (character: AccessToken) => {
@@ -29,8 +31,8 @@ export const CharacterDialog = ({
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter") {
-      character && updateCharacter(character, { account });
       closeDialog();
+      character && updateCharacter(character, { account, comment });
     }
   };
 
@@ -46,10 +48,20 @@ export const CharacterDialog = ({
         onChange={(event) => setAccount(event.target.value)}
         onKeyDown={handleKeyDown}
       />
+      <TextField
+        id="outlined-basic"
+        label="Comment"
+        variant="outlined"
+        value={comment ?? ""}
+        sx={{ margin: 1 }}
+        multiline={true}
+        onChange={(event) => setComment(event.target.value)}
+        onKeyDown={handleKeyDown}
+      />
       <DialogActions>
         <Button
           onClick={() => {
-            character && updateCharacter(character, { account });
+            character && updateCharacter(character, { account, comment });
             closeDialog();
           }}
           variant="contained"

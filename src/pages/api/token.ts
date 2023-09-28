@@ -47,6 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       character,
       needsLogin: false,
       account: "-",
+      comment: "",
     };
     res.json(token);
   } else {

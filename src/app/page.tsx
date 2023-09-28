@@ -42,6 +42,7 @@ const Home = () => {
         return {
           ...c,
           ...(updates.account ? { account: updates.account } : {}),
+          ...(updates.comment ? { comment: updates.comment } : {}),
         };
       return c;
     });

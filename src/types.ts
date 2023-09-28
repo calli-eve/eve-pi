@@ -8,6 +8,7 @@ export interface AccessToken {
   character: Character;
   account: string;
   needsLogin: boolean;
+  comment: string;
 }
 
 export interface Character {
@@ -28,6 +29,7 @@ export interface CharacterPlanets {
 
 export interface CharacterUpdate {
   account?: string;
+  comment?: string;
 }
 
 export type Planet = EsiType<"v1", "getCharactersCharacterIdPlanets">[number];

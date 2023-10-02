@@ -1,26 +1,26 @@
-import { Button, Tooltip, Typography, useTheme } from "@mui/material";
-import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
-import { Api } from "@/esi-api";
-import { forwardRef, useContext, useEffect, useState } from "react";
-import { DateTime } from "luxon";
+import { SessionContext } from "@/app/context/Context";
 import {
   EXTRACTOR_TYPE_IDS,
   FACTORY_IDS,
   PI_SCHEMATICS,
   PI_TYPES_MAP,
 } from "@/const";
+import { Api } from "@/esi-api";
+import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
+import CloseIcon from "@mui/icons-material/Close";
+import { Button, Tooltip, Typography, useTheme } from "@mui/material";
+import AppBar from "@mui/material/AppBar";
+import Dialog from "@mui/material/Dialog";
+import IconButton from "@mui/material/IconButton";
+import Slide from "@mui/material/Slide";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import Countdown from "react-countdown";
-import Image from "next/image";
-import { SessionContext } from "@/app/context/Context";
-import Slide from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
+import { TransitionProps } from "@mui/material/transitions";
+import { DateTime } from "luxon";
+import Image from "next/image";
+import React, { forwardRef, useContext, useEffect, useState } from "react";
+import Countdown from "react-countdown";
 import PinsCanvas3D from "./PinsCanvas3D";
 
 const Transition = forwardRef(function Transition(
@@ -134,16 +134,17 @@ export const PlanetTableRow = ({
     const localExports = locallyProduced
       .filter((p) => !locallyConsumed.some((lp) => lp === p))
       .map((typeId) => {
-        const schematic = PI_SCHEMATICS.flatMap((s) => s.outputs).find(
+        const outputs = PI_SCHEMATICS.flatMap((s) => s.outputs).find(
           (s) => s.type_id === typeId
         );
-        if (!schematic) return { typeId, amount: 0 };
+        if (!outputs) return { typeId, amount: 0 };
+        const cycleTime = PI_SCHEMATICS.find(s => s.schematic_id === outputs.schematic_id)?.cycle_time ?? 3600
         const factoriesProducing = planetInfo.pins
           .filter((p) => FACTORY_IDS().some((e) => e.type_id === p.type_id))
-          .filter((f) => f.schematic_id === schematic?.schematic_id);
-        const amount = schematic.quantity
-          ? factoriesProducing.length * schematic.quantity
-          : (0 * PI_SCHEMATICS[schematic.schematic_id].cycle_time) / 3600;
+          .filter((f) => f.schematic_id === outputs?.schematic_id);
+        const amount = outputs.quantity
+          ? factoriesProducing.length * outputs.quantity * (3600 / cycleTime)
+          : 0;
         return {
           typeId,
           amount,

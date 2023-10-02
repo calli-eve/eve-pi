@@ -35,6 +35,8 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/luxon": "^3.3.0",
-    "@types/three": "^0.152.1"
+    "@types/three": "^0.152.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "3.0.3"
   }
 }

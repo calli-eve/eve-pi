@@ -2,7 +2,7 @@ import { Stack, Typography, styled, useTheme } from "@mui/material";
 import Image from "next/image";
 import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
 import { Api } from "@/esi-api";
-import { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
 import Countdown from "react-countdown";

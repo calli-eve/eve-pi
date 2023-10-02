@@ -9,7 +9,7 @@ const StackItem = styled(Stack)(({ theme }) => ({
   alignItems: "center",
 }));
 
-export const NoPlanetCard = ({}: {}) => {
+export const NoPlanetCard = () => {
   const theme = useTheme();
   return (
     <StackItem

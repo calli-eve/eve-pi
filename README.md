@@ -2,7 +2,7 @@
 
 Simple tool to track your PI planet extractors. Login with your characters and enjoy the PI!
 
-Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://discord.gg/MDapvGyw)
+Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://discord.gg/qQK7vu3y9)
 
 ## [Avanto hosted PI tool](https://pi.avanto.tk)
 

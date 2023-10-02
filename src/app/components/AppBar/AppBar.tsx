@@ -1,25 +1,26 @@
-import * as React from "react";
+import MenuIcon from "@mui/icons-material/Menu";
+import PublicIcon from "@mui/icons-material/Public";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import PublicIcon from "@mui/icons-material/Public";
-import { LoginButton } from "../Login/LoginButton";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import * as React from "react";
 import { DowloadButton } from "../Backup/DowloadButton";
 import { UploadButton } from "../Backup/UploadButton";
-import { DiscordButton } from "../Discord/DiscordButton";
-import { GitHubButton } from "../Github/GitHubButton";
 import { CCPButton } from "../CCP/CCPButton";
 import { CompactModeButton } from "../CompactModeButton/CompactModeButton";
+import { DiscordButton } from "../Discord/DiscordButton";
+import { GitHubButton } from "../Github/GitHubButton";
+import { LoginButton } from "../Login/LoginButton";
+import { PlanModeButton } from "../PlanModeButton/PlanModeButton";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
+    null,
   );
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -103,6 +104,9 @@ function ResponsiveAppBar() {
               <MenuItem onClick={handleCloseNavMenu}>
                 <CompactModeButton />
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <PlanModeButton />
+              </MenuItem>
             </Menu>
           </Box>
           <PublicIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
@@ -129,6 +133,7 @@ function ResponsiveAppBar() {
               flexGrow: 1,
               display: { xs: "none", md: "flex" },
               alignItems: "center",
+              gap: "0.2rem"
             }}
           >
             <LoginButton />
@@ -138,6 +143,7 @@ function ResponsiveAppBar() {
             <GitHubButton />
             <CCPButton />
             <CompactModeButton />
+            <PlanModeButton />
           </Box>
         </Toolbar>
       </Container>

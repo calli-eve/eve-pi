@@ -22,6 +22,8 @@ export const SessionContext = createContext<{
   EVE_SSO_CLIENT_ID: string;
   compactMode: boolean;
   toggleCompactMode: () => void;
+  planMode: boolean;
+  togglePlanMode: () => void;
   piPrices: EvePraisalResult | undefined;
 }>({
   sessionReady: false,
@@ -31,5 +33,7 @@ export const SessionContext = createContext<{
   EVE_SSO_CLIENT_ID: "",
   compactMode: false,
   toggleCompactMode: () => {},
+  planMode: false,
+  togglePlanMode: () => {},
   piPrices: undefined,
 });

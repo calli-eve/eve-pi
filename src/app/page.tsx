@@ -16,6 +16,7 @@ const Home = () => {
   const [sessionReady, setSessionReady] = useState(false);
   const [environment, setEnvironment] = useState<Env | undefined>(undefined);
   const [compactMode, setCompactMode] = useState(false);
+  const [planMode, setPlanMode] = useState(false);
   const [piPrices, setPiPrices] = useState<EvePraisalResult | undefined>(
     undefined
   );
@@ -87,6 +88,10 @@ const Home = () => {
     setCompactMode(!compactMode);
   };
 
+  const togglePlanMode = () => {
+    setPlanMode(!planMode)
+  }
+
   useEffect(() => {
     const storedCompactMode = localStorage.getItem("compactMode");
     if (!storedCompactMode) return;
@@ -139,6 +144,8 @@ const Home = () => {
         EVE_SSO_CLIENT_ID: environment?.EVE_SSO_CLIENT_ID ?? "",
         compactMode,
         toggleCompactMode,
+        planMode,
+        togglePlanMode,
         piPrices,
       }}
     >
@@ -150,7 +157,7 @@ const Home = () => {
           restoreCharacters,
         }}
       >
-        <MainGrid sessionReady={sessionReady} />
+        <MainGrid />
       </CharacterContext.Provider>
     </SessionContext.Provider>
   );

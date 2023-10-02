@@ -37,7 +37,11 @@ export const CharacterDialog = ({
   };
 
   return (
-    <Dialog open={character !== undefined} onClose={closeDialog}>
+    <Dialog
+      open={character !== undefined}
+      onClose={closeDialog}
+      fullWidth={true}
+    >
       <DialogTitle>{character && character.character.name}</DialogTitle>
       <TextField
         id="outlined-basic"
@@ -50,13 +54,13 @@ export const CharacterDialog = ({
       />
       <TextField
         id="outlined-basic"
-        label="Comment"
+        label="Comment / Plan"
         variant="outlined"
         value={comment ?? ""}
         sx={{ margin: 1 }}
         multiline={true}
+        minRows={6}
         onChange={(event) => setComment(event.target.value)}
-        onKeyDown={handleKeyDown}
       />
       <DialogActions>
         <Button

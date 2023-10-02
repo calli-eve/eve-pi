@@ -10,8 +10,6 @@ import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
 import { CharacterContext, SessionContext } from "../context/Context";
 import ResponsiveAppBar from "./AppBar/AppBar";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@emotion/react";
 
 interface Grouped {
   [key: string]: AccessToken[];
@@ -38,7 +36,7 @@ declare module "@mui/material/styles" {
   }
 }
 
-export const MainGrid = ({ sessionReady }: { sessionReady: boolean }) => {
+export const MainGrid = () => {
   const { characters } = useContext(CharacterContext);
   const groupByAccount = characters.reduce<Grouped>((group, character) => {
     const { account } = character;

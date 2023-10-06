@@ -36,8 +36,8 @@ export const SessionContext = createContext<{
   planMode: false,
   togglePlanMode: () => {},
   piPrices: undefined,
-})
-export type ColorContextType = {
+});
+export type ColorSelectionType = {
   defaultColor: string;
   expiredColor: string;
   twoHoursColor: string;
@@ -46,16 +46,22 @@ export type ColorContextType = {
   twelveHoursColor: string;
   dayColor: string;
   twoDaysColor: string;
+};
 
-}
-export const ColorContext = createContext<ColorContextType>({
-  defaultColor: '#006596',
-  expiredColor: '#AB324A',
-  twoHoursColor: '#9C4438',
-  fourHoursColor: '#765B21',
-  eightHoursColor: '#63620D',
-  twelveHoursColor: '#2C6C2F',
-  dayColor: '#2F695A',
-  twoDaysColor: '#2F695A',
+export const defaultColors = {
+  defaultColor: "#006596",
+  expiredColor: "#AB324A",
+  twoHoursColor: "#9C4438",
+  fourHoursColor: "#765B21",
+  eightHoursColor: "#63620D",
+  twelveHoursColor: "#2C6C2F",
+  dayColor: "#2F695A",
+  twoDaysColor: "#2F695A",
+};
+export const ColorContext = createContext<{
+  colors: ColorSelectionType;
+  setColors: (colors: ColorSelectionType) => void;
+}>({
+  colors: defaultColors,
+  setColors: () => {}
 });
-

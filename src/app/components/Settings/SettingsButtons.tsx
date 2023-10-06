@@ -1,10 +1,22 @@
-import { SessionContext } from "@/app/context/Context";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Tooltip } from "@mui/material";
+import {
+  ColorContext,
+  ColorSelectionType,
+} from "@/app/context/Context";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { ColorChangeHandler, ColorResult, CompactPicker } from "react-color";
 import React from "react";
 import { useContext } from "react";
 
 export const SettingsButton = () => {
-  const { compactMode, toggleCompactMode } = useContext(SessionContext);
+  const { colors, setColors } = useContext(ColorContext);
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -14,6 +26,14 @@ export const SettingsButton = () => {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleColorSelection = (key: string, currentColors: ColorSelectionType) => (selection: ColorResult) => {
+    console.log(key, selection.hex)
+    setColors({
+      ...currentColors,
+      [key]: selection.hex
+    })
+  };
+
   return (
     <Tooltip title="Toggle settings dialog">
       <>
@@ -27,17 +47,21 @@ export const SettingsButton = () => {
           <DialogTitle id="alert-dialog-title">
             {"Override default timer colors"}
           </DialogTitle>
-          <DialogContent style={{ paddingTop: '1rem'}}>
-            <TextField
-              label="Required"
-              defaultValue="Hello World"
-            />
+          <DialogContent style={{ paddingTop: "1rem" }}>
+            {Object.keys(colors).map((key) => {
+              return (
+                <div key={`color-row-${key}`}>
+                  <Typography>{key}</Typography>
+                  <CompactPicker
+                    color={colors[key as keyof ColorSelectionType]}
+                    onChangeComplete={handleColorSelection(key, colors)}
+                  />
+                </div>
+              );
+            })}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Disagree</Button>
-            <Button onClick={handleClose} autoFocus>
-              Agree
-            </Button>
+            <Button onClick={handleClose}>Close</Button>
           </DialogActions>
         </Dialog>
       </>

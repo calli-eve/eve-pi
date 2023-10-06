@@ -7,7 +7,13 @@ import { memo, useCallback, useEffect, useState } from "react";
 import { AccessToken, CharacterUpdate, Env } from "../types";
 import { MainGrid } from "./components/MainGrid";
 import { refreshToken } from "@/esi-sso";
-import { CharacterContext, SessionContext } from "./context/Context";
+import {
+  CharacterContext,
+  ColorContext,
+  ColorSelectionType,
+  SessionContext,
+  defaultColors,
+} from "./context/Context";
 import { useSearchParams } from "next/navigation";
 import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
 
@@ -18,9 +24,9 @@ const Home = () => {
   const [compactMode, setCompactMode] = useState(false);
   const [planMode, setPlanMode] = useState(false);
   const [piPrices, setPiPrices] = useState<EvePraisalResult | undefined>(
-    undefined
+    undefined,
   );
-
+  const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
   const searchParams = useSearchParams();
   const code = searchParams && searchParams.get("code");
 
@@ -28,7 +34,7 @@ const Home = () => {
 
   const deleteCharacter = (character: AccessToken) => {
     const charactersToSave = characters.filter(
-      (c) => character.character.characterId !== c.character.characterId
+      (c) => character.character.characterId !== c.character.characterId,
     );
     setCharacters(charactersToSave);
     saveCharacters(charactersToSave);
@@ -36,7 +42,7 @@ const Home = () => {
 
   const updateCharacter = (
     character: AccessToken,
-    updates: CharacterUpdate
+    updates: CharacterUpdate,
   ) => {
     const charactersToSave = characters.map((c) => {
       if (c.character.characterId === character.character.characterId)
@@ -56,7 +62,7 @@ const Home = () => {
   };
 
   const handleCallback = async (
-    characters: AccessToken[]
+    characters: AccessToken[],
   ): Promise<AccessToken[]> => {
     if (code) {
       window.history.replaceState(null, "", "/");
@@ -89,18 +95,27 @@ const Home = () => {
   };
 
   const togglePlanMode = () => {
-    setPlanMode(!planMode)
-  }
+    setPlanMode(!planMode);
+  };
 
   useEffect(() => {
     const storedCompactMode = localStorage.getItem("compactMode");
     if (!storedCompactMode) return;
     storedCompactMode === "true" ? setCompactMode(true) : false;
   }, []);
+  useEffect(() => {
+    const storedColors = localStorage.getItem("colors");
+    if (!storedColors) return;
+    setColors(JSON.parse(storedColors))
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("compactMode", compactMode ? "true" : "false");
   }, [compactMode]);
+
+  useEffect(() => {
+    localStorage.setItem("colors", JSON.stringify(colors))
+  }, [colors]);
 
   // Initialize EVE PI
   useEffect(() => {
@@ -157,7 +172,9 @@ const Home = () => {
           restoreCharacters,
         }}
       >
-        <MainGrid />
+        <ColorContext.Provider value={{ colors: colors, setColors: setColors }}>
+          <MainGrid />
+        </ColorContext.Provider>
       </CharacterContext.Provider>
     </SessionContext.Provider>
   );

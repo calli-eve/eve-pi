@@ -1,8 +1,4 @@
-import {
-  SessionContext,
-  ColorContext,
-  ColorContextType,
-} from "@/app/context/Context";
+import { SessionContext, ColorContext } from "@/app/context/Context";
 import {
   EXTRACTOR_TYPE_IDS,
   FACTORY_IDS,
@@ -178,7 +174,7 @@ export const PlanetTableRow = ({
     getPlanetUniverse(planet).then(setPlanetInfoUniverse);
   }, [planet, character]);
 
-  const colorContext = useContext(ColorContext);
+  const { colors } = useContext(ColorContext);
   return (
     <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
       <TableCell component="th" scope="row">
@@ -210,7 +206,7 @@ export const PlanetTableRow = ({
                 style={{ display: "flex" }}
               >
                 <Typography
-                  color={timeColor(e.expiry_time, colorContext)}
+                  color={timeColor(e.expiry_time, colors)}
                   fontSize={theme.custom.smallText}
                   paddingRight={1}
                 >

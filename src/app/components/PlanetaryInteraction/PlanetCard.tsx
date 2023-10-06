@@ -31,7 +31,7 @@ const Transition = forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
   },
-  ref: React.Ref<unknown>
+  ref: React.Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -44,7 +44,7 @@ export const PlanetCard = ({
   character: AccessToken;
 }) => {
   const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
-    undefined
+    undefined,
   );
 
   const [planetInfoUniverse, setPlanetInfoUniverse] = useState<
@@ -71,7 +71,7 @@ export const PlanetCard = ({
     [];
   const getPlanet = async (
     character: AccessToken,
-    planet: Planet
+    planet: Planet,
   ): Promise<PlanetInfo> => {
     const api = new Api();
     const planetInfo = (
@@ -80,14 +80,14 @@ export const PlanetCard = ({
         planet.planet_id,
         {
           token: character.access_token,
-        }
+        },
       )
     ).data;
     return planetInfo;
   };
 
   const getPlanetUniverse = async (
-    planet: Planet
+    planet: Planet,
   ): Promise<PlanetInfoUniverse> => {
     const api = new Api();
     const planetInfo = (
@@ -96,7 +96,7 @@ export const PlanetCard = ({
     return planetInfo;
   };
 
-  const colorContext = useContext(ColorContext)
+  const { colors } = useContext(ColorContext);
 
   useEffect(() => {
     getPlanet(character, planet).then(setPlanetInfo);
@@ -144,7 +144,7 @@ export const PlanetCard = ({
         return (
           <Typography
             key={`${e}-${idx}-${character.character.characterId}`}
-            color={timeColor(e, colorContext)}
+            color={timeColor(e, colors)}
             fontSize={theme.custom.smallText}
           >
             {e ? (

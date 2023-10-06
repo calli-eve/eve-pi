@@ -1,9 +1,9 @@
-import { ColorContextType } from "@/app/context/Context";
+import { ColorSelectionType } from "@/app/context/Context";
 import { DateTime } from "luxon";
 
 export const timeColor = (
   extractorDate: string | undefined,
-  colors: ColorContextType,
+  colors: ColorSelectionType,
 ): string => {
   if (!extractorDate) return colors.expiredColor;
   const dateExtractor = DateTime.fromISO(extractorDate);

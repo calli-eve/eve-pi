@@ -17,6 +17,7 @@ import { DiscordButton } from "../Discord/DiscordButton";
 import { GitHubButton } from "../Github/GitHubButton";
 import { LoginButton } from "../Login/LoginButton";
 import { PlanModeButton } from "../PlanModeButton/PlanModeButton";
+import { SettingsButton } from "../Settings/SettingsButtons";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -102,6 +103,9 @@ function ResponsiveAppBar() {
                 <CCPButton />
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
+                <SettingsButton />
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
                 <CompactModeButton />
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
@@ -142,6 +146,7 @@ function ResponsiveAppBar() {
             <DiscordButton />
             <GitHubButton />
             <CCPButton />
+            <SettingsButton />
             <CompactModeButton />
             <PlanModeButton />
           </Box>

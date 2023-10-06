@@ -2,7 +2,7 @@ import { Stack, Typography, styled, useTheme } from "@mui/material";
 import Image from "next/image";
 import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
 import { Api } from "@/esi-api";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
 import Countdown from "react-countdown";
@@ -15,6 +15,8 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
+import { timeColor } from "./timeColors";
+import { ColorContext } from "@/app/context/Context";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -94,18 +96,7 @@ export const PlanetCard = ({
     return planetInfo;
   };
 
-  const timeColor = (extractorDate: string | undefined): string => {
-    if (!extractorDate) return "#AB324A";
-    const dateExtractor = DateTime.fromISO(extractorDate);
-    const dateNow = DateTime.now();
-    if (dateExtractor < dateNow) return "#AB324A";
-    if (dateExtractor.minus({ hours: 2 }) < dateNow) return "#9C4438";
-    if (dateExtractor.minus({ hours: 4 }) < dateNow) return "#765B21";
-    if (dateExtractor.minus({ hours: 8 }) < dateNow) return "#63620D";
-    if (dateExtractor.minus({ hours: 12 }) < dateNow) return "#2C6C2F";
-    if (dateExtractor.minus({ hours: 24 }) < dateNow) return "#2F695A";
-    return "#006596";
-  };
+  const colorContext = useContext(ColorContext)
 
   useEffect(() => {
     getPlanet(character, planet).then(setPlanetInfo);
@@ -153,7 +144,7 @@ export const PlanetCard = ({
         return (
           <Typography
             key={`${e}-${idx}-${character.character.characterId}`}
-            color={timeColor(e)}
+            color={timeColor(e, colorContext)}
             fontSize={theme.custom.smallText}
           >
             {e ? (

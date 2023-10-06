@@ -1,4 +1,8 @@
-import { SessionContext } from "@/app/context/Context";
+import {
+  SessionContext,
+  ColorContext,
+  ColorContextType,
+} from "@/app/context/Context";
 import {
   EXTRACTOR_TYPE_IDS,
   FACTORY_IDS,
@@ -22,12 +26,13 @@ import Image from "next/image";
 import React, { forwardRef, useContext, useEffect, useState } from "react";
 import Countdown from "react-countdown";
 import PinsCanvas3D from "./PinsCanvas3D";
+import { timeColor } from "./timeColors";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
   },
-  ref: React.Ref<unknown>
+  ref: React.Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -53,7 +58,7 @@ export const PlanetTableRow = ({
 
   const { piPrices } = useContext(SessionContext);
   const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
-    undefined
+    undefined,
   );
 
   const [planetInfoUniverse, setPlanetInfoUniverse] = useState<
@@ -62,7 +67,7 @@ export const PlanetTableRow = ({
 
   const [extractors, setExtractors] = useState<PlanetInfo["pins"]>([]);
   const [production, setProduction] = useState(
-    new Map<SchematicId, (typeof PI_SCHEMATICS)[number]>()
+    new Map<SchematicId, (typeof PI_SCHEMATICS)[number]>(),
   );
 
   const [imports, setImports] = useState<
@@ -70,14 +75,14 @@ export const PlanetTableRow = ({
   >([]);
 
   const [exports, setExports] = useState<{ typeId: number; amount: number }[]>(
-    []
+    [],
   );
 
   type SchematicId = number;
 
   const getPlanet = async (
     character: AccessToken,
-    planet: Planet
+    planet: Planet,
   ): Promise<PlanetInfo> => {
     const api = new Api();
     const planetRes = await api.v3.getCharactersCharacterIdPlanetsPlanetId(
@@ -85,15 +90,15 @@ export const PlanetTableRow = ({
       planet.planet_id,
       {
         token: character.access_token,
-      }
+      },
     );
 
     const planetInfo = planetRes.data;
 
     setExtractors(
       planetInfo.pins.filter((p) =>
-        EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id)
-      )
+        EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id),
+      ),
     );
 
     const localProduction = planetInfo.pins
@@ -101,7 +106,7 @@ export const PlanetTableRow = ({
       .reduce((acc, f) => {
         if (f.schematic_id) {
           const schematic = PI_SCHEMATICS.find(
-            (s) => s.schematic_id == f.schematic_id
+            (s) => s.schematic_id == f.schematic_id,
           );
           if (schematic) acc.set(f.schematic_id, schematic);
         }
@@ -127,18 +132,20 @@ export const PlanetTableRow = ({
       .filter(
         (p) =>
           ![...locallyProduced, ...locallyExcavated].some(
-            (lp) => lp === p.type_id
-          )
+            (lp) => lp === p.type_id,
+          ),
       );
 
     const localExports = locallyProduced
       .filter((p) => !locallyConsumed.some((lp) => lp === p))
       .map((typeId) => {
         const outputs = PI_SCHEMATICS.flatMap((s) => s.outputs).find(
-          (s) => s.type_id === typeId
+          (s) => s.type_id === typeId,
         );
         if (!outputs) return { typeId, amount: 0 };
-        const cycleTime = PI_SCHEMATICS.find(s => s.schematic_id === outputs.schematic_id)?.cycle_time ?? 3600
+        const cycleTime =
+          PI_SCHEMATICS.find((s) => s.schematic_id === outputs.schematic_id)
+            ?.cycle_time ?? 3600;
         const factoriesProducing = planetInfo.pins
           .filter((p) => FACTORY_IDS().some((e) => e.type_id === p.type_id))
           .filter((f) => f.schematic_id === outputs?.schematic_id);
@@ -157,7 +164,7 @@ export const PlanetTableRow = ({
   };
 
   const getPlanetUniverse = async (
-    planet: Planet
+    planet: Planet,
   ): Promise<PlanetInfoUniverse> => {
     const api = new Api();
     const planetInfo = (
@@ -166,24 +173,12 @@ export const PlanetTableRow = ({
     return planetInfo;
   };
 
-  const timeColor = (extractorDate: string | undefined): string => {
-    if (!extractorDate) return "#AB324A";
-    const dateExtractor = DateTime.fromISO(extractorDate);
-    const dateNow = DateTime.now();
-    if (dateExtractor < dateNow) return "#AB324A";
-    if (dateExtractor.minus({ hours: 2 }) < dateNow) return "#9C4438";
-    if (dateExtractor.minus({ hours: 4 }) < dateNow) return "#765B21";
-    if (dateExtractor.minus({ hours: 8 }) < dateNow) return "#63620D";
-    if (dateExtractor.minus({ hours: 12 }) < dateNow) return "#2C6C2F";
-    if (dateExtractor.minus({ hours: 24 }) < dateNow) return "#2F695A";
-    return "#006596";
-  };
-
   useEffect(() => {
     getPlanet(character, planet).then(setPlanetInfo);
     getPlanetUniverse(planet).then(setPlanetInfoUniverse);
   }, [planet, character]);
 
+  const colorContext = useContext(ColorContext);
   return (
     <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
       <TableCell component="th" scope="row">
@@ -215,7 +210,7 @@ export const PlanetTableRow = ({
                 style={{ display: "flex" }}
               >
                 <Typography
-                  color={timeColor(e.expiry_time)}
+                  color={timeColor(e.expiry_time, colorContext)}
                   fontSize={theme.custom.smallText}
                   paddingRight={1}
                 >

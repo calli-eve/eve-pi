@@ -27,6 +27,7 @@ const Home = () => {
     undefined,
   );
   const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
+  const [alertMode, setAlertMode] = useState(false);
   const searchParams = useSearchParams();
   const code = searchParams && searchParams.get("code");
 
@@ -98,15 +99,26 @@ const Home = () => {
     setPlanMode(!planMode);
   };
 
+  const toggleAlertMode = () => {
+    setAlertMode(!alertMode);
+  };
+
   useEffect(() => {
     const storedCompactMode = localStorage.getItem("compactMode");
     if (!storedCompactMode) return;
     storedCompactMode === "true" ? setCompactMode(true) : false;
   }, []);
+
   useEffect(() => {
     const storedColors = localStorage.getItem("colors");
     if (!storedColors) return;
-    setColors(JSON.parse(storedColors))
+    setColors(JSON.parse(storedColors));
+  }, []);
+
+  useEffect(() => {
+    const storedAlertMode = localStorage.getItem("alertMode");
+    if (!storedAlertMode) return;
+    setAlertMode(JSON.parse(storedAlertMode));
   }, []);
 
   useEffect(() => {
@@ -114,7 +126,11 @@ const Home = () => {
   }, [compactMode]);
 
   useEffect(() => {
-    localStorage.setItem("colors", JSON.stringify(colors))
+    localStorage.setItem("alertMode", alertMode ? "true" : "false");
+  }, [alertMode]);
+
+  useEffect(() => {
+    localStorage.setItem("colors", JSON.stringify(colors));
   }, [colors]);
 
   // Initialize EVE PI
@@ -162,6 +178,8 @@ const Home = () => {
         planMode,
         togglePlanMode,
         piPrices,
+        alertMode,
+        toggleAlertMode,
       }}
     >
       <CharacterContext.Provider

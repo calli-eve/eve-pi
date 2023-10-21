@@ -18,6 +18,7 @@ import { GitHubButton } from "../Github/GitHubButton";
 import { LoginButton } from "../Login/LoginButton";
 import { PlanModeButton } from "../PlanModeButton/PlanModeButton";
 import { SettingsButton } from "../Settings/SettingsButtons";
+import { AlertModeButton } from "../AlertModeButton/AlertModeButton";
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -111,6 +112,9 @@ function ResponsiveAppBar() {
               <MenuItem onClick={handleCloseNavMenu}>
                 <PlanModeButton />
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <AlertModeButton />
+              </MenuItem>
             </Menu>
           </Box>
           <PublicIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
@@ -149,6 +153,7 @@ function ResponsiveAppBar() {
             <SettingsButton />
             <CompactModeButton />
             <PlanModeButton />
+            <AlertModeButton />
           </Box>
         </Toolbar>
       </Container>

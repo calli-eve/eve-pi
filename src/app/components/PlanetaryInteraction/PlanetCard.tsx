@@ -15,8 +15,8 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
-import { timeColor } from "./timeColors";
-import { ColorContext } from "@/app/context/Context";
+import { alertModeVisibility, extractorsHaveExpired, timeColor } from "./timeColors";
+import { ColorContext, SessionContext,  } from "@/app/context/Context";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -43,6 +43,8 @@ export const PlanetCard = ({
   planet: Planet;
   character: AccessToken;
 }) => {
+  const { alertMode } = useContext(SessionContext);
+
   const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
     undefined,
   );
@@ -63,7 +65,7 @@ export const PlanetCard = ({
     setPlanetRenderOpen(false);
   };
 
-  const extractors =
+  const extractorsExpiryTime =
     (planetInfo &&
       planetInfo.pins
         .filter((p) => EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id))
@@ -97,6 +99,7 @@ export const PlanetCard = ({
   };
 
   const { colors } = useContext(ColorContext);
+  const expired = extractorsHaveExpired(extractorsExpiryTime) 
 
   useEffect(() => {
     getPlanet(character, planet).then(setPlanetInfo);
@@ -108,6 +111,7 @@ export const PlanetCard = ({
       height="100%"
       position="relative"
       minHeight={theme.custom.cardMinHeight}
+      visibility={alertModeVisibility(alertMode, expired)}
     >
       <Image
         src={`/${planet.planet_type}.png`}
@@ -117,12 +121,7 @@ export const PlanetCard = ({
         style={{ borderRadius: 8, marginRight: 4 }}
         onClick={handle3DrenderOpen}
       />
-      {extractors.some((e) => {
-        if (!e) return true;
-        const dateExtractor = DateTime.fromISO(e);
-        const dateNow = DateTime.now();
-        return dateExtractor < dateNow;
-      }) && (
+      {expired && (
         <Image
           width={32}
           height={32}
@@ -140,7 +139,7 @@ export const PlanetCard = ({
         </Typography>
       </div>
 
-      {extractors.map((e, idx) => {
+      {extractorsExpiryTime.map((e, idx) => {
         return (
           <Typography
             key={`${e}-${idx}-${character.character.characterId}`}

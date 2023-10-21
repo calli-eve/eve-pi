@@ -19,3 +19,17 @@ export const timeColor = (
   if (dateExtractor.minus({ hours: 48 }) < dateNow) return colors.twoDaysColor;
   return colors.defaultColor;
 };
+
+export const extractorsHaveExpired = (extractorsExpiryTime: (string | undefined)[]) =>
+  extractorsExpiryTime.some((e) => {
+    if (!e) return true;
+    const dateExtractor = DateTime.fromISO(e);
+    const dateNow = DateTime.now();
+    return dateExtractor < dateNow;
+  });
+
+export const alertModeVisibility = (alertMode: boolean, expired: boolean) => {
+  if(alertMode && expired) return 'visible'
+  if(alertMode && !expired) return 'collapse'
+  return 'visible'
+}

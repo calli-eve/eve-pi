@@ -22,7 +22,7 @@ import Image from "next/image";
 import React, { forwardRef, useContext, useEffect, useState } from "react";
 import Countdown from "react-countdown";
 import PinsCanvas3D from "./PinsCanvas3D";
-import { timeColor } from "./timeColors";
+import { timeColor, extractorsHaveExpired, alertModeVisibility } from "./timeColors";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -52,7 +52,7 @@ export const PlanetTableRow = ({
     setPlanetRenderOpen(false);
   };
 
-  const { piPrices } = useContext(SessionContext);
+  const { piPrices, alertMode } = useContext(SessionContext);
   const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
     undefined,
   );
@@ -174,9 +174,10 @@ export const PlanetTableRow = ({
     getPlanetUniverse(planet).then(setPlanetInfoUniverse);
   }, [planet, character]);
 
+  const expired = extractorsHaveExpired(extractors.map(e => e.expiry_time)) 
   const { colors } = useContext(ColorContext);
   return (
-    <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+    <TableRow style={{ visibility: alertModeVisibility(alertMode, expired) }} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
       <TableCell component="th" scope="row">
         <Tooltip
           title={`${

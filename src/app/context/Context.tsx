@@ -24,6 +24,8 @@ export const SessionContext = createContext<{
   toggleCompactMode: () => void;
   planMode: boolean;
   togglePlanMode: () => void;
+  alertMode: boolean;
+  toggleAlertMode: () => void;
   piPrices: EvePraisalResult | undefined;
 }>({
   sessionReady: false,
@@ -35,6 +37,8 @@ export const SessionContext = createContext<{
   toggleCompactMode: () => {},
   planMode: false,
   togglePlanMode: () => {},
+  alertMode: false,
+  toggleAlertMode: () => {},
   piPrices: undefined,
 });
 export type ColorSelectionType = {

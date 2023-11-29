@@ -46,6 +46,7 @@ export const CharacterRow = ({ character }: { character: AccessToken }) => {
           onClick={() => setSelectedCharacter(character)}
         >
           <Image
+            unoptimized
             src={`${EVE_IMAGE_URL}/characters/${character.character.characterId}/portrait?size=128`}
             alt=""
             width={theme.custom.cardImageSize}

@@ -114,6 +114,7 @@ export const PlanetCard = ({
       visibility={alertModeVisibility(alertMode, expired)}
     >
       <Image
+        unoptimized
         src={`/${planet.planet_type}.png`}
         alt=""
         width={theme.custom.cardImageSize}
@@ -123,6 +124,7 @@ export const PlanetCard = ({
       />
       {expired && (
         <Image
+          unoptimized
           width={32}
           height={32}
           src={`/stopped.png`}

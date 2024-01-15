@@ -8,7 +8,7 @@ export const CCPButton = () => {
         `}
       >
         <Button
-          href="https://community.eveonline.com/support/policies/eve-online-content-creation-terms-of-use-en/"
+          href="https://support.eveonline.com/hc/en-us/articles/8563917741084-EVE-Online-Content-Creation-Terms-of-Use"
           target="_blank"
           style={{ width: "100%" }}
           sx={{ color: "white", display: "block" }}

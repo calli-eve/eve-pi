@@ -9,6 +9,7 @@ export interface AccessToken {
   account: string;
   needsLogin: boolean;
   comment: string;
+  system: string;
 }
 
 export interface Character {
@@ -30,6 +31,7 @@ export interface CharacterPlanets {
 export interface CharacterUpdate {
   account?: string;
   comment?: string;
+  system?: string;
 }
 
 export type Planet = EsiType<"v1", "getCharactersCharacterIdPlanets">[number];
@@ -52,11 +54,11 @@ type EsiApiPathType<V extends EsiApiVersionType> = keyof InstanceType<
 >[V];
 type EsiApiResponseType<
   V extends EsiApiVersionType,
-  T extends EsiApiPathType<V>
+  T extends EsiApiPathType<V>,
 > = Awaited<ReturnType<InstanceType<typeof Api<unknown>>[V][T]>>;
 export type EsiType<
   V extends EsiApiVersionType,
-  T extends EsiApiPathType<V>
+  T extends EsiApiPathType<V>,
 > = EsiApiResponseType<V, T> extends { data: any }
   ? EsiApiResponseType<V, T>["data"]
   : never;

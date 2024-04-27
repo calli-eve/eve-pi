@@ -20,7 +20,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const headers = {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: `Basic ${Buffer.from(
-        `${EVE_SSO_CLIENT_ID}:${EVE_SSO_SECRET}`
+        `${EVE_SSO_CLIENT_ID}:${EVE_SSO_SECRET}`,
       ).toString("base64")}`,
       Host: "login.eveonline.com",
       "User-Agent": "https://github.com/calli-eve/eve-pi",
@@ -41,13 +41,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       token_type: response.token_type,
       refresh_token: crypto.AES.encrypt(
         response.refresh_token,
-        EVE_SSO_SECRET
+        EVE_SSO_SECRET,
       ).toString(),
       expires_at: Date.now() + response.expires_in * 1000,
       character,
       needsLogin: false,
       account: "-",
       comment: "",
+      system: "",
     };
     res.json(token);
   } else {

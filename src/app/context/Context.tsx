@@ -67,5 +67,5 @@ export const ColorContext = createContext<{
   setColors: (colors: ColorSelectionType) => void;
 }>({
   colors: defaultColors,
-  setColors: () => {}
+  setColors: () => {},
 });

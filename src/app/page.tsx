@@ -51,6 +51,7 @@ const Home = () => {
           ...c,
           ...(updates.account ? { account: updates.account } : {}),
           ...(updates.comment ? { comment: updates.comment } : {}),
+          ...(updates.system ? { system: updates.system } : {}),
         };
       return c;
     });

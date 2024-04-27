@@ -17,10 +17,12 @@ export const CharacterDialog = ({
 }) => {
   const [account, setAccount] = useState("");
   const [comment, setComment] = useState("");
+  const [system, setSystem] = useState("");
 
   useEffect(() => {
     if (character?.account) setAccount(character.account);
     if (character?.comment) setComment(character.comment);
+    if (character?.system) setSystem(character.system);
   }, [character]);
 
   const logout = (character: AccessToken) => {
@@ -54,6 +56,15 @@ export const CharacterDialog = ({
       />
       <TextField
         id="outlined-basic"
+        label="System"
+        variant="outlined"
+        value={system ?? ""}
+        sx={{ margin: 1 }}
+        minRows={6}
+        onChange={(event) => setSystem(event.target.value)}
+      />
+      <TextField
+        id="outlined-basic"
         label="Comment / Plan"
         variant="outlined"
         value={comment ?? ""}
@@ -62,10 +73,12 @@ export const CharacterDialog = ({
         minRows={6}
         onChange={(event) => setComment(event.target.value)}
       />
+
       <DialogActions>
         <Button
           onClick={() => {
-            character && updateCharacter(character, { account, comment });
+            character &&
+              updateCharacter(character, { account, comment, system });
             closeDialog();
           }}
           variant="contained"

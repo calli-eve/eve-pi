@@ -15,8 +15,12 @@ import {
   useTheme,
   Stack,
   styled,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import { useContext } from "react";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -75,51 +79,59 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
 
   return (
     <StackItem width="100%">
-      <h2>Totals</h2>
-      <TableContainer component={Paper}>
-        <Table size="small" aria-label="a dense table">
-          <TableHead>
-            <TableRow>
-              <TableCell width="40%">
-                <Tooltip title="What exports factories are producing">
-                  <Typography fontSize={theme.custom.smallText}>
-                    Exports
-                  </Typography>
-                </Tooltip>
-              </TableCell>
-              <TableCell width="10%">
-                <Tooltip title="How many units per hour factories are producing">
-                  <Typography fontSize={theme.custom.smallText}>u/h</Typography>
-                </Tooltip>
-              </TableCell>
-              <TableCell width="10%" align="right">
-                <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
-                  <Typography fontSize={theme.custom.smallText}>
-                    ISK/M
-                  </Typography>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {withProductNameAndPrice.map((product) => (
-              <SummaryRow
-                key={product.materialName}
-                material={product.materialName}
-                amount={product.amount}
-                price={product.price}
-              />
-            ))}
-            <SummaryRow
-              material="Total"
-              price={withProductNameAndPrice.reduce(
-                (amount, p) => amount + p.price,
-                0,
-              )}
-            />
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Accordion style={{ width: "100%" }}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <h2>Totals</h2>
+        </AccordionSummary>
+        <AccordionDetails>
+          <TableContainer component={Paper}>
+            <Table size="small" aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  <TableCell width="40%">
+                    <Tooltip title="What exports factories are producing">
+                      <Typography fontSize={theme.custom.smallText}>
+                        Exports
+                      </Typography>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell width="10%">
+                    <Tooltip title="How many units per hour factories are producing">
+                      <Typography fontSize={theme.custom.smallText}>
+                        u/h
+                      </Typography>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell width="10%" align="right">
+                    <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
+                      <Typography fontSize={theme.custom.smallText}>
+                        ISK/M
+                      </Typography>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {withProductNameAndPrice.map((product) => (
+                  <SummaryRow
+                    key={product.materialName}
+                    material={product.materialName}
+                    amount={product.amount}
+                    price={product.price}
+                  />
+                ))}
+                <SummaryRow
+                  material="Total"
+                  price={withProductNameAndPrice.reduce(
+                    (amount, p) => amount + p.price,
+                    0,
+                  )}
+                />
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </AccordionDetails>
+      </Accordion>
     </StackItem>
   );
 };

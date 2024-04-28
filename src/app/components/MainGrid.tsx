@@ -84,7 +84,7 @@ export const MainGrid = () => {
       <CssBaseline />
       <Box sx={{ flexGrow: 1 }}>
         <ResponsiveAppBar />
-        <Summary characters={characters} />
+        {compactMode ? <></> : <Summary characters={characters} />}
         <Grid container spacing={1}>
           {Object.values(groupByAccount).map((g, id) => (
             <Grid

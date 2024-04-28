@@ -1,3 +1,4 @@
+import { SessionContext } from "@/app/context/Context";
 import { PI_TYPES_MAP } from "@/const";
 import { planetCalculations } from "@/planets";
 import { AccessToken } from "@/types";
@@ -15,6 +16,7 @@ import {
   Stack,
   styled,
 } from "@mui/material";
+import { useContext } from "react";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -28,7 +30,13 @@ interface Grouped {
   [key: number]: number;
 }
 
+const displayValue = (valueInMillions: number): string =>
+  valueInMillions >= 1000
+    ? `${(valueInMillions / 1000).toFixed(2)} B`
+    : `${valueInMillions.toFixed(2)} M`;
+
 export const Summary = ({ characters }: { characters: AccessToken[] }) => {
+  const { piPrices, alertMode } = useContext(SessionContext);
   const exports = characters.flatMap((char) => {
     return char.planets.flatMap((planet) => {
       const { localExports } = planetCalculations(planet);
@@ -46,11 +54,20 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
   const withProductNameAndPrice = Object.keys(groupedByMaterial).map(
     (typeIdString) => {
       const typeId = parseInt(typeIdString);
+      const amount = groupedByMaterial[typeId];
+      const valueInMillions =
+        (((piPrices?.appraisal.items.find((a) => a.typeID === typeId)?.prices
+          .sell.min ?? 0) *
+          amount) /
+          1000000) *
+        24 *
+        30;
+
       return {
         typeId,
-        amount: groupedByMaterial[typeId],
+        amount,
         materialName: PI_TYPES_MAP[typeId].name,
-        price: 0,
+        price: valueInMillions,
       };
     },
   );
@@ -93,6 +110,13 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
                 price={product.price}
               />
             ))}
+            <SummaryRow
+              material="Total"
+              price={withProductNameAndPrice.reduce(
+                (amount, p) => amount + p.price,
+                0,
+              )}
+            />
           </TableBody>
         </Table>
       </TableContainer>
@@ -106,7 +130,7 @@ const SummaryRow = ({
   price,
 }: {
   material: string;
-  amount: number;
+  amount?: number;
   price: number;
 }) => (
   <TableRow>
@@ -114,6 +138,6 @@ const SummaryRow = ({
       {material}
     </TableCell>
     <TableCell>{amount}</TableCell>
-    <TableCell align="right">{price}</TableCell>
+    <TableCell align="right">{displayValue(price)}</TableCell>
   </TableRow>
 );

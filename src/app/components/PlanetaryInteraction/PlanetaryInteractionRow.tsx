@@ -1,7 +1,5 @@
-import { Api } from "@/esi-api";
-import { AccessToken, Planet } from "@/types";
+import { AccessToken } from "@/types";
 import { Stack, Tooltip, Typography, styled, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
 import { PlanetCard } from "./PlanetCard";
 import { NoPlanetCard } from "./NoPlanetCard";
 import Table from "@mui/material/Table";
@@ -21,25 +19,10 @@ const StackItem = styled(Stack)(({ theme }) => ({
   alignItems: "center",
 }));
 
-const getPlanets = async (character: AccessToken): Promise<Planet[]> => {
-  const api = new Api();
-  const planets = (
-    await api.v1.getCharactersCharacterIdPlanets(
-      character.character.characterId,
-      {
-        token: character.access_token,
-      }
-    )
-  ).data;
-  return planets;
-};
-
 const PlanetaryIteractionTable = ({
   character,
-  planets,
 }: {
   character: AccessToken;
-  planets: Planet[];
 }) => {
   const theme = useTheme();
 
@@ -102,7 +85,7 @@ const PlanetaryIteractionTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {planets.map((planet) => (
+            {character.planets.map((planet) => (
               <PlanetTableRow
                 key={`${character.character.characterId}-${planet.planet_id}`}
                 planet={planet}
@@ -118,22 +101,20 @@ const PlanetaryIteractionTable = ({
 
 const PlanetaryInteractionIconsRow = ({
   character,
-  planets,
 }: {
   character: AccessToken;
-  planets: Planet[];
 }) => {
   return (
     <StackItem>
       <Stack spacing={2} direction="row" flexWrap="wrap">
-        {planets.map((planet) => (
+        {character.planets.map((planet) => (
           <PlanetCard
             key={`${character.character.characterId}-${planet.planet_id}`}
             planet={planet}
             character={character}
           />
         ))}
-        {Array.from(Array(6 - planets.length).keys()).map((i, id) => (
+        {Array.from(Array(6 - character.planets.length).keys()).map((i, id) => (
           <NoPlanetCard
             key={`${character.character.characterId}-no-planet-${id}`}
           />
@@ -148,15 +129,11 @@ export const PlanetaryInteractionRow = ({
 }: {
   character: AccessToken;
 }) => {
-  const [planets, setPlanets] = useState<Planet[]>([]);
   const theme = useTheme();
-  useEffect(() => {
-    getPlanets(character).then(setPlanets).catch(console.log);
-  }, [character]);
 
   return theme.custom.compactMode ? (
-    <PlanetaryInteractionIconsRow planets={planets} character={character} />
+    <PlanetaryInteractionIconsRow character={character} />
   ) : (
-    <PlanetaryIteractionTable planets={planets} character={character} />
+    <PlanetaryIteractionTable character={character} />
   );
 };

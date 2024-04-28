@@ -1,7 +1,12 @@
 import { Stack, Typography, styled, useTheme } from "@mui/material";
 import Image from "next/image";
-import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
-import { Api } from "@/esi-api";
+import {
+  AccessToken,
+  Planet,
+  PlanetInfo,
+  PlanetInfoUniverse,
+  PlanetWithInfo,
+} from "@/types";
 import React, { forwardRef, useContext, useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
@@ -15,8 +20,12 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Button from "@mui/material/Button";
-import { alertModeVisibility, extractorsHaveExpired, timeColor } from "./timeColors";
-import { ColorContext, SessionContext,  } from "@/app/context/Context";
+import {
+  alertModeVisibility,
+  extractorsHaveExpired,
+  timeColor,
+} from "./timeColors";
+import { ColorContext, SessionContext } from "@/app/context/Context";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -37,21 +46,16 @@ const Transition = forwardRef(function Transition(
 });
 
 export const PlanetCard = ({
-  planet,
   character,
+  planet,
 }: {
-  planet: Planet;
   character: AccessToken;
+  planet: PlanetWithInfo;
 }) => {
   const { alertMode } = useContext(SessionContext);
 
-  const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
-    undefined,
-  );
-
-  const [planetInfoUniverse, setPlanetInfoUniverse] = useState<
-    PlanetInfoUniverse | undefined
-  >(undefined);
+  const planetInfo = planet.info;
+  const planetInfoUniverse = planet.infoUniverse;
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
 
@@ -71,40 +75,10 @@ export const PlanetCard = ({
         .filter((p) => EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id))
         .map((p) => p.expiry_time)) ??
     [];
-  const getPlanet = async (
-    character: AccessToken,
-    planet: Planet,
-  ): Promise<PlanetInfo> => {
-    const api = new Api();
-    const planetInfo = (
-      await api.v3.getCharactersCharacterIdPlanetsPlanetId(
-        character.character.characterId,
-        planet.planet_id,
-        {
-          token: character.access_token,
-        },
-      )
-    ).data;
-    return planetInfo;
-  };
-
-  const getPlanetUniverse = async (
-    planet: Planet,
-  ): Promise<PlanetInfoUniverse> => {
-    const api = new Api();
-    const planetInfo = (
-      await api.v1.getUniversePlanetsPlanetId(planet.planet_id)
-    ).data;
-    return planetInfo;
-  };
 
   const { colors } = useContext(ColorContext);
-  const expired = extractorsHaveExpired(extractorsExpiryTime) 
+  const expired = extractorsHaveExpired(extractorsExpiryTime);
 
-  useEffect(() => {
-    getPlanet(character, planet).then(setPlanetInfo);
-    getPlanetUniverse(planet).then(setPlanetInfoUniverse);
-  }, [planet, character]);
   return (
     <StackItem
       alignItems="flex-start"
@@ -124,7 +98,6 @@ export const PlanetCard = ({
       />
       {expired && (
         <Image
-          unoptimized
           width={32}
           height={32}
           src={`/stopped.png`}

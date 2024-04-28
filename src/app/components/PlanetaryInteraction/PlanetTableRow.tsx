@@ -1,12 +1,7 @@
 import { SessionContext, ColorContext } from "@/app/context/Context";
-import {
-  EXTRACTOR_TYPE_IDS,
-  FACTORY_IDS,
-  PI_SCHEMATICS,
-  PI_TYPES_MAP,
-} from "@/const";
-import { Api } from "@/esi-api";
-import { AccessToken, Planet, PlanetInfo, PlanetInfoUniverse } from "@/types";
+import { PI_TYPES_MAP } from "@/const";
+import { AccessToken, PlanetWithInfo } from "@/types";
+import { planetCalculations } from "@/planets";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, Tooltip, Typography, useTheme } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
@@ -19,10 +14,10 @@ import Toolbar from "@mui/material/Toolbar";
 import { TransitionProps } from "@mui/material/transitions";
 import { DateTime } from "luxon";
 import Image from "next/image";
-import React, { forwardRef, useContext, useEffect, useState } from "react";
+import React, { forwardRef, useContext, useState } from "react";
 import Countdown from "react-countdown";
 import PinsCanvas3D from "./PinsCanvas3D";
-import { timeColor, extractorsHaveExpired, alertModeVisibility } from "./timeColors";
+import { timeColor, alertModeVisibility } from "./timeColors";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -37,7 +32,7 @@ export const PlanetTableRow = ({
   planet,
   character,
 }: {
-  planet: Planet;
+  planet: PlanetWithInfo;
   character: AccessToken;
 }) => {
   const theme = useTheme();
@@ -53,131 +48,16 @@ export const PlanetTableRow = ({
   };
 
   const { piPrices, alertMode } = useContext(SessionContext);
-  const [planetInfo, setPlanetInfo] = useState<PlanetInfo | undefined>(
-    undefined,
-  );
-
-  const [planetInfoUniverse, setPlanetInfoUniverse] = useState<
-    PlanetInfoUniverse | undefined
-  >(undefined);
-
-  const [extractors, setExtractors] = useState<PlanetInfo["pins"]>([]);
-  const [production, setProduction] = useState(
-    new Map<SchematicId, (typeof PI_SCHEMATICS)[number]>(),
-  );
-
-  const [imports, setImports] = useState<
-    (typeof PI_SCHEMATICS)[number]["inputs"]
-  >([]);
-
-  const [exports, setExports] = useState<{ typeId: number; amount: number }[]>(
-    [],
-  );
-
-  type SchematicId = number;
-
-  const getPlanet = async (
-    character: AccessToken,
-    planet: Planet,
-  ): Promise<PlanetInfo> => {
-    const api = new Api();
-    const planetRes = await api.v3.getCharactersCharacterIdPlanetsPlanetId(
-      character.character.characterId,
-      planet.planet_id,
-      {
-        token: character.access_token,
-      },
-    );
-
-    const planetInfo = planetRes.data;
-
-    setExtractors(
-      planetInfo.pins.filter((p) =>
-        EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id),
-      ),
-    );
-
-    const localProduction = planetInfo.pins
-      .filter((p) => FACTORY_IDS().some((e) => e.type_id === p.type_id))
-      .reduce((acc, f) => {
-        if (f.schematic_id) {
-          const schematic = PI_SCHEMATICS.find(
-            (s) => s.schematic_id == f.schematic_id,
-          );
-          if (schematic) acc.set(f.schematic_id, schematic);
-        }
-        return acc;
-      }, new Map<SchematicId, (typeof PI_SCHEMATICS)[number]>());
-
-    setProduction(localProduction);
-
-    const locallyProduced = Array.from(localProduction)
-      .flatMap((p) => p[1].outputs)
-      .map((p) => p.type_id);
-
-    const locallyConsumed = Array.from(localProduction)
-      .flatMap((p) => p[1].inputs)
-      .map((p) => p.type_id);
-
-    const locallyExcavated = planetInfo.pins
-      .filter((p) => EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id))
-      .map((e) => e.extractor_details?.product_type_id ?? 0);
-
-    const localImports = Array.from(localProduction)
-      .flatMap((p) => p[1].inputs)
-      .filter(
-        (p) =>
-          ![...locallyProduced, ...locallyExcavated].some(
-            (lp) => lp === p.type_id,
-          ),
-      );
-
-    const localExports = locallyProduced
-      .filter((p) => !locallyConsumed.some((lp) => lp === p))
-      .map((typeId) => {
-        const outputs = PI_SCHEMATICS.flatMap((s) => s.outputs).find(
-          (s) => s.type_id === typeId,
-        );
-        if (!outputs) return { typeId, amount: 0 };
-        const cycleTime =
-          PI_SCHEMATICS.find((s) => s.schematic_id === outputs.schematic_id)
-            ?.cycle_time ?? 3600;
-        const factoriesProducing = planetInfo.pins
-          .filter((p) => FACTORY_IDS().some((e) => e.type_id === p.type_id))
-          .filter((f) => f.schematic_id === outputs?.schematic_id);
-        const amount = outputs.quantity
-          ? factoriesProducing.length * outputs.quantity * (3600 / cycleTime)
-          : 0;
-        return {
-          typeId,
-          amount,
-        };
-      });
-
-    setImports(localImports);
-    setExports(localExports);
-    return planetInfo;
-  };
-
-  const getPlanetUniverse = async (
-    planet: Planet,
-  ): Promise<PlanetInfoUniverse> => {
-    const api = new Api();
-    const planetInfo = (
-      await api.v1.getUniversePlanetsPlanetId(planet.planet_id)
-    ).data;
-    return planetInfo;
-  };
-
-  useEffect(() => {
-    getPlanet(character, planet).then(setPlanetInfo);
-    getPlanetUniverse(planet).then(setPlanetInfoUniverse);
-  }, [planet, character]);
-
-  const expired = extractorsHaveExpired(extractors.map(e => e.expiry_time)) 
+  const planetInfo = planet.info;
+  const planetInfoUniverse = planet.infoUniverse;
+  const { expired, extractors, localProduction, localImports, localExports } =
+    planetCalculations(planet);
   const { colors } = useContext(ColorContext);
   return (
-    <TableRow style={{ visibility: alertModeVisibility(alertMode, expired) }} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+    <TableRow
+      style={{ visibility: alertModeVisibility(alertMode, expired) }}
+      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+    >
       <TableCell component="th" scope="row">
         <Tooltip
           title={`${
@@ -233,7 +113,7 @@ export const PlanetTableRow = ({
       </TableCell>
       <TableCell>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {Array.from(production).map((schematic, idx) => {
+          {Array.from(localProduction).map((schematic, idx) => {
             return (
               <Typography
                 key={`prod-${character.character.characterId}-${planet.planet_id}-${idx}`}
@@ -247,7 +127,7 @@ export const PlanetTableRow = ({
       </TableCell>
       <TableCell>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {imports.map((i) => (
+          {localImports.map((i) => (
             <Typography
               key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
               fontSize={theme.custom.smallText}
@@ -259,7 +139,7 @@ export const PlanetTableRow = ({
       </TableCell>
       <TableCell>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {exports.map((exports) => (
+          {localExports.map((exports) => (
             <Typography
               key={`export-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
               fontSize={theme.custom.smallText}
@@ -271,7 +151,7 @@ export const PlanetTableRow = ({
       </TableCell>
       <TableCell>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          {exports.map((exports) => (
+          {localExports.map((exports) => (
             <Typography
               key={`export-uph-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
               fontSize={theme.custom.smallText}
@@ -290,7 +170,7 @@ export const PlanetTableRow = ({
             textAlign: "end",
           }}
         >
-          {exports.map((e) => {
+          {localExports.map((e) => {
             const valueInMillions =
               (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
                 ?.prices.sell.min ?? 0) *

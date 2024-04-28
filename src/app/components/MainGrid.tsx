@@ -10,6 +10,7 @@ import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
 import { CharacterContext, SessionContext } from "../context/Context";
 import ResponsiveAppBar from "./AppBar/AppBar";
+import { Summary } from "./Summary/Summary";
 
 interface Grouped {
   [key: string]: AccessToken[];
@@ -58,7 +59,7 @@ export const MainGrid = () => {
         cardMinHeight: compactMode ? 100 : 170,
         stoppedPosition: compactMode ? 32 : 48,
       },
-    })
+    }),
   );
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export const MainGrid = () => {
           cardMinHeight: compactMode ? 100 : 170,
           stoppedPosition: compactMode ? 32 : 48,
         },
-      })
+      }),
     );
   }, [compactMode]);
 
@@ -83,6 +84,7 @@ export const MainGrid = () => {
       <CssBaseline />
       <Box sx={{ flexGrow: 1 }}>
         <ResponsiveAppBar />
+        <Summary characters={characters} />
         <Grid container spacing={1}>
           {Object.values(groupByAccount).map((g, id) => (
             <Grid

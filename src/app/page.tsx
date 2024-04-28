@@ -4,7 +4,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { memo, useCallback, useEffect, useState } from "react";
-import { AccessToken, CharacterUpdate, Env } from "../types";
+import { AccessToken, CharacterUpdate, Env, PlanetWithInfo } from "../types";
 import { MainGrid } from "./components/MainGrid";
 import { refreshToken } from "@/esi-sso";
 import {
@@ -16,6 +16,7 @@ import {
 } from "./context/Context";
 import { useSearchParams } from "next/navigation";
 import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
+import { getPlanet, getPlanetUniverse, getPlanets } from "@/planets";
 
 const Home = () => {
   const [characters, setCharacters] = useState<AccessToken[]>([]);
@@ -30,8 +31,6 @@ const Home = () => {
   const [alertMode, setAlertMode] = useState(false);
   const searchParams = useSearchParams();
   const code = searchParams && searchParams.get("code");
-
-  // Memoize chracter state manipulations
 
   const deleteCharacter = (character: AccessToken) => {
     const charactersToSave = characters.filter(
@@ -82,6 +81,26 @@ const Home = () => {
     }
     return [];
   }, []);
+
+  const initializeCharacterPlanets = (
+    characters: AccessToken[],
+  ): Promise<AccessToken[]> =>
+    Promise.all(
+      characters.map(async (c) => {
+        const planets = await getPlanets(c);
+        const planetsWithInfo: PlanetWithInfo[] = await Promise.all(
+          planets.map(async (p) => ({
+            ...p,
+            info: await getPlanet(c, p),
+            infoUniverse: await getPlanetUniverse(p),
+          })),
+        );
+        return {
+          ...c,
+          planets: planetsWithInfo,
+        };
+      }),
+    );
 
   const saveCharacters = (characters: AccessToken[]): AccessToken[] => {
     localStorage.setItem("characters", JSON.stringify(characters));
@@ -148,6 +167,7 @@ const Home = () => {
       .then(refreshSession)
       .then(handleCallback)
       .then(saveCharacters)
+      .then(initializeCharacterPlanets)
       .then(setCharacters)
       .then(() => setSessionReady(true));
   }, []);

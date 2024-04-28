@@ -10,6 +10,7 @@ export interface AccessToken {
   needsLogin: boolean;
   comment: string;
   system: string;
+  planets: PlanetWithInfo[];
 }
 
 export interface Character {
@@ -25,6 +26,7 @@ export interface CharacterPlanets {
   name: string;
   characterId: number;
   account?: string;
+  system?: string;
   planets: PlanetWithInfo[];
 }
 

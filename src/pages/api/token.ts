@@ -49,6 +49,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       account: "-",
       comment: "",
       system: "",
+      planets: [],
     };
     res.json(token);
   } else {

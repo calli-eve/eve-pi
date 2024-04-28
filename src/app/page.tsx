@@ -108,7 +108,10 @@ const Home = () => {
   };
 
   const restoreCharacters = (characters: AccessToken[]) => {
-    refreshSession(characters).then(saveCharacters).then(setCharacters);
+    refreshSession(characters)
+      .then(saveCharacters)
+      .then(initializeCharacterPlanets)
+      .then(setCharacters);
   };
 
   const toggleCompactMode = () => {
@@ -182,7 +185,10 @@ const Home = () => {
     const ESI_CACHE_TIME_MS = 600000;
     const interval = setInterval(() => {
       const characters = initializeCharacters();
-      refreshSession(characters).then(saveCharacters).then(setCharacters);
+      refreshSession(characters)
+        .then(saveCharacters)
+        .then(initializeCharacterPlanets)
+        .then(setCharacters);
     }, ESI_CACHE_TIME_MS);
     return () => clearInterval(interval);
   });

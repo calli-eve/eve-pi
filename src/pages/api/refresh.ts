@@ -48,6 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         account: accessToken.account,
         comment: accessToken.comment,
         system: accessToken.system,
+        planets: [],
       };
 
       console.log("Refresh", character.name, character.characterId);

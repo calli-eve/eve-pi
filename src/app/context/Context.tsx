@@ -1,6 +1,7 @@
 import { EvePraisalResult } from "@/eve-praisal";
 import { AccessToken, CharacterUpdate } from "@/types";
 import { Dispatch, SetStateAction, createContext } from "react";
+import { PlanetConfig } from "../components/PlanetConfig/PlanetConfigDialog";
 
 export const CharacterContext = createContext<{
   characters: AccessToken[];
@@ -27,6 +28,14 @@ export const SessionContext = createContext<{
   alertMode: boolean;
   toggleAlertMode: () => void;
   piPrices: EvePraisalResult | undefined;
+  updatePlanetConfig: (config: PlanetConfig) => void;
+  readPlanetConfig: ({
+    characterId,
+    planetId,
+  }: {
+    characterId: number;
+    planetId: number;
+  }) => PlanetConfig;
 }>({
   sessionReady: false,
   refreshSession: () => {},
@@ -40,6 +49,16 @@ export const SessionContext = createContext<{
   alertMode: false,
   toggleAlertMode: () => {},
   piPrices: undefined,
+  updatePlanetConfig: () => {},
+  readPlanetConfig: ({
+    planetId,
+    characterId,
+  }: {
+    planetId: number;
+    characterId: number;
+  }) => {
+    return { characterId, planetId, excludeFromTotals: true };
+  },
 });
 export type ColorSelectionType = {
   defaultColor: string;

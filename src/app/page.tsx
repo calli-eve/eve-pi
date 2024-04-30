@@ -17,6 +17,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
 import { getPlanet, getPlanetUniverse, getPlanets } from "@/planets";
+import { PlanetConfig } from "./components/PlanetConfig/PlanetConfigDialog";
 
 const Home = () => {
   const [characters, setCharacters] = useState<AccessToken[]>([]);
@@ -27,6 +28,7 @@ const Home = () => {
   const [piPrices, setPiPrices] = useState<EvePraisalResult | undefined>(
     undefined,
   );
+
   const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
   const [alertMode, setAlertMode] = useState(false);
   const searchParams = useSearchParams();
@@ -126,6 +128,22 @@ const Home = () => {
     setAlertMode(!alertMode);
   };
 
+  const updatePlanetConfig = (config: PlanetConfig) => {
+    console.log("poop");
+  };
+
+  const readPlanetConfig = ({
+    planetId,
+    characterId,
+  }: {
+    planetId: number;
+    characterId: number;
+  }): PlanetConfig => {
+    const defaultConfig = { planetId, characterId, excludeFromTotals: false };
+
+    return defaultConfig;
+  };
+
   useEffect(() => {
     const storedCompactMode = localStorage.getItem("compactMode");
     if (!storedCompactMode) return;
@@ -156,7 +174,6 @@ const Home = () => {
     localStorage.setItem("colors", JSON.stringify(colors));
   }, [colors]);
 
-  // Initialize EVE PI
   useEffect(() => {
     fetch("api/env")
       .then((r) => r.json())
@@ -207,6 +224,8 @@ const Home = () => {
         piPrices,
         alertMode,
         toggleAlertMode,
+        updatePlanetConfig,
+        readPlanetConfig,
       }}
     >
       <CharacterContext.Provider

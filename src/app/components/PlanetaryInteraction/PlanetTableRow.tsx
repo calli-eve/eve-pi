@@ -18,6 +18,7 @@ import React, { forwardRef, useContext, useState } from "react";
 import Countdown from "react-countdown";
 import PinsCanvas3D from "./PinsCanvas3D";
 import { timeColor, alertModeVisibility } from "./timeColors";
+import { PlanetConfigDialog } from "../PlanetConfig/PlanetConfigDialog";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -38,6 +39,7 @@ export const PlanetTableRow = ({
   const theme = useTheme();
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
+  const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
 
   const handle3DrenderOpen = () => {
     setPlanetRenderOpen(true);
@@ -45,6 +47,14 @@ export const PlanetTableRow = ({
 
   const handle3DrenderClose = () => {
     setPlanetRenderOpen(false);
+  };
+
+  const handlePlanetConfigOpen = () => {
+    setPlanetConfigOpen(true);
+  };
+
+  const handlePlanetConfigClose = () => {
+    setPlanetConfigOpen(false);
   };
 
   const { piPrices, alertMode } = useContext(SessionContext);
@@ -195,6 +205,14 @@ export const PlanetTableRow = ({
         </div>
       </TableCell>
       <TableCell>
+        <Tooltip title="Open planet configuration">
+          <Button variant="contained" onClick={handlePlanetConfigOpen}>
+            Config
+          </Button>
+        </Tooltip>
+      </TableCell>
+
+      <TableCell>
         <Tooltip title="Open 3D render of this planet">
           <Button variant="contained" onClick={handle3DrenderOpen}>
             3D
@@ -226,6 +244,32 @@ export const PlanetTableRow = ({
           </Toolbar>
         </AppBar>
         <PinsCanvas3D planetInfo={planetInfo} />
+      </Dialog>
+      <Dialog
+        fullScreen
+        open={planetConfigOpen}
+        onClose={handlePlanetConfigClose}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handlePlanetConfigClose}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+              Planet configuration: {planetInfoUniverse?.name}
+            </Typography>
+            <Button autoFocus color="inherit" onClick={handlePlanetConfigClose}>
+              Close
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <PlanetConfigDialog planet={planet} character={character} />
       </Dialog>
     </TableRow>
   );

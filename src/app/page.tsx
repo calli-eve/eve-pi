@@ -61,7 +61,16 @@ const Home = () => {
   };
 
   const refreshSession = (characters: AccessToken[]) => {
-    return Promise.all(characters.map((c) => refreshToken(c)));
+    return Promise.all(
+      characters.map(async (c) => {
+        try {
+          const refreshed = await refreshToken(c);
+          return { ...refreshed, invalidToken: false };
+        } catch (e) {
+          return { ...c, invalidToken: true };
+        }
+      }),
+    );
   };
 
   const handleCallback = async (
@@ -89,6 +98,7 @@ const Home = () => {
   ): Promise<AccessToken[]> =>
     Promise.all(
       characters.map(async (c) => {
+        if (c.invalidToken) return { ...c, planets: [] };
         const planets = await getPlanets(c);
         const planetsWithInfo: PlanetWithInfo[] = await Promise.all(
           planets.map(async (p) => ({

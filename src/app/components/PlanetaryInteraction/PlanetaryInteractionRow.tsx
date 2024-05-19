@@ -26,6 +26,13 @@ const PlanetaryIteractionTable = ({
 }) => {
   const theme = useTheme();
 
+  if (character.invalidToken)
+    return (
+      <p style={{ color: "red" }}>
+        Character token has expired. Relogin to fix.
+      </p>
+    );
+
   return (
     <StackItem width="100%">
       <TableContainer component={Paper}>

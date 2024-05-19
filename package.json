@@ -15,6 +15,7 @@
     "@fontsource/roboto": "^5.0.3",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.5",
+    "@sentry/nextjs": "^8.2.1",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",
     "@types/react-dom": "18.2.5",

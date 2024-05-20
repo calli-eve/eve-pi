@@ -78,7 +78,13 @@ const Home = () => {
     if (code) {
       window.history.replaceState(null, "", "/");
       const res = await fetch(`api/token?code=${code}`);
-      return [...characters, await res.json()];
+      const newCharacter: AccessToken = await res.json();
+      return [
+        ...characters.filter(
+          (c) => c.character.characterId !== newCharacter.character.characterId,
+        ),
+        newCharacter,
+      ];
     }
     return Promise.resolve(characters);
   };

@@ -1,7 +1,7 @@
 import { AccessToken } from "./types";
 
 export const refreshToken = async (
-  character: AccessToken
+  character: AccessToken,
 ): Promise<AccessToken> => {
   return fetch(`api/refresh`, {
     method: "POST",
@@ -14,11 +14,14 @@ export const refreshToken = async (
     redirect: "error",
     referrerPolicy: "no-referrer",
     body: JSON.stringify(character),
-  }).then((res) => res.json());
+  }).then((res) => {
+    if (res.ok) return res.json();
+    else throw new Error("Could not refresh");
+  });
 };
 
 export const revokeToken = async (
-  character: AccessToken
+  character: AccessToken,
 ): Promise<Response> => {
   return fetch(`api/revoke`, {
     method: "POST",
@@ -37,7 +40,7 @@ export const revokeToken = async (
 export const loginParameters = async (
   selectedScopes: string[],
   EVE_SSO_CLIENT_ID: string,
-  EVE_SSO_CALLBACK_URL: string
+  EVE_SSO_CALLBACK_URL: string,
 ) => {
   return new URLSearchParams({
     response_type: "code",
@@ -50,6 +53,6 @@ export const loginParameters = async (
 
 export const eveSwagger = async () => {
   return fetch("https://esi.evetech.net/latest/swagger.json").then((res) =>
-    res.json()
+    res.json(),
   );
 };

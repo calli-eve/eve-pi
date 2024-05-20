@@ -11,7 +11,6 @@ export interface AccessToken {
   comment: string;
   system: string;
   planets: PlanetWithInfo[];
-  invalidToken?: boolean;
 }
 
 export interface Character {

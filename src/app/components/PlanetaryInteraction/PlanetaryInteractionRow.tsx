@@ -26,7 +26,7 @@ const PlanetaryIteractionTable = ({
 }) => {
   const theme = useTheme();
 
-  if (character.invalidToken)
+  if (character.needsLogin)
     return (
       <p style={{ color: "red" }}>
         Character token has expired. Relogin to fix.

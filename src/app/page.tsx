@@ -60,14 +60,13 @@ const Home = () => {
     saveCharacters(charactersToSave);
   };
 
-  const refreshSession = (characters: AccessToken[]) => {
+  const refreshSession = async (characters: AccessToken[]) => {
     return Promise.all(
-      characters.map(async (c) => {
+      characters.map((c) => {
         try {
-          const refreshed = await refreshToken(c);
-          return { ...refreshed, invalidToken: false };
-        } catch (e) {
-          return { ...c, invalidToken: true };
+          return refreshToken(c);
+        } catch {
+          return { ...c, needsLogin: true };
         }
       }),
     );
@@ -88,7 +87,7 @@ const Home = () => {
     const localStorageCharacters = localStorage.getItem("characters");
     if (localStorageCharacters) {
       const characterArray: AccessToken[] = JSON.parse(localStorageCharacters);
-      return characterArray;
+      return characterArray.filter((c) => c.access_token && c.character);
     }
     return [];
   }, []);
@@ -98,7 +97,8 @@ const Home = () => {
   ): Promise<AccessToken[]> =>
     Promise.all(
       characters.map(async (c) => {
-        if (c.invalidToken) return { ...c, planets: [] };
+        if (c.needsLogin || c.character === undefined)
+          return { ...c, planets: [] };
         const planets = await getPlanets(c);
         const planetsWithInfo: PlanetWithInfo[] = await Promise.all(
           planets.map(async (p) => ({

@@ -78,6 +78,11 @@ const PlanetaryIteractionTable = ({
                 </Tooltip>
               </TableCell>
               <TableCell width="2%">
+                <Tooltip title="Is planet ecluded from totals">
+                  <Typography fontSize={theme.custom.smallText}>Excluded</Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="2%">
                 <Tooltip title="How many units per hour factories are producing">
                   <Typography fontSize={theme.custom.smallText}>u/h</Typography>
                 </Tooltip>

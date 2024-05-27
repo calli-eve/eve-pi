@@ -40,9 +40,10 @@ const displayValue = (valueInMillions: number): string =>
     : `${valueInMillions.toFixed(2)} M`;
 
 export const Summary = ({ characters }: { characters: AccessToken[] }) => {
-  const { piPrices, alertMode } = useContext(SessionContext);
+  const { piPrices } = useContext(SessionContext);
   const exports = characters.flatMap((char) => {
-    return char.planets.flatMap((planet) => {
+    return char.planets.filter(p => !char.planetConfig.some(c => c.planetId == p.planet_id && c.excludeFromTotals))
+      .flatMap((planet) => {
       const { localExports } = planetCalculations(planet);
       return localExports;
     });

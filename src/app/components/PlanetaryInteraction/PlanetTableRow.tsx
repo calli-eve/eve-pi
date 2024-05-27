@@ -1,7 +1,7 @@
-import { SessionContext, ColorContext } from "@/app/context/Context";
+import { ColorContext, SessionContext } from "@/app/context/Context";
 import { PI_TYPES_MAP } from "@/const";
-import { AccessToken, PlanetWithInfo } from "@/types";
 import { planetCalculations } from "@/planets";
+import { AccessToken, PlanetWithInfo } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button, Tooltip, Typography, useTheme } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
@@ -16,9 +16,9 @@ import { DateTime } from "luxon";
 import Image from "next/image";
 import React, { forwardRef, useContext, useState } from "react";
 import Countdown from "react-countdown";
-import PinsCanvas3D from "./PinsCanvas3D";
-import { timeColor, alertModeVisibility } from "./timeColors";
 import { PlanetConfigDialog } from "../PlanetConfig/PlanetConfigDialog";
+import PinsCanvas3D from "./PinsCanvas3D";
+import { alertModeVisibility, timeColor } from "./timeColors";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -62,6 +62,7 @@ export const PlanetTableRow = ({
   const planetInfoUniverse = planet.infoUniverse;
   const { expired, extractors, localProduction, localImports, localExports } =
     planetCalculations(planet);
+  const planetConfig = character.planetConfig.find(p => p.planetId === planet.planet_id)
   const { colors } = useContext(ColorContext);
   return (
     <TableRow
@@ -155,6 +156,18 @@ export const PlanetTableRow = ({
               fontSize={theme.custom.smallText}
             >
               {PI_TYPES_MAP[exports.typeId].name}
+            </Typography>
+          ))}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          {localExports.map((exports) => (
+            <Typography
+              key={`export-excluded-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
+              fontSize={theme.custom.smallText}
+            >
+              {planetConfig?.excludeFromTotals ? 'ex' : ''}
             </Typography>
           ))}
         </div>

@@ -1,3 +1,4 @@
+import { PlanetConfig } from "./app/components/PlanetConfig/PlanetConfigDialog";
 import { Api } from "./esi-api";
 
 export interface AccessToken {
@@ -11,6 +12,7 @@ export interface AccessToken {
   comment: string;
   system: string;
   planets: PlanetWithInfo[];
+  planetConfig: PlanetConfig[];
 }
 
 export interface Character {

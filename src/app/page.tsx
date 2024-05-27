@@ -145,7 +145,18 @@ const Home = () => {
   };
 
   const updatePlanetConfig = (config: PlanetConfig) => {
-    console.log("poop");
+    const charactersToSave = characters.map((c) => {
+      if (c.character.characterId === config.characterId) {
+        return {
+          ...c,
+          planetConfig: [...c.planetConfig.filter(p => p.planetId !== config.planetId), config] 
+        }
+      }
+        
+      return c;
+    });
+    setCharacters(charactersToSave);
+    saveCharacters(charactersToSave);
   };
 
   const readPlanetConfig = ({
@@ -157,7 +168,7 @@ const Home = () => {
   }): PlanetConfig => {
     const defaultConfig = { planetId, characterId, excludeFromTotals: false };
 
-    return defaultConfig;
+    return characters.find(c => c.character.characterId === characterId)?.planetConfig.find(p => p.planetId === planetId) ?? defaultConfig
   };
 
   useEffect(() => {

@@ -34,7 +34,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         headers,
       }).then((res) => res.json());
       const character = extractCharacterFromToken(response);
-
       const token: AccessToken = {
         access_token: response.access_token,
         token_type: response.token_type,
@@ -49,6 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         comment: accessToken.comment,
         system: accessToken.system,
         planets: [],
+        planetConfig: accessToken.planetConfig ?? [],
       };
 
       console.log("Refresh", character.name, character.characterId);

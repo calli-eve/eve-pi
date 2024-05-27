@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import React from 'react'
-
+import PlausibleProvider from 'next-plausible'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -16,6 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <PlausibleProvider domain="pi.avanto.tk" />
+      </head>
       <body className={inter.className}>
         {children}
       </body>

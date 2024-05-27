@@ -13,7 +13,9 @@ const nextConfig = {
   output: "standalone",
 };
 
-module.exports = nextConfig;
+const { withPlausibleProxy } = require('next-plausible')
+
+module.exports = withPlausibleProxy()(nextConfig);
 
 
 // Injected content via Sentry wizard below

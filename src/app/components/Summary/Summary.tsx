@@ -18,9 +18,11 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  TableSortLabel,
 } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { argv0 } from "process";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -41,12 +43,19 @@ const displayValue = (valueInMillions: number): string =>
 
 export const Summary = ({ characters }: { characters: AccessToken[] }) => {
   const { piPrices } = useContext(SessionContext);
+  const [sort, setSort] = useState(true);
   const exports = characters.flatMap((char) => {
-    return char.planets.filter(p => !char.planetConfig.some(c => c.planetId == p.planet_id && c.excludeFromTotals))
+    return char.planets
+      .filter(
+        (p) =>
+          !char.planetConfig.some(
+            (c) => c.planetId == p.planet_id && c.excludeFromTotals,
+          ),
+      )
       .flatMap((planet) => {
-      const { localExports } = planetCalculations(planet);
-      return localExports;
-    });
+        const { localExports } = planetCalculations(planet);
+        return localExports;
+      });
   });
 
   const groupedByMaterial = exports.reduce<Grouped>((totals, material) => {
@@ -91,9 +100,13 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
                 <TableRow>
                   <TableCell width="40%">
                     <Tooltip title="What exports factories are producing">
-                      <Typography fontSize={theme.custom.smallText}>
+                      <TableSortLabel
+                        active={true}
+                        direction={sort ? "asc" : "desc"}
+                        onClick={() => setSort(!sort)}
+                      >
                         Exports
-                      </Typography>
+                      </TableSortLabel>
                     </Tooltip>
                   </TableCell>
                   <TableCell width="10%">
@@ -113,14 +126,21 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {withProductNameAndPrice.map((product) => (
-                  <SummaryRow
-                    key={product.materialName}
-                    material={product.materialName}
-                    amount={product.amount}
-                    price={product.price}
-                  />
-                ))}
+                {withProductNameAndPrice
+                  .sort((a, b) => {
+                    if (a.materialName === b.materialName) return 0;
+                    if (sort) return a.materialName > b.materialName ? 1 : -1;
+                    if (!sort) return a.materialName > b.materialName ? -1 : 1;
+                    return 0;
+                  })
+                  .map((product) => (
+                    <SummaryRow
+                      key={product.materialName}
+                      material={product.materialName}
+                      amount={product.amount}
+                      price={product.price}
+                    />
+                  ))}
                 <SummaryRow
                   material="Total"
                   price={withProductNameAndPrice.reduce(

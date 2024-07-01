@@ -41,9 +41,13 @@ const displayValue = (valueInMillions: number): string =>
     ? `${(valueInMillions / 1000).toFixed(2)} B`
     : `${valueInMillions.toFixed(2)} M`;
 
+type SortBy = "name" | "perHour" | "price";
+type SortDirection = "asc" | "desc";
+
 export const Summary = ({ characters }: { characters: AccessToken[] }) => {
   const { piPrices } = useContext(SessionContext);
-  const [sort, setSort] = useState(true);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [sortBy, setSortBy] = useState<SortBy>("name");
   const exports = characters.flatMap((char) => {
     return char.planets
       .filter(
@@ -102,8 +106,13 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
                     <Tooltip title="What exports factories are producing">
                       <TableSortLabel
                         active={true}
-                        direction={sort ? "asc" : "desc"}
-                        onClick={() => setSort(!sort)}
+                        direction={sortDirection}
+                        onClick={() => {
+                          setSortDirection(
+                            sortDirection === "asc" ? "desc" : "asc",
+                          );
+                          setSortBy("name");
+                        }}
                       >
                         Exports
                       </TableSortLabel>
@@ -111,16 +120,34 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
                   </TableCell>
                   <TableCell width="10%">
                     <Tooltip title="How many units per hour factories are producing">
-                      <Typography fontSize={theme.custom.smallText}>
+                      <TableSortLabel
+                        active={true}
+                        direction={sortDirection}
+                        onClick={() => {
+                          setSortDirection(
+                            sortDirection === "asc" ? "desc" : "asc",
+                          );
+                          setSortBy("perHour");
+                        }}
+                      >
                         u/h
-                      </Typography>
+                      </TableSortLabel>
                     </Tooltip>
                   </TableCell>
                   <TableCell width="10%" align="right">
                     <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
-                      <Typography fontSize={theme.custom.smallText}>
+                      <TableSortLabel
+                        active={true}
+                        direction={sortDirection}
+                        onClick={() => {
+                          setSortDirection(
+                            sortDirection === "asc" ? "desc" : "asc",
+                          );
+                          setSortBy("price");
+                        }}
+                      >
                         ISK/M
-                      </Typography>
+                      </TableSortLabel>
                     </Tooltip>
                   </TableCell>
                 </TableRow>
@@ -128,9 +155,24 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
               <TableBody>
                 {withProductNameAndPrice
                   .sort((a, b) => {
-                    if (a.materialName === b.materialName) return 0;
-                    if (sort) return a.materialName > b.materialName ? 1 : -1;
-                    if (!sort) return a.materialName > b.materialName ? -1 : 1;
+                    if (sortBy === "name") {
+                      if (sortDirection === "asc")
+                        return a.materialName > b.materialName ? 1 : -1;
+                      if (sortDirection === "desc")
+                        return a.materialName > b.materialName ? -1 : 1;
+                    }
+                    if (sortBy === "perHour") {
+                      if (sortDirection === "asc")
+                        return a.amount > b.amount ? 1 : -1;
+                      if (sortDirection === "desc")
+                        return a.amount > b.amount ? -1 : 1;
+                    }
+                    if (sortBy === "price") {
+                      if (sortDirection === "asc")
+                        return a.price > b.price ? 1 : -1;
+                      if (sortDirection === "desc")
+                        return a.price > b.price ? -1 : 1;
+                    }
                     return 0;
                   })
                   .map((product) => (

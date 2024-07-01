@@ -62,7 +62,9 @@ export const PlanetTableRow = ({
   const planetInfoUniverse = planet.infoUniverse;
   const { expired, extractors, localProduction, localImports, localExports } =
     planetCalculations(planet);
-  const planetConfig = character.planetConfig.find(p => p.planetId === planet.planet_id)
+  const planetConfig = character.planetConfig.find(
+    (p) => p.planetId === planet.planet_id,
+  );
   const { colors } = useContext(ColorContext);
   return (
     <TableRow
@@ -143,7 +145,7 @@ export const PlanetTableRow = ({
               key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
               fontSize={theme.custom.smallText}
             >
-              {PI_TYPES_MAP[i.type_id].name}
+              {PI_TYPES_MAP[i.type_id].name} ({i.quantity}/h)
             </Typography>
           ))}
         </div>
@@ -167,7 +169,7 @@ export const PlanetTableRow = ({
               key={`export-excluded-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
               fontSize={theme.custom.smallText}
             >
-              {planetConfig?.excludeFromTotals ? 'ex' : ''}
+              {planetConfig?.excludeFromTotals ? "ex" : ""}
             </Typography>
           ))}
         </div>

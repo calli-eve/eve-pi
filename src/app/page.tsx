@@ -79,11 +79,14 @@ const Home = () => {
       window.history.replaceState(null, "", "/");
       const res = await fetch(`api/token?code=${code}`);
       const newCharacter: AccessToken = await res.json();
+      const oldCharacter = characters.find(
+        (c) => c.character.characterId === newCharacter.character.characterId,
+      );
       return [
         ...characters.filter(
           (c) => c.character.characterId !== newCharacter.character.characterId,
         ),
-        newCharacter,
+        { ...newCharacter, account: oldCharacter?.account ?? "-" },
       ];
     }
     return Promise.resolve(characters);
@@ -149,10 +152,13 @@ const Home = () => {
       if (c.character.characterId === config.characterId) {
         return {
           ...c,
-          planetConfig: [...c.planetConfig.filter(p => p.planetId !== config.planetId), config] 
-        }
+          planetConfig: [
+            ...c.planetConfig.filter((p) => p.planetId !== config.planetId),
+            config,
+          ],
+        };
       }
-        
+
       return c;
     });
     setCharacters(charactersToSave);
@@ -168,7 +174,11 @@ const Home = () => {
   }): PlanetConfig => {
     const defaultConfig = { planetId, characterId, excludeFromTotals: false };
 
-    return characters.find(c => c.character.characterId === characterId)?.planetConfig.find(p => p.planetId === planetId) ?? defaultConfig
+    return (
+      characters
+        .find((c) => c.character.characterId === characterId)
+        ?.planetConfig.find((p) => p.planetId === planetId) ?? defaultConfig
+    );
   };
 
   useEffect(() => {

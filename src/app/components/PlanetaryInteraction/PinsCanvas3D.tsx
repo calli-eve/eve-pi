@@ -21,18 +21,19 @@ const PinsCanvas3D = ({
   const animationRef = useRef<number>(0);
 
   useEffect(() => {
-    if (!planetInfo) return;
+    if (!planetInfo || planetInfo.pins.length === 0) return;
     const pins = planetInfo?.pins ?? [];
     const extractors: ExtractorHead[] = [];
 
     planetInfo.pins.forEach((p) => {
       if (
-        !p.extractor_details?.heads &&
+        !p.extractor_details?.heads ||
         p.extractor_details?.heads.length === 0
       )
         return;
 
       p.extractor_details?.heads.forEach((h) => {
+        if (!h) return;
         extractors.push({ ...h, parent_id: p.pin_id });
       });
     });
@@ -87,6 +88,7 @@ const PinsCanvas3D = ({
         vectorHead.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
         dotGeometryHead.lookAt(vectorHead);
         dotGeometryHead.translate(vectorHead.x, vectorHead.y, vectorHead.z + 1);
+        if (!dotGeometryHead) return;
         dotGeometriesHead.push(dotGeometryHead);
       });
 
@@ -107,7 +109,7 @@ const PinsCanvas3D = ({
         .forEach((p) => {
           const dotGeometryCommandCenter = new THREE.CircleGeometry(
             DOT_SIZE,
-            9
+            9,
           );
           const phi = p.latitude;
           const theta = p.longitude;
@@ -116,7 +118,7 @@ const PinsCanvas3D = ({
           dotGeometryCommandCenter.translate(
             vectorCommandCenter.x,
             vectorCommandCenter.y,
-            vectorCommandCenter.z
+            vectorCommandCenter.z,
           );
           dotGeometriesCommandCenter.push(dotGeometryCommandCenter);
         });
@@ -129,6 +131,7 @@ const PinsCanvas3D = ({
           vector.setFromSphericalCoords(SPHERE_RADIUS, phi, theta);
           dotGeometry.lookAt(vector);
           dotGeometry.translate(vector.x, vector.y, vector.z);
+          if (!dotGeometry) return;
           dotGeometries.push(dotGeometry);
         }
       }
@@ -143,7 +146,7 @@ const PinsCanvas3D = ({
         BufferGeometryUtils.mergeGeometries(dotGeometriesHead);
 
       const mergedDotGeometriesCC = BufferGeometryUtils.mergeGeometries(
-        dotGeometriesCommandCenter
+        dotGeometriesCommandCenter,
       );
 
       const dotMaterial = new THREE.MeshBasicMaterial({
@@ -171,7 +174,7 @@ const PinsCanvas3D = ({
       const dotMeshPI = new THREE.Mesh(mergedDotGeometriesPI, dotMaterialPI);
       const dotMeshHead = new THREE.Mesh(
         mergedDotGeometriesHead,
-        dotMaterialHead
+        dotMaterialHead,
       );
 
       const dotMeshCC = new THREE.Mesh(mergedDotGeometriesCC, dotMaterialCC);
@@ -185,7 +188,7 @@ const PinsCanvas3D = ({
         CAMERA_FOV,
         CANVAS.width / CANVAS.height,
         CAMERA_NEAR,
-        CAMERA_FAR
+        CAMERA_FAR,
       );
       camera.position.set(vectorPI.x, vectorPI.y, vectorPI.z);
 

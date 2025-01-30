@@ -3,7 +3,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState, Suspense } from "react";
 import { AccessToken, CharacterUpdate, Env, PlanetWithInfo } from "../types";
 import { MainGrid } from "./components/MainGrid";
 import { refreshToken } from "@/esi-sso";
@@ -20,6 +20,7 @@ import { getPlanet, getPlanetUniverse, getPlanets } from "@/planets";
 import { PlanetConfig } from "./components/PlanetConfig/PlanetConfigDialog";
 
 const Home = () => {
+  const searchParams = useSearchParams();
   const [characters, setCharacters] = useState<AccessToken[]>([]);
   const [sessionReady, setSessionReady] = useState(false);
   const [environment, setEnvironment] = useState<Env | undefined>(undefined);
@@ -31,8 +32,6 @@ const Home = () => {
 
   const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
   const [alertMode, setAlertMode] = useState(false);
-  const searchParams = useSearchParams();
-  const code = searchParams && searchParams.get("code");
 
   const deleteCharacter = (character: AccessToken) => {
     const charactersToSave = characters.filter(
@@ -75,6 +74,7 @@ const Home = () => {
   const handleCallback = async (
     characters: AccessToken[],
   ): Promise<AccessToken[]> => {
+    const code = searchParams?.get("code");
     if (code) {
       window.history.replaceState(null, "", "/");
       const res = await fetch(`api/token?code=${code}`);
@@ -246,6 +246,7 @@ const Home = () => {
     }, ESI_CACHE_TIME_MS);
     return () => clearInterval(interval);
   });
+
   return (
     <SessionContext.Provider
       value={{
@@ -281,4 +282,11 @@ const Home = () => {
   );
 };
 
-export default memo(Home);
+const HomeWrapper = () => (
+  <Suspense>
+    <Home />
+  </Suspense>
+);
+HomeWrapper.displayName = 'HomeWrapper';
+
+export default memo(HomeWrapper);

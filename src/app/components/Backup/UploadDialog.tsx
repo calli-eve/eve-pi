@@ -43,7 +43,7 @@ export const UploadDialog = ({
 
       fileReader.readAsText(file);
     }
-  }, [file]);
+  }, [file, closeDialog, restoreCharacters, validate]);
 
   const changeHandler = (event: any) => {
     setFile(event.target.files[0]);

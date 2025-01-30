@@ -291,48 +291,12 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
                             )}
                           </Box>
                         </Box>
-
-                        {inputs.length > 0 && (
-                          <>
-                            <Divider />
-                            <Typography variant="caption" color="text.secondary">
-                              Inputs per cycle:
-                            </Typography>
-                            <Stack spacing={0.5}>
-                              {inputs.map(input => (
-                                <Typography key={input.typeId} variant="caption" sx={{ pl: 2 }}>
-                                  • {PI_TYPES_MAP[input.typeId]?.name}: {input.quantity} units
-                                  {factoryCount > 0 && ` (${(input.quantity * factoryCount).toFixed(0)} total)`}
-                                </Typography>
-                              ))}
-                            </Stack>
-                          </>
-                        )}
-
-                        <Divider />
                         <Stack spacing={0.5}>
-                          {factoryCount > 0 && (
-                            <>
-                              <Typography variant="caption" color="text.secondary">
-                                Factories: {factoryCount}
-                              </Typography>
-                              {cycleTime && (
-                                <Typography variant="caption" color="text.secondary">
-                                  Cycles per hour: {(3600 / cycleTime).toFixed(1)}
-                                </Typography>
-                              )}
-                            </>
-                          )}
                           {production > 0 && (
                             <>
                               <Typography variant="caption" color="success.main">
                                 Production: {production.toFixed(1)} units total
                               </Typography>
-                              {factoryCount > 0 && (
-                                <Typography variant="caption" color="success.main">
-                                  ({(production / factoryCount).toFixed(1)} units/factory)
-                                </Typography>
-                              )}
                             </>
                           )}
                           {consumption > 0 && (
@@ -340,11 +304,6 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
                               <Typography variant="caption" color="error.main">
                                 Consumption: {consumption.toFixed(1)} units total
                               </Typography>
-                              {factoryCount > 0 && (
-                                <Typography variant="caption" color="error.main">
-                                  ({(consumption / factoryCount).toFixed(1)} units/factory)
-                                </Typography>
-                              )}
                             </>
                           )}
                           {isImported && (
@@ -364,12 +323,6 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
                             sx={{ fontWeight: 'bold' }}
                           >
                             Net: {(production - consumption).toFixed(1)} units total
-                            {factoryCount > 0 && (
-                              <>
-                                <br />
-                                ({((production - consumption) / factoryCount).toFixed(1)} units/factory)
-                              </>
-                            )}
                           </Typography>
                         </Stack>
                       </Paper>

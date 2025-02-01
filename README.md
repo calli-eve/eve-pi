@@ -9,6 +9,7 @@ Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://d
 ![Screenshot of PI tool](https://github.com/calli-eve/eve-pi/blob/main/images/eve-pi.png)
 ![3D render of a planet](https://github.com/calli-eve/eve-pi/blob/main/images/3dplanet.png)
 
+
 Features:
 
 - Group characters to account groups by clickin on the character icon
@@ -19,6 +20,10 @@ Features:
 - Backup to download characters to a file
 - Rstore from a file. Must be from the same instance!
 - View the 3D render of the planet with your PI setup by clicking the planet
+
+## Support with hosting
+
+Consider using partner code 'CALLIEVE' when doing purchases in EVE <3
 
 ## Basic usage
 

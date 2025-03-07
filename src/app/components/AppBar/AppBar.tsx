@@ -19,6 +19,8 @@ import { LoginButton } from "../Login/LoginButton";
 import { PlanModeButton } from "../PlanModeButton/PlanModeButton";
 import { SettingsButton } from "../Settings/SettingsButtons";
 import { AlertModeButton } from "../AlertModeButton/AlertModeButton";
+import { SupportButton } from "../SupportButton/SupportButton";
+
 
 function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -104,6 +106,9 @@ function ResponsiveAppBar() {
                 <CCPButton />
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
+                <SupportButton />
+              </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
                 <SettingsButton />
               </MenuItem>
               <MenuItem onClick={handleCloseNavMenu}>
@@ -150,6 +155,7 @@ function ResponsiveAppBar() {
             <DiscordButton />
             <GitHubButton />
             <CCPButton />
+            <SupportButton />
             <SettingsButton />
             <CompactModeButton />
             <PlanModeButton />

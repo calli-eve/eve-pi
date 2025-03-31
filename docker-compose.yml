@@ -8,6 +8,14 @@ services:
       - EVE_SSO_CLIENT_ID=${EVE_SSO_CLIENT_ID}
       - EVE_SSO_CALLBACK_URL=${EVE_SSO_CALLBACK_URL}
       - EVE_SSO_SECRET=${EVE_SSO_SECRET}
+      - NEXT_PUBLIC_PRAISAL_URL=${NEXT_PUBLIC_PRAISAL_URL}
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
     ports:
       - 3000:3000
     restart: unless-stopped
+    networks:
+      - nginx
+
+networks:
+  nginx:
+    external: true

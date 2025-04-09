@@ -1,5 +1,5 @@
 import { ColorContext, SessionContext } from "@/app/context/Context";
-import { PI_TYPES_MAP } from "@/const";
+import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES } from "@/const";
 import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -104,6 +104,34 @@ export const PlanetTableRow = ({
   const extractedTypeIds = extractors
     .map(e => e.extractor_details?.product_type_id)
     .filter((id): id is number => id !== undefined);
+
+  // Get storage facilities
+  const storageFacilities = planetInfo.pins.filter(pin => 
+    STORAGE_IDS().some(storage => storage.type_id === pin.type_id)
+  );
+
+  const getStorageInfo = (pin: any) => {
+    if (!pin || !pin.contents) return null;
+
+    const storageType = PI_TYPES_MAP[pin.type_id].name;
+    const storageCapacity = STORAGE_CAPACITIES[pin.type_id] || 0;
+    
+    // Calculate total volume of stored products for this specific pin
+    const totalVolume = (pin.contents || [])
+      .reduce((sum: number, item: any) => {
+        const volume = PI_PRODUCT_VOLUMES[item.type_id] || 0;
+        return sum + (item.amount * volume);
+      }, 0);
+
+    const fillRate = storageCapacity > 0 ? (totalVolume / storageCapacity) * 100 : 0;
+
+    return {
+      type: storageType,
+      capacity: storageCapacity,
+      used: totalVolume,
+      fillRate: fillRate
+    };
+  };
 
   return (
     <>
@@ -257,6 +285,43 @@ export const PlanetTableRow = ({
                 </Typography>
               );
             })}
+          </div>
+        </TableCell>
+        <TableCell>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {storageFacilities
+              .sort((a, b) => {
+                const isALaunchpad = a.type_id === 2256 || a.type_id === 2542 || a.type_id === 2543 || a.type_id === 2544 || a.type_id === 2552 || a.type_id === 2555 || a.type_id === 2556 || a.type_id === 2557;
+                const isBLaunchpad = b.type_id === 2256 || b.type_id === 2542 || b.type_id === 2543 || b.type_id === 2544 || b.type_id === 2552 || b.type_id === 2555 || b.type_id === 2556 || b.type_id === 2557;
+                return isALaunchpad === isBLaunchpad ? 0 : isALaunchpad ? -1 : 1;
+              })
+              .map((storage) => {
+                const storageInfo = getStorageInfo(storage);
+                if (!storageInfo) return null;
+                
+                const isLaunchpad = storage.type_id === 2256 || 
+                                  storage.type_id === 2542 || 
+                                  storage.type_id === 2543 || 
+                                  storage.type_id === 2544 || 
+                                  storage.type_id === 2552 || 
+                                  storage.type_id === 2555 || 
+                                  storage.type_id === 2556 || 
+                                  storage.type_id === 2557;
+                
+                const fillRate = storageInfo.fillRate;
+                const color = fillRate > 95 ? '#ff0000' : fillRate > 80 ? '#ffd700' : 'inherit';
+                
+                return (
+                  <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.pin_id}`} style={{ display: "flex", alignItems: "center" }}>
+                    <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
+                      {isLaunchpad ? 'L' : 'S'}
+                    </Typography>
+                    <Typography fontSize={theme.custom.smallText} style={{ color }}>
+                      {fillRate.toFixed(1)}%
+                    </Typography>
+                  </div>
+                );
+              })}
           </div>
         </TableCell>
         <TableCell>

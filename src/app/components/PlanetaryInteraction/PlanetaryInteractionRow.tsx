@@ -10,6 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { PlanetTableRow } from "./PlanetTableRow";
+import Image from "next/image";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -91,6 +92,13 @@ const PlanetaryIteractionTable = ({
                 <Tooltip title="How many million ISK per month this planet is exporting (Jita sell min)">
                   <Typography fontSize={theme.custom.smallText}>
                     ISK/M
+                  </Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell width="10%">
+                <Tooltip title="Storage facility fill rate">
+                  <Typography fontSize={theme.custom.smallText}>
+                    Storage Fill rate
                   </Typography>
                 </Tooltip>
               </TableCell>

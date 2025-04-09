@@ -934,410 +934,149 @@ export const STORAGE_IDS = () =>
       t.name.indexOf("Launchpad") !== -1
   );
 
-/*
-schematic_id,type_id,quantity,is_input
-65,2389,40,1
-65,9838,5,0
-65,3645,40,1
-66,9832,5,0
-66,3645,40,1
-66,2390,40,1
-67,2390,40,1
-67,2389,40,1
-67,9830,5,0
-68,3683,40,1
-68,3691,5,0
-68,2390,40,1
-69,2392,40,1
-69,3683,40,1
-69,2317,5,0
-70,2392,40,1
-70,3697,5,0
-70,9828,40,1
-71,9840,5,0
-71,2401,40,1
-71,2389,40,1
-72,2328,5,0
-72,3645,40,1
-72,2398,40,1
-73,3689,5,0
-73,2398,40,1
-73,2399,40,1
-74,2400,40,1
-74,3828,5,0
-74,2398,40,1
-75,2400,40,1
-75,44,5,0
-75,2399,40,1
-76,2400,40,1
-76,2401,40,1
-76,9836,5,0
-77,2401,40,1
-77,9842,5,0
-77,9828,40,1
-78,2393,40,1
-78,2398,40,1
-78,2463,5,0
-79,2329,5,0
-79,2396,40,1
-79,2399,40,1
-80,9828,40,1
-80,2397,40,1
-80,2327,5,0
-81,2393,40,1
-81,3779,40,1
-81,3775,5,0
-82,2393,40,1
-82,2395,40,1
-82,3693,5,0
-83,2395,40,1
-83,15317,5,0
-83,3779,40,1
-84,2395,40,1
-84,2396,40,1
-84,3725,5,0
-85,2396,40,1
-85,2397,40,1
-85,3695,5,0
-86,2393,40,1
-86,3645,40,1
-86,2319,5,0
-87,2312,5,0
-87,3683,40,1
-87,3779,40,1
-88,2392,40,1
-88,2321,5,0
-88,2397,40,1
-89,17136,3,0
-89,3691,10,1
-89,9838,10,1
-90,2344,3,0
-90,9832,10,1
-90,2317,10,1
-91,2345,3,0
-91,9830,10,1
-91,3697,10,1
-92,2312,10,1
-92,2346,3,0
-92,2319,10,1
-94,9840,10,1
-94,2321,10,1
-94,17898,3,0
-95,2329,10,1
-95,2348,3,0
-95,2317,10,1
-95,9838,10,1
-96,2328,10,1
-96,9832,10,1
-96,9836,10,1
-96,2349,3,0
-97,9848,3,0
-97,3689,10,1
-97,9836,10,1
-98,9842,10,1
-98,3828,10,1
-98,2351,3,0
-99,2352,3,0
-99,44,10,1
-99,2327,10,1
-100,2328,10,1
-100,9840,10,1
-100,9834,3,0
-102,2329,10,1
-102,2354,3,0
-102,3697,10,1
-103,2312,10,1
-103,3689,10,1
-103,9842,10,1
-103,9846,3,0
-104,3828,10,1
-104,3725,10,1
-104,2358,3,0
-104,2463,10,1
-105,3725,10,1
-105,28974,3,0
-105,3775,10,1
-106,2360,3,0
-106,3693,10,1
-106,3695,10,1
-107,2321,10,1
-107,15317,10,1
-107,2361,3,0
-108,2329,10,1
-108,12836,3,0
-108,2463,10,1
-109,2312,10,1
-109,17392,3,0
-109,2327,10,1
-110,9840,10,1
-110,3695,10,1
-110,2366,3,0
-110,3775,10,1
-111,2319,10,1
-111,3691,10,1
-111,3693,10,1
-111,2367,3,0
-112,2344,6,1
-112,2393,40,1
-112,2870,1,0
-112,9848,6,1
-113,2875,1,0
-113,3645,40,1
-113,28974,6,1
-113,2351,6,1
-114,2360,6,1
-114,17136,6,1
-114,2869,1,0
-114,2398,40,1
-115,2352,6,1
-115,2345,6,1
-115,2361,6,1
-115,2872,1,0
-116,2346,6,1
-116,12836,6,1
-116,9834,6,1
-116,2871,1,0
-117,17392,6,1
-117,2354,6,1
-117,2867,1,0
-117,17898,6,1
-118,2348,6,1
-118,2868,1,0
-118,2366,6,1
-118,9846,6,1
-119,2876,1,0
-119,2349,6,1
-119,2358,6,1
-119,2367,6,1
-121,2268,3000,1
-121,3645,20,0
-122,2308,3000,1
-122,2389,20,0
-123,2309,3000,1
-123,2390,20,0
-124,3683,20,0
-124,2310,3000,1
-125,2392,20,0
-125,2311,3000,1
-126,2267,3000,1
-126,2398,20,0
-127,2270,3000,1
-127,2399,20,0
-128,2272,3000,1
-128,2400,20,0
-129,2401,20,0
-129,2306,3000,1
-130,2307,3000,1
-130,9828,20,0
-131,2073,3000,1
-131,2393,20,0
-132,3779,20,0
-132,2286,3000,1
-133,2395,20,0
-133,2287,3000,1
-134,2288,3000,1
-134,2396,20,0
-135,2305,3000,1
-135,2397,20,0 
-*/
+export const PI_PRODUCT_VOLUMES: Record<number, number> = {
+  44: 0.75, // Enriched Uranium
+  2073: 0.005, // Microorganisms
+  2256: 0.0, // Temperate Launchpad
+  2257: 0.0, // Ice Storage Facility
+  2267: 0.005, // Base Metals
+  2268: 0.005, // Aqueous Liquids
+  2270: 0.005, // Noble Metals
+  2272: 0.005, // Heavy Metals
+  2286: 0.005, // Planktic Colonies
+  2287: 0.005, // Complex Organisms
+  2288: 0.005, // Carbon Compounds
+  2305: 0.005, // Autotrophs
+  2306: 0.005, // Non-CS Crystals
+  2307: 0.005, // Felsic Magma
+  2308: 0.005, // Suspended Plasma
+  2309: 0.005, // Ionic Solutions
+  2310: 0.005, // Noble Gas
+  2311: 0.005, // Reactive Gas
+  2312: 0.75, // Supertensile Plastics
+  2317: 0.75, // Oxides
+  2319: 0.75, // Test Cultures
+  2321: 0.75, // Polyaramids
+  2327: 0.75, // Microfiber Shielding
+  2328: 0.75, // Water-Cooled CPU
+  2329: 0.75, // Biocells
+  2344: 3.0, // Condensates
+  2345: 3.0, // Camera Drones
+  2346: 3.0, // Synthetic Synapses
+  2348: 3.0, // Gel-Matrix Biopaste
+  2349: 3.0, // Supercomputers
+  2351: 3.0, // Smartfab Units
+  2352: 3.0, // Nuclear Reactors
+  2354: 3.0, // Neocoms
+  2358: 3.0, // Biotech Research Reports
+  2360: 3.0, // Industrial Explosives
+  2361: 3.0, // Hermetic Membranes
+  2366: 3.0, // Hazmat Detection Systems
+  2367: 3.0, // Cryoprotectant Solution
+  2389: 0.19, // Plasmoids
+  2390: 0.19, // Electrolytes
+  2392: 0.19, // Oxidizing Compound
+  2393: 0.19, // Bacteria
+  2395: 0.19, // Proteins
+  2396: 0.19, // Biofuels
+  2397: 0.19, // Industrial Fibers
+  2398: 0.19, // Reactive Metals
+  2399: 0.19, // Precious Metals
+  2400: 0.19, // Toxic Metals
+  2401: 0.19, // Chiral Structures
+  2463: 0.75, // Nanites
+  2469: 0.0, // Lava Basic Industry Facility
+  2470: 0.0, // Lava Advanced Industry Facility
+  2471: 0.0, // Plasma Basic Industry Facility
+  2472: 0.0, // Plasma Advanced Industry Facility
+  2473: 0.0, // Barren Basic Industry Facility
+  2474: 0.0, // Barren Advanced Industry Facility
+  2475: 0.0, // Barren High-Tech Production Plant
+  2480: 0.0, // Temperate Advanced Industry Facility
+  2481: 0.0, // Temperate Basic Industry Facility
+  2482: 0.0, // Temperate High-Tech Production Plant
+  2483: 0.0, // Storm Basic Industry Facility
+  2484: 0.0, // Storm Advanced Industry Facility
+  2485: 0.0, // Oceanic Advanced Industry Facility
+  2490: 0.0, // Oceanic Basic Industry Facility
+  2491: 0.0, // Ice Advanced Industry Facility
+  2492: 0.0, // Gas Basic Industry Facility
+  2493: 0.0, // Ice Basic Industry Facility
+  2494: 0.0, // Gas Advanced Industry Facility
+  2535: 0.0, // Oceanic Storage Facility
+  2536: 0.0, // Gas Storage Facility
+  2541: 0.0, // Barren Storage Facility
+  2542: 0.0, // Oceanic Launchpad
+  2543: 0.0, // Gas Launchpad
+  2544: 0.0, // Barren Launchpad
+  2552: 0.0, // Ice Launchpad
+  2555: 0.0, // Lava Launchpad
+  2556: 0.0, // Plasma Launchpad
+  2557: 0.0, // Storm Launchpad
+  2558: 0.0, // Lava Storage Facility
+  2560: 0.0, // Plasma Storage Facility
+  2561: 0.0, // Storm Storage Facility
+  2562: 0.0, // Temperate Storage Facility
+  2848: 0.0, // Barren Extractor Control Unit
+  2867: 50.0, // Broadcast Node
+  2868: 50.0, // Integrity Response Drones
+  2869: 50.0, // Nano-Factory
+  2870: 50.0, // Organic Mortar Applicators
+  2871: 50.0, // Recursive Computing Module
+  2872: 50.0, // Self-Harmonizing Power Core
+  2875: 50.0, // Sterile Conduits
+  2876: 50.0, // Wetware Mainframe
+  3060: 0.0, // Gas Extractor Control Unit
+  3061: 0.0, // Ice Extractor Control Unit
+  3062: 0.0, // Lava Extractor Control Unit
+  3063: 0.0, // Oceanic Extractor Control Unit
+  3064: 0.0, // Plasma Extractor Control Unit
+  3067: 0.0, // Storm Extractor Control Unit
+  3068: 0.0, // Temperate Extractor Control Unit
+  3645: 0.19, // Water
+  3683: 0.19, // Oxygen
+  3689: 0.75, // Mechanical Parts
+  3691: 0.75, // Synthetic Oil
+  3693: 0.75, // Fertilizer
+  3695: 0.75, // Polytextiles
+  3697: 0.75, // Silicate Glass
+  3725: 0.75, // Livestock
+  3775: 0.75, // Viral Agent
+  3779: 0.19, // Biomass
+  3828: 0.75, // Construction Blocks
+  9828: 0.19, // Silicon
+  9830: 0.75, // Rocket Fuel
+  9832: 0.75, // Coolant
+  9834: 3.0, // Guidance Systems
+  9836: 0.75, // Consumer Electronics
+  9838: 0.75, // Superconductors
+  9840: 0.75, // Transmitter
+  9842: 0.75, // Miniature Electronics
+  9846: 3.0, // Planetary Vehicles
+  9848: 3.0, // Robotics
+  12836: 3.0, // Transcranial Microcontrollers
+  15317: 0.75, // Genetically Enhanced Livestock
+  17136: 3.0, // Ukomi Superconductors
+  17392: 3.0, // Data Chips
+  17898: 3.0, // High-Tech Transmitters
+  28974: 3.0, // Vaccines
+};
 
-/*
-type_id,group_id,name
-2469,1028,Lava Basic Industry Facility
-2470,1028,Lava Advanced Industry Facility
-2471,1028,Plasma Basic Industry Facility
-2472,1028,Plasma Advanced Industry Facility
-2473,1028,Barren Basic Industry Facility
-2474,1028,Barren Advanced Industry Facility
-2475,1028,Barren High-Tech Production Plant
-2480,1028,Temperate Advanced Industry Facility
-2481,1028,Temperate Basic Industry Facility
-2482,1028,Temperate High-Tech Production Plant
-2483,1028,Storm Basic Industry Facility
-2484,1028,Storm Advanced Industry Facility
-2485,1028,Oceanic Advanced Industry Facility
-2490,1028,Oceanic Basic Industry Facility
-2491,1028,Ice Advanced Industry Facility
-2492,1028,Gas Basic Industry Facility
-2493,1028,Ice Basic Industry Facility
-2494,1028,Gas Advanced Industry Facility
-2848,1063,Barren Extractor Control Unit
-3060,1063,Gas Extractor Control Unit
-3061,1063,Ice Extractor Control Unit
-3062,1063,Lava Extractor Control Unit
-3063,1063,Oceanic Extractor Control Unit
-3064,1063,Plasma Extractor Control Unit
-3067,1063,Storm Extractor Control Unit
-3068,1063,Temperate Extractor Control Unit
-2257,1029,Ice Storage Facility
-2535,1029,Oceanic Storage Facility
-2536,1029,Gas Storage Facility
-2541,1029,Barren Storage Facility
-2558,1029,Lava Storage Facility
-2560,1029,Plasma Storage Facility
-2561,1029,Storm Storage Facility
-2562,1029,Temperate Storage Facility
-2256,1030,Temperate Launchpad
-2542,1030,Oceanic Launchpad
-2543,1030,Gas Launchpad
-2544,1030,Barren Launchpad
-2552,1030,Ice Launchpad
-2555,1030,Lava Launchpad
-2556,1030,Plasma Launchpad
-2557,1030,Storm Launchpad
-2267,1032,Base Metals
-2270,1032,Noble Metals
-2272,1032,Heavy Metals
-2306,1032,Non-CS Crystals
-2307,1032,Felsic Magma
-2268,1033,Aqueous Liquids
-2308,1033,Suspended Plasma
-2309,1033,Ionic Solutions
-2310,1033,Noble Gas
-2311,1033,Reactive Gas
-44,1034,Enriched Uranium
-2312,1034,Supertensile Plastics
-2317,1034,Oxides
-2319,1034,Test Cultures
-2321,1034,Polyaramids
-2327,1034,Microfiber Shielding
-2328,1034,Water-Cooled CPU
-2329,1034,Biocells
-2463,1034,Nanites
-3689,1034,Mechanical Parts
-3691,1034,Synthetic Oil
-3693,1034,Fertilizer
-3695,1034,Polytextiles
-3697,1034,Silicate Glass
-3725,1034,Livestock
-3775,1034,Viral Agent
-3828,1034,Construction Blocks
-9830,1034,Rocket Fuel
-9832,1034,Coolant
-9836,1034,Consumer Electronics
-9838,1034,Superconductors
-9840,1034,Transmitter
-9842,1034,Miniature Electronics
-15317,1034,Genetically Enhanced Livestock
-2073,1035,Microorganisms
-2286,1035,Planktic Colonies
-2287,1035,Complex Organisms
-2288,1035,Carbon Compounds
-2305,1035,Autotrophs
-2344,1040,Condensates
-2345,1040,Camera Drones
-2346,1040,Synthetic Synapses
-2348,1040,Gel-Matrix Biopaste
-2349,1040,Supercomputers
-2351,1040,Smartfab Units
-2352,1040,Nuclear Reactors
-2354,1040,Neocoms
-2358,1040,Biotech Research Reports
-2360,1040,Industrial Explosives
-2361,1040,Hermetic Membranes
-2366,1040,Hazmat Detection Systems
-2367,1040,Cryoprotectant Solution
-9834,1040,Guidance Systems
-9846,1040,Planetary Vehicles
-9848,1040,Robotics
-12836,1040,Transcranial Microcontrollers
-17136,1040,Ukomi Superconductors
-17392,1040,Data Chips
-17898,1040,High-Tech Transmitters
-28974,1040,Vaccines
-2867,1041,Broadcast Node
-2868,1041,Integrity Response Drones
-2869,1041,Nano-Factory
-2870,1041,Organic Mortar Applicators
-2871,1041,Recursive Computing Module
-2872,1041,Self-Harmonizing Power Core
-2875,1041,Sterile Conduits
-2876,1041,Wetware Mainframe
-2389,1042,Plasmoids
-2390,1042,Electrolytes
-2392,1042,Oxidizing Compound
-2393,1042,Bacteria
-2395,1042,Proteins
-2396,1042,Biofuels
-2397,1042,Industrial Fibers
-2398,1042,Reactive Metals
-2399,1042,Precious Metals
-2400,1042,Toxic Metals
-2401,1042,Chiral Structures
-3645,1042,Water
-3683,1042,Oxygen
-3779,1042,Biomass
-9828,1042,Silicon
- */
-
-/*
-schematic_id,name,cycle_time
-65,Superconductors,3600
-66,Coolant,3600
-67,Rocket Fuel,3600
-68,Synthetic Oil,3600
-69,Oxides,3600
-70,Silicate Glass,3600
-71,Transmitter,3600
-72,Water-Cooled CPU,3600
-73,Mechanical Parts,3600
-74,Construction Blocks,3600
-75,Enriched Uranium,3600
-76,Consumer Electronics,3600
-77,Miniature Electronics,3600
-78,Nanites,3600
-79,Biocells,3600
-80,Microfiber Shielding,3600
-81,Viral Agent,3600
-82,Fertilizer,3600
-83,Genetically Enhanced Livestock,3600
-84,Livestock,3600
-85,Polytextiles,3600
-86,Test Cultures,3600
-87,Supertensile Plastics,3600
-88,Polyaramids,3600
-89,Ukomi Superconductor,3600
-90,Condensates,3600
-91,Camera Drones,3600
-92,Synthetic Synapses,3600
-94,High-Tech Transmitter,3600
-95,Gel-Matrix Biopaste,3600
-96,Supercomputers,3600
-97,Robotics,3600
-98,Smartfab Units,3600
-99,Nuclear Reactors,3600
-100,Guidance Systems,3600
-102,Neocoms,3600
-103,Planetary Vehicles,3600
-104,Biotech Research Reports,3600
-105,Vaccines,3600
-106,Industrial Explosives,3600
-107,Hermetic Membranes,3600
-108,Transcranial Microcontroller,3600
-109,Data Chips,3600
-110,Hazmat Detection Systems,3600
-111,Cryoprotectant Solution,3600
-112,Organic Mortar Applicators,3600
-113,Sterile Conduits,3600
-114,Nano-Factory,3600
-115,Self-Harmonizing Power Core,3600
-116,Recursive Computing Module,3600
-117,Broadcast Node,3600
-118,Integrity Response Drones,3600
-119,Wetware Mainframe,3600
-121,Water,1800
-122,Plasmoids,1800
-123,Electrolytes,1800
-124,Oxygen,1800
-125,Oxidizing Compound,1800
-126,Reactive Metals,1800
-127,Precious Metals,1800
-128,Toxic Metals,1800
-129,Chiral Structures,1800
-130,Silicon,1800
-131,Bacteria,1800
-132,Biomass,1800
-133,Proteins,1800
-134,Biofuels,1800
-135,Industrial Fibers,1800
- */
+export const STORAGE_CAPACITIES: Record<number, number> = {
+  2257: 12000, // Ice Storage Facility
+  2535: 12000, // Oceanic Storage Facility
+  2536: 12000, // Gas Storage Facility
+  2541: 12000, // Barren Storage Facility
+  2558: 12000, // Lava Storage Facility
+  2560: 12000, // Plasma Storage Facility
+  2561: 12000, // Storm Storage Facility
+  2562: 12000, // Temperate Storage Facility
+  2256: 10000, // Temperate Launchpad
+  2542: 10000, // Oceanic Launchpad
+  2543: 10000, // Gas Launchpad
+  2544: 10000, // Barren Launchpad
+  2552: 10000, // Ice Launchpad
+  2555: 10000, // Lava Launchpad
+  2556: 10000, // Plasma Launchpad
+  2557: 10000, // Storm Launchpad
+};

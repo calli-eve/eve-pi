@@ -2,7 +2,7 @@
 version: "2.1"
 services:
   eve-pi:
-    build: .
+    image: ghcr.io/calli-eve/eve-pi:latest
     container_name: eve-pi
     environment:
       - EVE_SSO_CLIENT_ID=${EVE_SSO_CLIENT_ID}

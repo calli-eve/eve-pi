@@ -166,6 +166,39 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                 </Paper>
               );
             })}
+            {extractors.length === 2 && (
+              <Paper sx={{ p: 1, bgcolor: 'background.default' }}>
+                <Typography variant="subtitle2" color="error">
+                  Balance
+                </Typography>
+                <Stack spacing={0.5}>
+                  {extractors.map((extractor, index) => {
+                    const averagePerHour = (extractor.baseValue * 3600) / extractor.cycleTime;
+                    return (
+                      <Typography key={index} variant="body2">
+                        • {PI_TYPES_MAP[extractor.typeId]?.name}: {averagePerHour.toFixed(1)} u/h
+                      </Typography>
+                    );
+                  })}
+                  <Typography 
+                    variant="body2" 
+                    color="error"
+                    sx={{ 
+                      mt: 1,
+                      fontWeight: 'bold',
+                      borderTop: '1px solid',
+                      borderColor: 'divider',
+                      pt: 1
+                    }}
+                  >
+                    Difference: {Math.abs(
+                      (extractors[0].baseValue * 3600 / extractors[0].cycleTime) - 
+                      (extractors[1].baseValue * 3600 / extractors[1].cycleTime)
+                    ).toFixed(1)} u/h
+                  </Typography>
+                </Stack>
+              </Paper>
+            )}
           </Stack>
         </Box>
       </Stack>

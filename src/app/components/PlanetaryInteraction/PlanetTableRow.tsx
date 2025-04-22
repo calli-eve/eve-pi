@@ -100,6 +100,21 @@ export const PlanetTableRow = ({
     factoryCount: schematic.count || 1
   }));
 
+  // Calculate extractor averages and check for large differences
+  const extractorAverages = extractors
+    .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
+    .map(e => {
+      const cycleTime = e.extractor_details?.cycle_time || 3600;
+      const qtyPerCycle = e.extractor_details?.qty_per_cycle || 0;
+      return {
+        typeId: e.extractor_details!.product_type_id!,
+        averagePerHour: (qtyPerCycle * 3600) / cycleTime
+      };
+    });
+
+  const hasLargeExtractorDifference = extractorAverages.length === 2 && 
+    Math.abs(extractorAverages[0].averagePerHour - extractorAverages[1].averagePerHour) > 1000;
+
   const storageFacilities = planetInfo.pins.filter(pin => 
     STORAGE_IDS().some(storage => storage.type_id === pin.type_id)
   );
@@ -189,9 +204,23 @@ export const PlanetTableRow = ({
                   }
                 }}
               >
-                <Typography fontSize={theme.custom.smallText}>
-                  {planetInfoUniverse?.name}
-                </Typography>
+                <Stack spacing={0}>
+                  <Typography 
+                    fontSize={theme.custom.smallText}
+                    color={hasLargeExtractorDifference ? 'error' : 'inherit'}
+                  >
+                    {planetInfoUniverse?.name}
+                  </Typography>
+                  {hasLargeExtractorDifference && (
+                    <Typography 
+                      fontSize={theme.custom.smallText}
+                      color="error"
+                      sx={{ opacity: 0.7 }}
+                    >
+                      off-balance
+                    </Typography>
+                  )}
+                </Stack>
               </Tooltip>
             </div>
           </Tooltip>
@@ -415,38 +444,18 @@ export const PlanetTableRow = ({
         <TableCell colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
           <Collapse in={simulationOpen} timeout="auto" unmountOnExit>
             <Box sx={{ my: 2 }}>
-              <Tooltip
-                placement="right"
-                title={
-                  <ExtractionSimulationTooltip
-                    extractors={extractors
-                      .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
-                      .map(e => ({
-                        typeId: e.extractor_details!.product_type_id!,
-                        baseValue: e.extractor_details!.qty_per_cycle!,
-                        cycleTime: e.extractor_details!.cycle_time || 3600,
-                        installTime: e.install_time ?? "",
-                        expiryTime: e.expiry_time ?? ""
-                      }))}
-                  />
-                }
-                componentsProps={{
-                  tooltip: {
-                    sx: {
-                      bgcolor: 'background.paper',
-                      '& .MuiTooltip-arrow': {
-                        color: 'background.paper',
-                      },
-                    }
-                  }
-                }}
-              >
-                <div>
-                  <Typography fontSize={theme.custom.smallText}>
-                    {planetInfoUniverse?.name}
-                  </Typography>
-                </div>
-              </Tooltip>
+              <ExtractionSimulationDisplay
+                extractors={extractors
+                  .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
+                  .map(e => ({
+                    typeId: e.extractor_details!.product_type_id!,
+                    baseValue: e.extractor_details!.qty_per_cycle!,
+                    cycleTime: e.extractor_details!.cycle_time || 3600,
+                    installTime: e.install_time ?? "",
+                    expiryTime: e.expiry_time ?? ""
+                  }))}
+                productionNodes={productionNodes}
+              />
             </Box>
           </Collapse>
         </TableCell>

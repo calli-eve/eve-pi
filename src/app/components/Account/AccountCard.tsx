@@ -7,11 +7,64 @@ import { useContext, useState } from "react";
 import { PlanRow } from "./PlanRow";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { planetCalculations } from "@/planets";
+import { EvePraisalResult } from "@/eve-praisal";
+import { STORAGE_IDS } from "@/const";
+
+interface AccountTotals {
+  monthlyEstimate: number;
+  storageValue: number;
+}
+
+const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalResult | undefined): AccountTotals => {
+  let totalMonthlyEstimate = 0;
+  let totalStorageValue = 0;
+
+  characters.forEach((character) => {
+    character.planets.forEach((planet) => {
+      const { localExports } = planetCalculations(planet);
+      const planetConfig = character.planetConfig.find(p => p.planetId === planet.planet_id);
+      
+      // Calculate monthly estimate
+      if (!planetConfig?.excludeFromTotals) {
+        localExports.forEach((exportItem) => {
+          const valueInMillions = (((piPrices?.appraisal.items.find(
+            (a) => a.typeID === exportItem.typeId,
+          )?.prices.sell.min ?? 0) *
+            exportItem.amount) /
+            1000000) *
+            24 *
+            30;
+          totalMonthlyEstimate += valueInMillions;
+        });
+      }
+
+      if (!planetConfig?.excludeFromTotals) {
+        planet.info.pins
+          .filter(pin => STORAGE_IDS().some(storage => storage.type_id === pin.type_id))
+          .forEach(storage => {
+            storage.contents?.forEach(content => {
+              const valueInMillions = (piPrices?.appraisal.items.find(
+                (a) => a.typeID === content.type_id,
+              )?.prices.sell.min ?? 0) * content.amount / 1000000;
+              totalStorageValue += valueInMillions;
+            });
+          });
+      }
+    });
+  });
+
+  return {
+    monthlyEstimate: totalMonthlyEstimate,
+    storageValue: totalStorageValue
+  };
+};
 
 export const AccountCard = ({ characters }: { characters: AccessToken[] }) => {
   const theme = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { planMode } = useContext(SessionContext);
+  const { planMode, piPrices } = useContext(SessionContext);
+  const { monthlyEstimate, storageValue } = calculateAccountTotals(characters, piPrices);
 
   return (
     <Paper
@@ -46,17 +99,39 @@ export const AccountCard = ({ characters }: { characters: AccessToken[] }) => {
             justifyContent: 'space-between',
           }}
         >
-          <Typography 
-            sx={{ 
-              fontSize: "0.9rem",
-              fontWeight: 500,
-              color: theme.palette.text.primary,
-            }}
-          >
-            {characters.length > 0 && characters[0].account !== "-"
-              ? `Account: ${characters[0].account}`
-              : "No account name"}
-          </Typography>
+          <Box>
+            <Typography 
+              sx={{ 
+                fontSize: "0.9rem",
+                fontWeight: 500,
+                color: theme.palette.text.primary,
+              }}
+            >
+              {characters.length > 0 && characters[0].account !== "-"
+                ? `Account: ${characters[0].account}`
+                : "No account name"}
+            </Typography>
+            <Typography 
+              sx={{ 
+                fontSize: "0.8rem",
+                color: theme.palette.text.secondary,
+              }}
+            >
+              Monthly Estimate: {monthlyEstimate >= 1000 
+                ? `${(monthlyEstimate / 1000).toFixed(2)} B` 
+                : `${monthlyEstimate.toFixed(2)} M`} ISK
+            </Typography>
+            <Typography 
+              sx={{ 
+                fontSize: "0.8rem",
+                color: theme.palette.text.secondary,
+              }}
+            >
+              Storage Value: {storageValue >= 1000 
+                ? `${(storageValue / 1000).toFixed(2)} B` 
+                : `${storageValue.toFixed(2)} M`} ISK
+            </Typography>
+          </Box>
           <IconButton 
             size="small" 
             onClick={() => setIsCollapsed(!isCollapsed)}

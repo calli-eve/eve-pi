@@ -1,5 +1,4 @@
 import { PlanetConfig } from "./app/components/PlanetConfig/PlanetConfigDialog";
-import { Api } from "./esi-api";
 
 export interface AccessToken {
   access_token: string;
@@ -20,10 +19,50 @@ export interface Character {
   characterId: number;
 }
 
+export interface Planet {
+  planet_id: number;
+  solar_system_id: number;
+  planet_type: "temperate" | "barren" | "oceanic" | "ice" | "gas" | "lava" | "storm" | "plasma";
+  last_update: string;
+  num_pins: number;
+  owner_id: number;
+  upgrade_level: number;
+}
+
+export interface PlanetInfo {
+  links: Array<{
+    destination_pin_id: number;
+    link_level: number;
+    source_pin_id: number;
+  }>;
+  pins: Pin[];
+  routes: Array<{
+    content_type_id: number;
+    destination_pin_id: number;
+    quantity: number;
+    route_id: number;
+    source_pin_id: number;
+    waypoints?: number[];
+  }>;
+}
+
+export interface PlanetInfoUniverse {
+  name: string;
+  planet_id: number;
+  system_id: number;
+  type_id: number;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+}
+
 export interface PlanetWithInfo extends Planet {
   info: PlanetInfo;
   infoUniverse: PlanetInfoUniverse;
 }
+
 export interface CharacterPlanets {
   name: string;
   characterId: number;
@@ -38,31 +77,45 @@ export interface CharacterUpdate {
   system?: string;
 }
 
-export type Planet = EsiType<"v1", "getCharactersCharacterIdPlanets">[number];
-
-export type PlanetInfoUniverse = EsiType<"v1", "getUniversePlanetsPlanetId">;
-
-export type PlanetInfo = EsiType<
-  "v3",
-  "getCharactersCharacterIdPlanetsPlanetId"
->;
-
 export interface Env {
   EVE_SSO_CALLBACK_URL: string;
   EVE_SSO_CLIENT_ID: string;
 }
 
-type EsiApiVersionType = keyof InstanceType<typeof Api<unknown>>;
-type EsiApiPathType<V extends EsiApiVersionType> = keyof InstanceType<
-  typeof Api<unknown>
->[V];
-type EsiApiResponseType<
-  V extends EsiApiVersionType,
-  T extends EsiApiPathType<V>,
-> = Awaited<ReturnType<InstanceType<typeof Api<unknown>>[V][T]>>;
-export type EsiType<
-  V extends EsiApiVersionType,
-  T extends EsiApiPathType<V>,
-> = EsiApiResponseType<V, T> extends { data: any }
-  ? EsiApiResponseType<V, T>["data"]
-  : never;
+export interface EvePraisalResult {
+  appraisal: {
+    items: Array<{
+      typeID: number;
+      prices: {
+        sell: {
+          min: number;
+        };
+      };
+    }>;
+  };
+}
+
+export interface Pin {
+  pin_id: number;
+  type_id: number;
+  schematic_id?: number;
+  expiry_time?: string;
+  install_time?: string;
+  latitude: number;
+  longitude: number;
+  extractor_details?: {
+    cycle_time?: number;
+    head_radius?: number;
+    heads: Array<{
+      head_id: number;
+      latitude: number;
+      longitude: number;
+    }>;
+    product_type_id?: number;
+    qty_per_cycle?: number;
+  };
+  contents?: Array<{
+    type_id: number;
+    amount: number;
+  }>;
+}

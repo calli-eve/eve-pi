@@ -97,15 +97,6 @@ export const PlanetTableRow = ({
     cycleTime: schematic.cycle_time
   }));
 
-  // Convert Map to Array for schematic IDs
-  const installedSchematicIds = Array.from(localProduction.values()).map(p => p.schematic_id);
-  
-  // Get extractor head types safely
-  const extractedTypeIds = extractors
-    .map(e => e.extractor_details?.product_type_id)
-    .filter((id): id is number => id !== undefined);
-
-  // Get storage facilities
   const storageFacilities = planetInfo.pins.filter(pin => 
     STORAGE_IDS().some(storage => storage.type_id === pin.type_id)
   );
@@ -116,11 +107,16 @@ export const PlanetTableRow = ({
     const storageType = PI_TYPES_MAP[pin.type_id].name;
     const storageCapacity = STORAGE_CAPACITIES[pin.type_id] || 0;
     
-    // Calculate total volume of stored products for this specific pin
     const totalVolume = (pin.contents || [])
       .reduce((sum: number, item: any) => {
         const volume = PI_PRODUCT_VOLUMES[item.type_id] || 0;
         return sum + (item.amount * volume);
+      }, 0);
+
+    const totalValue = (pin.contents || [])
+      .reduce((sum: number, item: any) => {
+        const price = piPrices?.appraisal.items.find((a) => a.typeID === item.type_id)?.prices.sell.min ?? 0;
+        return sum + (item.amount * price);
       }, 0);
 
     const fillRate = storageCapacity > 0 ? (totalVolume / storageCapacity) * 100 : 0;
@@ -129,7 +125,8 @@ export const PlanetTableRow = ({
       type: storageType,
       capacity: storageCapacity,
       used: totalVolume,
-      fillRate: fillRate
+      fillRate: fillRate,
+      value: totalValue
     };
   };
 
@@ -319,6 +316,11 @@ export const PlanetTableRow = ({
                     <Typography fontSize={theme.custom.smallText} style={{ color }}>
                       {fillRate.toFixed(1)}%
                     </Typography>
+                    {storageInfo.value > 0 && (
+                      <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
+                        ({Math.round(storageInfo.value / 1000000)}M)
+                      </Typography>
+                    )}
                   </div>
                 );
               })}

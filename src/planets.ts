@@ -51,7 +51,7 @@ export const getPlanetUniverse = async (
 export const planetCalculations = (planet: PlanetWithInfo) => {
   const planetInfo = planet.info;
   type SchematicId = number;
-  const extractors: PlanetInfo["pins"] = planetInfo.pins.filter((p) =>
+  const extractors = planetInfo.pins.filter((p) =>
     EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id),
   );
   const localProduction = planetInfo.pins

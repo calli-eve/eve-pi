@@ -20,6 +20,7 @@ import { PlanetConfigDialog } from "../PlanetConfig/PlanetConfigDialog";
 import PinsCanvas3D from "./PinsCanvas3D";
 import { alertModeVisibility, timeColor } from "./timeColors";
 import { ExtractionSimulationDisplay } from './ExtractionSimulationDisplay';
+import { ExtractionSimulationTooltip } from './ExtractionSimulationTooltip';
 import { ProductionNode } from './ExtractionSimulation';
 import { Collapse, Box, Stack } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -160,7 +161,38 @@ export const PlanetTableRow = ({
                 height={theme.custom.cardImageSize / 6}
                 style={{ marginRight: "5px" }}
               />
-              {planetInfoUniverse?.name}
+              <Tooltip
+                placement="right"
+                title={
+                  <ExtractionSimulationTooltip
+                    extractors={extractors
+                      .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
+                      .map(e => ({
+                        typeId: e.extractor_details!.product_type_id!,
+                        baseValue: e.extractor_details!.qty_per_cycle!,
+                        cycleTime: e.extractor_details!.cycle_time || 3600,
+                        installTime: e.install_time ?? "",
+                        expiryTime: e.expiry_time ?? ""
+                      }))}
+                  />
+                }
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      bgcolor: 'background.paper',
+                      '& .MuiTooltip-arrow': {
+                        color: 'background.paper',
+                      },
+                      maxWidth: 'none',
+                      width: 'fit-content'
+                    }
+                  }
+                }}
+              >
+                <Typography fontSize={theme.custom.smallText}>
+                  {planetInfoUniverse?.name}
+                </Typography>
+              </Tooltip>
             </div>
           </Tooltip>
         </TableCell>
@@ -383,18 +415,38 @@ export const PlanetTableRow = ({
         <TableCell colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
           <Collapse in={simulationOpen} timeout="auto" unmountOnExit>
             <Box sx={{ my: 2 }}>
-              <ExtractionSimulationDisplay
-                extractors={extractors
-                  .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
-                  .map(e => ({
-                    typeId: e.extractor_details!.product_type_id!,
-                    baseValue: e.extractor_details!.qty_per_cycle!,
-                    cycleTime: e.extractor_details!.cycle_time || 3600,
-                    installTime: e.install_time ?? "",
-                    expiryTime: e.expiry_time ?? ""
-                  }))}
-                productionNodes={productionNodes}
-              />
+              <Tooltip
+                placement="right"
+                title={
+                  <ExtractionSimulationTooltip
+                    extractors={extractors
+                      .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
+                      .map(e => ({
+                        typeId: e.extractor_details!.product_type_id!,
+                        baseValue: e.extractor_details!.qty_per_cycle!,
+                        cycleTime: e.extractor_details!.cycle_time || 3600,
+                        installTime: e.install_time ?? "",
+                        expiryTime: e.expiry_time ?? ""
+                      }))}
+                  />
+                }
+                componentsProps={{
+                  tooltip: {
+                    sx: {
+                      bgcolor: 'background.paper',
+                      '& .MuiTooltip-arrow': {
+                        color: 'background.paper',
+                      },
+                    }
+                  }
+                }}
+              >
+                <div>
+                  <Typography fontSize={theme.custom.smallText}>
+                    {planetInfoUniverse?.name}
+                  </Typography>
+                </div>
+              </Tooltip>
             </Box>
           </Collapse>
         </TableCell>

@@ -1,7 +1,6 @@
 import { EvePraisalResult } from "@/eve-praisal";
-import { AccessToken, CharacterUpdate } from "@/types";
+import { AccessToken, CharacterUpdate, PlanetConfig } from "@/types";
 import { Dispatch, SetStateAction, createContext } from "react";
-import { PlanetConfig } from "../components/PlanetConfig/PlanetConfigDialog";
 
 export const CharacterContext = createContext<{
   characters: AccessToken[];

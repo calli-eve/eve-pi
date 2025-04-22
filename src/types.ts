@@ -1,5 +1,3 @@
-import { PlanetConfig } from "./app/components/PlanetConfig/PlanetConfigDialog";
-
 export interface AccessToken {
   access_token: string;
   expires_at: number;
@@ -118,4 +116,10 @@ export interface Pin {
     type_id: number;
     amount: number;
   }>;
+}
+
+export interface PlanetConfig {
+  characterId: number;
+  planetId: number;
+  excludeFromTotals: boolean;
 }

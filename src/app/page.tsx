@@ -17,7 +17,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
 import { getPlanet, getPlanetUniverse, getPlanets } from "@/planets";
-import { PlanetConfig } from "./components/PlanetConfig/PlanetConfigDialog";
+import { PlanetConfig } from "@/types";
 
 const Home = () => {
   const searchParams = useSearchParams();

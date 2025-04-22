@@ -1,7 +1,9 @@
 import React from 'react';
-import { Box, Paper, Typography, Grid, Stack, Divider } from '@mui/material';
+import { Box, Paper, Typography, Grid, Stack, Divider, Tooltip } from '@mui/material';
 import { EVE_IMAGE_URL } from '@/const';
 import { PI_TYPES_MAP } from '@/const';
+import { DateTime } from 'luxon';
+import Countdown from 'react-countdown';
 
 interface Factory {
   schematic_id: number;
@@ -29,6 +31,7 @@ interface ProductionChainVisualizationProps {
     typeId: number;
     baseValue: number;
     cycleTime: number;
+    expiryTime: string;
   }>;
   factories: Factory[];
   extractorTotals: Map<number, number>;
@@ -39,8 +42,10 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
   extractedTypeIds,
   factories,
   extractorTotals,
-  productionNodes
+  productionNodes,
+  extractors
 }) => {
+
   // Get all type IDs involved in the production chain
   const allTypeIds = new Set<number>();
   const requiredInputs = new Set<number>();
@@ -214,9 +219,15 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
 
   // Get factory count for a type
   const getFactoryCount = (typeId: number): number => {
-    const node = nodesByOutput.get(typeId);
-    if (!node) return 0;
-    return factories.find(f => f.schematic_id === node.schematicId)?.count ?? 0;
+    // First find the node that produces this type
+    const producingNode = productionNodes.find(node => 
+      node.outputs.some(output => output.typeId === typeId)
+    );
+    
+    if (!producingNode) return 0;
+    
+    // Then find the factory count for this schematic
+    return factories.find(f => f.schematic_id === producingNode.schematicId)?.count ?? 0;
   };
 
   // Get input requirements for a type
@@ -230,6 +241,11 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
   const getSchematicCycleTime = (typeId: number): number | undefined => {
     const node = nodesByOutput.get(typeId);
     return node?.cycleTime;
+  };
+
+  // Get extractor expiry time for a type
+  const getExtractorExpiryTime = (typeId: number): string | undefined => {
+    return extractors.find(e => e.typeId === typeId)?.expiryTime;
   };
 
   return (
@@ -258,6 +274,7 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
                   const consumption = consumptionTotals.get(typeId) ?? 0;
                   const inputs = getInputRequirements(typeId);
                   const cycleTime = getSchematicCycleTime(typeId);
+                  const expiryTime = getExtractorExpiryTime(typeId);
 
                   return (
                     <Grid item key={typeId} xs={12} sm={6} md={4}>
@@ -292,19 +309,49 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
                           </Box>
                         </Box>
                         <Stack spacing={0.5}>
-                          {production > 0 && (
-                            <>
-                              <Typography variant="caption" color="success.main">
-                                Production: {production.toFixed(1)} units total
+                          {factoryCount > 0 && (
+                            <Typography variant="caption" color="info.main">
+                              Factories: {factoryCount}
+                            </Typography>
+                          )}
+                          {inputs.length > 0 && (
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Inputs:
                               </Typography>
-                            </>
+                              {inputs.map(input => (
+                                <Typography 
+                                  key={input.typeId} 
+                                  variant="caption" 
+                                  sx={{ display: 'block', ml: 1 }}
+                                >
+                                  {PI_TYPES_MAP[input.typeId]?.name}: {input.quantity * factoryCount}/cycle
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
+                          {expiryTime && (
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Extractor expires in:
+                              </Typography>
+                              <Typography variant="caption" sx={{ ml: 1 }}>
+                                <Countdown
+                                  overtime={true}
+                                  date={DateTime.fromISO(expiryTime).toMillis()}
+                                />
+                              </Typography>
+                            </Box>
+                          )}
+                          {production > 0 && (
+                            <Typography variant="caption" color="success.main">
+                              Production: {production.toFixed(1)} units total
+                            </Typography>
                           )}
                           {consumption > 0 && (
-                            <>
-                              <Typography variant="caption" color="error.main">
-                                Consumption: {consumption.toFixed(1)} units total
-                              </Typography>
-                            </>
+                            <Typography variant="caption" color="error.main">
+                              Consumption: {consumption.toFixed(1)} units total
+                            </Typography>
                           )}
                           {isImported && (
                             <>

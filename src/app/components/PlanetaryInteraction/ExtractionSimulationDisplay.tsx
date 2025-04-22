@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Paper, Typography, Stack } from '@mui/material';
 import { Line } from 'react-chartjs-2';
-import { useTheme } from '@mui/material';
 import { getProgramOutputPrediction, ProductionNode } from './ExtractionSimulation';
 import { PI_TYPES_MAP } from '@/const';
 import { ProductionChainVisualization } from './ProductionChainVisualization';
@@ -15,6 +14,8 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { DateTime } from 'luxon';
+import Countdown from 'react-countdown';
 
 ChartJS.register(
   CategoryScale,
@@ -43,6 +44,7 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
   extractors,
   productionNodes
 }) => {
+
   const CYCLE_TIME = 30 * 60; // 30 minutes in seconds
 
   // Calculate program duration and cycles for each extractor
@@ -56,6 +58,7 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
       cycles: Math.floor(programDuration / CYCLE_TIME)
     };
   });
+
 
   const maxCycles = Math.max(...extractorPrograms.map(e => e.cycles));
 
@@ -156,10 +159,14 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
   const installedSchematicIds = Array.from(new Set(productionNodes.map(node => node.schematicId)));
 
   // Create factories array with correct counts
-  const factories = installedSchematicIds.map(schematicId => ({
-    schematic_id: schematicId,
-    count: productionNodes.filter(node => node.schematicId === schematicId).length
-  }));
+  const factories = installedSchematicIds.map(schematicId => {
+    const node = productionNodes.find(n => n.schematicId === schematicId);
+    if (!node) return { schematic_id: schematicId, count: 0 };
+    return {
+      schematic_id: schematicId,
+      count: node.factoryCount
+    };
+  });
 
   return (
     <Box>
@@ -191,6 +198,12 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
               <Typography variant="body2" component="div" sx={{ pl: 2 }}>
                 • Expiry Time: {new Date(expiryTime).toLocaleString()}
               </Typography>
+              <Typography variant="body2" component="div" sx={{ pl: 2 }}>
+                • Factory Count: {factories.find(f => f.schematic_id === typeId)?.count ?? 0}
+              </Typography>
+              <Typography variant="body2" component="div" sx={{ pl: 2 }}>
+                • Expires in: <Countdown overtime={true} date={DateTime.fromISO(expiryTime).toMillis()} />
+              </Typography>
             </Stack>
           ))}
         </Box>
@@ -204,7 +217,8 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
         extractors={extractors.map(e => ({
           typeId: e.typeId,
           baseValue: e.baseValue,
-          cycleTime: CYCLE_TIME
+          cycleTime: CYCLE_TIME,
+          expiryTime: e.expiryTime
         }))}
         factories={factories}
         extractorTotals={extractorTotals}

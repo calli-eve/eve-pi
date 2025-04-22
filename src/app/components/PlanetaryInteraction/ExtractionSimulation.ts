@@ -65,6 +65,7 @@ export interface ProductionNode {
     quantity: number;
   }>;
   cycleTime: number;
+  factoryCount: number;
 }
 
 export interface ProductionChainBalance {

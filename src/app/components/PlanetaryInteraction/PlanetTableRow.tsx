@@ -4,7 +4,7 @@ import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Button, Tooltip, Typography, useTheme, Menu, MenuItem, IconButton } from "@mui/material";
+import { Button, Tooltip, Typography, useTheme, Menu, MenuItem, IconButton, Checkbox, FormControlLabel } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Dialog from "@mui/material/Dialog";
 import Slide from "@mui/material/Slide";
@@ -72,14 +72,15 @@ export const PlanetTableRow = ({
     setPlanetConfigOpen(false);
   };
 
-  const { piPrices, alertMode } = useContext(SessionContext);
+  const { piPrices, alertMode, updatePlanetConfig, readPlanetConfig } = useContext(SessionContext);
   const planetInfo = planet.info;
   const planetInfoUniverse = planet.infoUniverse;
   const { expired, extractors, localProduction, localImports, localExports } =
     planetCalculations(planet);
-  const planetConfig = character.planetConfig.find(
-    (p) => p.planetId === planet.planet_id,
-  );
+  const planetConfig = readPlanetConfig({
+    characterId: character.character.characterId,
+    planetId: planet.planet_id,
+  });
   const { colors } = useContext(ColorContext);
   // Convert local production to ProductionNode array for simulation
   const productionNodes: ProductionNode[] = Array.from(localProduction).map(([schematicId, schematic]) => ({
@@ -94,7 +95,8 @@ export const PlanetTableRow = ({
       typeId: output.type_id,
       quantity: output.quantity
     })),
-    cycleTime: schematic.cycle_time
+    cycleTime: schematic.cycle_time,
+    factoryCount: schematic.count || 1
   }));
 
   const storageFacilities = planetInfo.pins.filter(pin => 
@@ -128,6 +130,13 @@ export const PlanetTableRow = ({
       fillRate: fillRate,
       value: totalValue
     };
+  };
+
+  const handleExcludeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updatePlanetConfig({
+      ...planetConfig,
+      excludeFromTotals: event.target.checked,
+    });
   };
 
   return (
@@ -230,12 +239,17 @@ export const PlanetTableRow = ({
         <TableCell>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {localExports.map((exports) => (
-              <Typography
+              <FormControlLabel
                 key={`export-excluded-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
-                fontSize={theme.custom.smallText}
-              >
-                {planetConfig?.excludeFromTotals ? "ex" : ""}
-              </Typography>
+                control={
+                  <Checkbox
+                    checked={planetConfig.excludeFromTotals}
+                    onChange={handleExcludeChange}
+                    size="small"
+                  />
+                }
+                label=""
+              />
             ))}
           </div>
         </TableCell>

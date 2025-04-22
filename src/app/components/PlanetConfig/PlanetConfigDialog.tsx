@@ -3,8 +3,6 @@ import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import {
   Card,
-  Checkbox,
-  FormControlLabel,
   Table,
   TableBody,
   TableCell,
@@ -20,12 +18,6 @@ import Image from "next/image";
 import { ColorContext, SessionContext } from "@/app/context/Context";
 import { useContext } from "react";
 
-export type PlanetConfig = {
-  characterId: number;
-  planetId: number;
-  excludeFromTotals: boolean;
-};
-
 export const PlanetConfigDialog = ({
   planet,
   character,
@@ -35,14 +27,9 @@ export const PlanetConfigDialog = ({
 }) => {
   const theme = useTheme();
   const { colors } = useContext(ColorContext);
-  const { piPrices, readPlanetConfig, updatePlanetConfig } =
-    useContext(SessionContext);
+  const { piPrices } = useContext(SessionContext);
   const { extractors, localProduction, localImports, localExports } =
     planetCalculations(planet);
-  const planetConfig = readPlanetConfig({
-    characterId: character.character.characterId,
-    planetId: planet.planet_id,
-  });
 
   return (
     <Card style={{ padding: "1rem", margin: "1rem" }}>
@@ -189,23 +176,6 @@ export const PlanetConfigDialog = ({
           </TableRow>
         </TableBody>
       </Table>
-      <Card style={{ marginTop: "1rem" }}>
-        <Typography>Planet configuration</Typography>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={planetConfig.excludeFromTotals}
-              onChange={() =>
-                updatePlanetConfig({
-                  ...planetConfig,
-                  excludeFromTotals: !planetConfig.excludeFromTotals,
-                })
-              }
-            />
-          }
-          label="Consumed by production chain"
-        />
-      </Card>
     </Card>
   );
 };

@@ -61,10 +61,19 @@ export const planetCalculations = (planet: PlanetWithInfo) => {
         const schematic = PI_SCHEMATICS.find(
           (s) => s.schematic_id == f.schematic_id,
         );
-        if (schematic) acc.set(f.schematic_id, schematic);
+        if (schematic) {
+          const existing = acc.get(f.schematic_id);
+          if (existing) {
+            // If we already have this schematic, increment its count
+            existing.count = (existing.count || 0) + 1;
+          } else {
+            // First time seeing this schematic, set count to 1
+            acc.set(f.schematic_id, { ...schematic, count: 1 });
+          }
+        }
       }
       return acc;
-    }, new Map<SchematicId, (typeof PI_SCHEMATICS)[number]>());
+    }, new Map<SchematicId, (typeof PI_SCHEMATICS)[number] & { count: number }>());
 
   const locallyProduced = Array.from(localProduction)
     .flatMap((p) => p[1].outputs)

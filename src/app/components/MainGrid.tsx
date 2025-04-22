@@ -164,7 +164,9 @@ export const MainGrid = () => {
                           },
                         }}
                       >
-                        <AccountCard characters={groupByAccount[account]} />
+                        {groupByAccount[account] && groupByAccount[account].length > 0 && (
+                          <AccountCard characters={groupByAccount[account]} />
+                        )}
                       </Grid>
                     )}
                   </DraggableComponent>

@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogTitle } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogTitle, Box } from "@mui/material";
 import { AccessToken, CharacterUpdate } from "../../../types";
 import { useEffect, useState, KeyboardEvent } from "react";
 import TextField from "@mui/material/TextField";
@@ -34,7 +34,9 @@ export const CharacterDialog = ({
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter") {
       closeDialog();
-      character && updateCharacter(character, { account, comment });
+      if (character) {
+        updateCharacter(character, { account, comment });
+      }
     }
   };
 
@@ -44,16 +46,27 @@ export const CharacterDialog = ({
       onClose={closeDialog}
       fullWidth={true}
     >
-      <DialogTitle>{character && character.character.name}</DialogTitle>
-      <TextField
-        id="outlined-basic"
-        label="Account name"
-        variant="outlined"
-        value={account ?? ""}
-        sx={{ margin: 1 }}
-        onChange={(event) => setAccount(event.target.value)}
-        onKeyDown={handleKeyDown}
-      />
+      <DialogTitle>{character?.character?.name}</DialogTitle>
+      <Box sx={{ display: 'flex', alignItems: 'center', margin: 1 }}>
+        <TextField
+          id="outlined-basic"
+          label="Account name"
+          variant="outlined"
+          value={account ?? ""}
+          sx={{ flex: 1 }}
+          onChange={(event) => setAccount(event.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <Button
+          onClick={() => {
+            setAccount("-");
+          }}
+          variant="outlined"
+          sx={{ ml: 1 }}
+        >
+          Clear account
+        </Button>
+      </Box>
       <TextField
         id="outlined-basic"
         label="System"
@@ -77,6 +90,7 @@ export const CharacterDialog = ({
       <DialogActions>
         <Button
           onClick={() => {
+            console.log("Saving character", character, { account, comment, system });
             character &&
               updateCharacter(character, { account, comment, system });
             closeDialog();

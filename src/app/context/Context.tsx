@@ -35,6 +35,8 @@ export const SessionContext = createContext<{
     characterId: number;
     planetId: number;
   }) => PlanetConfig;
+  balanceThreshold: number;
+  setBalanceThreshold: Dispatch<SetStateAction<number>>;
 }>({
   sessionReady: false,
   refreshSession: () => {},
@@ -58,6 +60,8 @@ export const SessionContext = createContext<{
   }) => {
     return { characterId, planetId, excludeFromTotals: true };
   },
+  balanceThreshold: 1000,
+  setBalanceThreshold: () => {},
 });
 export type ColorSelectionType = {
   defaultColor: string;

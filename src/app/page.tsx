@@ -29,6 +29,7 @@ const Home = () => {
   const [piPrices, setPiPrices] = useState<EvePraisalResult | undefined>(
     undefined,
   );
+  const [balanceThreshold, setBalanceThreshold] = useState(1000);
 
   const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
   const [alertMode, setAlertMode] = useState(false);
@@ -200,6 +201,17 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    const storedBalanceThreshold = localStorage.getItem("balanceThreshold");
+    if (storedBalanceThreshold) {
+      setBalanceThreshold(parseInt(storedBalanceThreshold));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("balanceThreshold", balanceThreshold.toString());
+  }, [balanceThreshold]);
+
+  useEffect(() => {
     localStorage.setItem("compactMode", compactMode ? "true" : "false");
   }, [compactMode]);
 
@@ -264,6 +276,8 @@ const Home = () => {
         toggleAlertMode,
         updatePlanetConfig,
         readPlanetConfig,
+        balanceThreshold,
+        setBalanceThreshold,
       }}
     >
       <CharacterContext.Provider

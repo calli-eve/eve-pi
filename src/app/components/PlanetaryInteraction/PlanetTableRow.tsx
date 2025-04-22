@@ -73,7 +73,7 @@ export const PlanetTableRow = ({
     setPlanetConfigOpen(false);
   };
 
-  const { piPrices, alertMode, updatePlanetConfig, readPlanetConfig } = useContext(SessionContext);
+  const { piPrices, alertMode, updatePlanetConfig, readPlanetConfig, balanceThreshold } = useContext(SessionContext);
   const planetInfo = planet.info;
   const planetInfoUniverse = planet.infoUniverse;
   const { expired, extractors, localProduction, localImports, localExports } =
@@ -113,7 +113,7 @@ export const PlanetTableRow = ({
     });
 
   const hasLargeExtractorDifference = extractorAverages.length === 2 && 
-    Math.abs(extractorAverages[0].averagePerHour - extractorAverages[1].averagePerHour) > 1000;
+    Math.abs(extractorAverages[0].averagePerHour - extractorAverages[1].averagePerHour) > balanceThreshold;
 
   const storageFacilities = planetInfo.pins.filter(pin => 
     STORAGE_IDS().some(storage => storage.type_id === pin.type_id)

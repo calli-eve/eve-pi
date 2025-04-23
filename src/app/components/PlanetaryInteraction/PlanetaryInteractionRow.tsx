@@ -159,8 +159,8 @@ export const PlanetaryInteractionRow = ({
   const theme = useTheme();
 
   return theme.custom.compactMode ? (
-    <PlanetaryInteractionIconsRow character={character} />
+    <div style={{ marginTop: "1.2rem" }}><PlanetaryInteractionIconsRow character={character} /></div>
   ) : (
-    <PlanetaryIteractionTable character={character} />
+    <div style={{ marginTop: "1.4rem" }}><PlanetaryIteractionTable character={character} /></div>
   );
 };

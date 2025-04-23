@@ -1,31 +1,21 @@
-import { Stack, Typography, styled, useTheme } from "@mui/material";
+import { Stack, Typography, styled, useTheme, Tooltip } from "@mui/material";
 import Image from "next/image";
 import {
   AccessToken,
-  Planet,
-  PlanetInfo,
-  PlanetInfoUniverse,
   PlanetWithInfo,
 } from "@/types";
-import React, { forwardRef, useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { DateTime } from "luxon";
 import { EXTRACTOR_TYPE_IDS } from "@/const";
 import Countdown from "react-countdown";
-import PinsCanvas3D from "./PinsCanvas3D";
-import Slide from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import Button from "@mui/material/Button";
+import { getProgramOutputPrediction } from "./ExtractionSimulation";
 import {
   alertModeVisibility,
   extractorsHaveExpired,
   timeColor,
 } from "./timeColors";
 import { ColorContext, SessionContext } from "@/app/context/Context";
+import { ExtractionSimulationTooltip } from "./ExtractionSimulationTooltip";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -35,15 +25,6 @@ const StackItem = styled(Stack)(({ theme }) => ({
   justifyContent: "flex-start",
   alignItems: "center",
 }));
-
-const Transition = forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>,
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export const PlanetCard = ({
   character,
@@ -57,17 +38,7 @@ export const PlanetCard = ({
   const planetInfo = planet.info;
   const planetInfoUniverse = planet.infoUniverse;
 
-  const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
-
   const theme = useTheme();
-
-  const handle3DrenderOpen = () => {
-    setPlanetRenderOpen(true);
-  };
-
-  const handle3DrenderClose = () => {
-    setPlanetRenderOpen(false);
-  };
 
   const extractorsExpiryTime =
     (planetInfo &&
@@ -79,7 +50,75 @@ export const PlanetCard = ({
   const { colors } = useContext(ColorContext);
   const expired = extractorsHaveExpired(extractorsExpiryTime);
 
+  const CYCLE_TIME = 30 * 60; // 30 minutes in seconds
+
+  const extractors = planetInfo?.pins
+    .filter((p) => EXTRACTOR_TYPE_IDS.some((e) => e === p.type_id))
+    .map((p) => ({
+      typeId: p.type_id,
+      baseValue: p.extractor_details?.qty_per_cycle || 0,
+      cycleTime: p.extractor_details?.cycle_time || 3600,
+      installTime: p.install_time || "",
+      expiryTime: p.expiry_time || "",
+      installedSchematicId: p.extractor_details?.product_type_id || undefined
+    })) || [];
+
+  // Calculate program duration and cycles for each extractor
+  const extractorPrograms = extractors.map(extractor => {
+    const installDate = new Date(extractor.installTime);
+    const expiryDate = new Date(extractor.expiryTime);
+    const programDuration = (expiryDate.getTime() - installDate.getTime()) / 1000; // Convert to seconds
+    return {
+      ...extractor,
+      programDuration,
+      cycles: Math.floor(programDuration / CYCLE_TIME)
+    };
+  });
+
+
+  // Get output predictions for each extractor
+  const extractorOutputs = extractorPrograms.map(extractor => ({
+    typeId: extractor.typeId,
+    cycleTime: CYCLE_TIME,
+    cycles: extractor.cycles,
+    prediction: getProgramOutputPrediction(
+      extractor.baseValue,
+      CYCLE_TIME,
+      extractor.cycles
+    )
+  }));
+
+  // Calculate average per hour for each extractor
+  const extractorAverages = extractorOutputs.map(extractor => {
+    const totalOutput = extractor.prediction.reduce((sum, val) => sum + val, 0);
+    const programDuration = extractor.cycles * CYCLE_TIME;
+    const averagePerHour = (totalOutput / programDuration) * 3600;
+    return {
+      typeId: extractor.typeId,
+      averagePerHour
+    };
+  });
+
   return (
+    <Tooltip
+      title={
+        <ExtractionSimulationTooltip
+          extractors={extractors}
+        />
+      }
+      componentsProps={{
+        tooltip: {
+          sx: {
+            bgcolor: 'background.paper',
+            '& .MuiTooltip-arrow': {
+              color: 'background.paper',
+            },
+            maxWidth: 'none',
+            width: 'fit-content'
+          }
+        }
+      }}
+    >
     <StackItem
       alignItems="flex-start"
       height="100%"
@@ -87,15 +126,32 @@ export const PlanetCard = ({
       minHeight={theme.custom.cardMinHeight}
       visibility={alertModeVisibility(alertMode, expired)}
     >
-      <Image
-        unoptimized
-        src={`/${planet.planet_type}.png`}
-        alt=""
-        width={theme.custom.cardImageSize}
-        height={theme.custom.cardImageSize}
-        style={{ borderRadius: 8, marginRight: 4 }}
-        onClick={handle3DrenderOpen}
-      />
+      
+        <div style={{ position: 'relative' }}>
+          <Image
+            unoptimized
+            src={`/${planet.planet_type}.png`}
+            alt=""
+            width={theme.custom.cardImageSize}
+            height={theme.custom.cardImageSize}
+            style={{ 
+              borderRadius: 8, 
+              marginRight: 4,
+              position: 'relative',
+              zIndex: 0
+            }}
+          />
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: theme.custom.cardImageSize,
+            height: theme.custom.cardImageSize,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderRadius: 8,
+          }} />
+        </div>
+     
       {expired && (
         <Image
           width={32}
@@ -109,55 +165,41 @@ export const PlanetCard = ({
         <Typography fontSize={theme.custom.smallText}>
           {planetInfoUniverse?.name}
         </Typography>
-        <Typography fontSize={theme.custom.smallText}>
-          L{planet.upgrade_level}
-        </Typography>
+        {extractorsExpiryTime.map((e, idx) => {
+          const extractor = extractors[idx];
+          const average = extractorAverages[idx];
+          return (
+            <div key={`${e}-${idx}-${character.character.characterId}`}>
+              <Typography
+                color={timeColor(e, colors)}
+                fontSize={theme.custom.smallText}
+              >
+                {!expired && e && <Countdown
+                    overtime={true}
+                    date={DateTime.fromISO(e).toMillis()}
+                  />
+                }
+              </Typography>
+              {!expired && extractor && average && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <Image
+                    unoptimized
+                    src={`https://images.evetech.net/types/${extractor.installedSchematicId}/icon?size=32`}
+                    alt=""
+                    width={16}
+                    height={16}
+                    style={{ borderRadius: 4 }}
+                  />
+                  <Typography fontSize={theme.custom.smallText}>
+                    {average.averagePerHour.toFixed(1)}/h
+                  </Typography>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
-
-      {extractorsExpiryTime.map((e, idx) => {
-        return (
-          <Typography
-            key={`${e}-${idx}-${character.character.characterId}`}
-            color={timeColor(e, colors)}
-            fontSize={theme.custom.smallText}
-          >
-            {e ? (
-              <Countdown
-                overtime={true}
-                date={DateTime.fromISO(e).toMillis()}
-              />
-            ) : (
-              "STOPPED"
-            )}
-          </Typography>
-        );
-      })}
-      <Dialog
-        fullScreen
-        open={planetRenderOpen}
-        onClose={handle3DrenderClose}
-        TransitionComponent={Transition}
-      >
-        <AppBar sx={{ position: "relative" }}>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              onClick={handle3DrenderClose}
-              aria-label="close"
-            >
-              <CloseIcon />
-            </IconButton>
-            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              {planetInfoUniverse?.name}
-            </Typography>
-            <Button autoFocus color="inherit" onClick={handle3DrenderClose}>
-              Close
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <PinsCanvas3D planetInfo={planetInfo} />
-      </Dialog>
     </StackItem>
+    </Tooltip>
   );
 };

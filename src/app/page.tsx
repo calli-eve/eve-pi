@@ -248,7 +248,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const ESI_CACHE_TIME_MS = 600000;
+    const ESI_CACHE_TIME_MS = 3000000;
     const interval = setInterval(() => {
       const characters = initializeCharacters();
       refreshSession(characters)

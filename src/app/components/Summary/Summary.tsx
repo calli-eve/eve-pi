@@ -51,18 +51,22 @@ export const Summary = ({ characters }: { characters: AccessToken[] }) => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [sortBy, setSortBy] = useState<SortBy>("name");
   const [startDate, setStartDate] = useState<string>(DateTime.now().startOf('day').toISO());
-  const [activityPercentage, setActivityPercentage] = useState<number>(() => {
-    const saved = localStorage.getItem('activityPercentage');
-    return saved ? parseFloat(saved) : 100;
-  });
+  const [activityPercentage, setActivityPercentage] = useState<number>(100);
 
+  // Load saved values from localStorage on mount
   useEffect(() => {
     const savedDate = localStorage.getItem('productionStartDate');
     if (savedDate) {
       setStartDate(savedDate);
     }
+
+    const savedActivity = localStorage.getItem('activityPercentage');
+    if (savedActivity) {
+      setActivityPercentage(parseFloat(savedActivity));
+    }
   }, []);
 
+  // Save values to localStorage when they change
   useEffect(() => {
     localStorage.setItem('productionStartDate', startDate);
   }, [startDate]);

@@ -102,9 +102,11 @@ export const PlanetCard = ({
   return (
     <Tooltip
       title={
-        <ExtractionSimulationTooltip
-          extractors={extractors}
-        />
+        extractors.length > 0 ? (
+          <ExtractionSimulationTooltip
+            extractors={extractors}
+          />
+        ) : null
       }
       componentsProps={{
         tooltip: {

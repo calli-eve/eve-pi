@@ -165,11 +165,8 @@ export const PlanetTableRow = ({
           }
         }}
         onClick={(e) => {
-          // Only trigger if clicking a cell with the clickable-cell class
           if (!(e.target as HTMLElement).closest('.clickable-cell')) return;
-          if (extractors.length > 0) {
-            setSimulationOpen(!simulationOpen);
-          }
+          setSimulationOpen(!simulationOpen);
         }}
       >
         <TableCell component="th" scope="row" className="clickable-cell">
@@ -190,17 +187,19 @@ export const PlanetTableRow = ({
               <Tooltip
                 placement="right"
                 title={
-                  <ExtractionSimulationTooltip
-                    extractors={extractors
-                      .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
-                      .map(e => ({
-                        typeId: e.extractor_details!.product_type_id!,
-                        baseValue: e.extractor_details!.qty_per_cycle!,
-                        cycleTime: e.extractor_details!.cycle_time || 3600,
-                        installTime: e.install_time ?? "",
-                        expiryTime: e.expiry_time ?? ""
-                      }))}
-                  />
+                  extractors.length > 0 ? (
+                    <ExtractionSimulationTooltip
+                      extractors={extractors
+                        .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
+                        .map(e => ({
+                          typeId: e.extractor_details!.product_type_id!,
+                          baseValue: e.extractor_details!.qty_per_cycle!,
+                          cycleTime: e.extractor_details!.cycle_time || 3600,
+                          installTime: e.install_time ?? "",
+                          expiryTime: e.expiry_time ?? ""
+                        }))}
+                    />
+                  ) : null
                 }
                 componentsProps={{
                   tooltip: {

@@ -291,7 +291,7 @@ export const PlanetTableRow = ({
                 key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
                 fontSize={theme.custom.smallText}
               >
-                {PI_TYPES_MAP[i.type_id].name} ({i.quantity}/h)
+                {PI_TYPES_MAP[i.type_id].name} ({i.quantity * i.factoryCount}/h)
               </Typography>
             ))}
           </div>

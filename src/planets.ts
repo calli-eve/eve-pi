@@ -94,7 +94,13 @@ export const planetCalculations = (planet: PlanetWithInfo) => {
         ![...locallyProduced, ...locallyExcavated].some(
           (lp) => lp === p.type_id,
         ),
-    );
+    ).map((p) => ({
+      ...p,
+      factoryCount: planetInfo.pins
+        .filter((f) => f.schematic_id === p.schematic_id)
+        .length,
+    }));
+
 
   const localExports = locallyProduced
     .filter((p) => !locallyConsumed.some((lp) => lp === p))

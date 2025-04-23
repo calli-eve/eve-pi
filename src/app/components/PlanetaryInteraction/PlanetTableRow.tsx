@@ -23,8 +23,6 @@ import { ExtractionSimulationDisplay } from './ExtractionSimulationDisplay';
 import { ExtractionSimulationTooltip } from './ExtractionSimulationTooltip';
 import { ProductionNode } from './ExtractionSimulation';
 import { Collapse, Box, Stack } from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -159,9 +157,22 @@ export const PlanetTableRow = ({
     <>
       <TableRow
         style={{ visibility: alertModeVisibility(alertMode, expired) }}
-        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+        sx={{ 
+          "&:last-child td, &:last-child th": { border: 0 },
+          cursor: 'pointer',
+          '&:hover': {
+            backgroundColor: 'action.hover'
+          }
+        }}
+        onClick={(e) => {
+          // Only trigger if clicking a cell with the clickable-cell class
+          if (!(e.target as HTMLElement).closest('.clickable-cell')) return;
+          if (extractors.length > 0) {
+            setSimulationOpen(!simulationOpen);
+          }
+        }}
       >
-        <TableCell component="th" scope="row">
+        <TableCell component="th" scope="row" className="clickable-cell">
           <Tooltip
             title={`${
               planet.planet_type.charAt(0).toUpperCase() +
@@ -225,8 +236,8 @@ export const PlanetTableRow = ({
             </div>
           </Tooltip>
         </TableCell>
-        <TableCell>{planet.upgrade_level}</TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">{planet.upgrade_level}</TableCell>
+        <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {extractors.map((e, idx) => {
               return (
@@ -259,7 +270,7 @@ export const PlanetTableRow = ({
             })}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from(localProduction).map((schematic, idx) => {
               return (
@@ -273,7 +284,7 @@ export const PlanetTableRow = ({
             })}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {localImports.map((i) => (
               <Typography
@@ -285,7 +296,7 @@ export const PlanetTableRow = ({
             ))}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {localExports.map((exports) => (
               <Typography
@@ -314,7 +325,7 @@ export const PlanetTableRow = ({
             ))}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {localExports.map((exports) => (
               <Typography
@@ -326,7 +337,7 @@ export const PlanetTableRow = ({
             ))}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">
           <div
             style={{
               display: "flex",
@@ -359,7 +370,7 @@ export const PlanetTableRow = ({
             })}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {storageFacilities
               .sort((a, b) => {
@@ -401,7 +412,7 @@ export const PlanetTableRow = ({
               })}
           </div>
         </TableCell>
-        <TableCell>
+        <TableCell className="menu-cell">
           <IconButton
             aria-label="more"
             aria-controls="planet-menu"
@@ -423,14 +434,6 @@ export const PlanetTableRow = ({
             }}>
               Configure Planet
             </MenuItem>
-            {extractors.length > 0 && (
-              <MenuItem onClick={() => {
-                setSimulationOpen(!simulationOpen);
-                handleMenuClose();
-              }}>
-                {simulationOpen ? 'Hide Extraction Simulation' : 'Show Extraction Simulation'}
-              </MenuItem>
-            )}
             <MenuItem onClick={() => {
               handle3DrenderOpen();
               handleMenuClose();
@@ -441,7 +444,7 @@ export const PlanetTableRow = ({
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
+        <TableCell colSpan={6} style={{ paddingBottom: 0, paddingTop: 0, border: 'none' }}>
           <Collapse in={simulationOpen} timeout="auto" unmountOnExit>
             <Box sx={{ my: 2 }}>
               <ExtractionSimulationDisplay

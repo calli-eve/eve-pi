@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Paper, Typography, Grid, Stack, Divider, Tooltip } from '@mui/material';
+import { Box, Paper, Typography, Grid, Stack } from '@mui/material';
 import { EVE_IMAGE_URL } from '@/const';
 import { PI_TYPES_MAP } from '@/const';
 import { DateTime } from 'luxon';
 import Countdown from 'react-countdown';
+import Image from 'next/image';
 
 interface Factory {
   schematic_id: number;
@@ -291,7 +292,7 @@ export const ProductionChainVisualization: React.FC<ProductionChainVisualization
                         }}
                       >
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <img 
+                          <Image 
                             src={`${EVE_IMAGE_URL}/types/${typeId}/icon`} 
                             alt={type?.name ?? `Type ${typeId}`}
                             width={48}

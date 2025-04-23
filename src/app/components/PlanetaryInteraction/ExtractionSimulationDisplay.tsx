@@ -170,7 +170,7 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
 
   return (
     <Box>
-      <Paper sx={{ p: 2 }}>
+      {extractors.length > 0 ? <Paper sx={{ p: 2 }}>
         <Typography variant="h6" gutterBottom>
           Extraction Simulation
         </Typography>
@@ -210,7 +210,7 @@ export const ExtractionSimulationDisplay: React.FC<ExtractionSimulationDisplayPr
         <div style={{ height: '300px' }}>
           <Line data={chartData} options={chartOptions} />
         </div>
-      </Paper>
+      </Paper> : null}
 
       <ProductionChainVisualization
         extractedTypeIds={extractedTypeIds}

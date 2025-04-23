@@ -1,5 +1,5 @@
 import { AccessToken } from "@/types";
-import { Stack, Tooltip, Typography, styled, useTheme } from "@mui/material";
+import { Icon, IconButton, Stack, Tooltip, Typography, styled, useTheme } from "@mui/material";
 import { PlanetCard } from "./PlanetCard";
 import { NoPlanetCard } from "./NoPlanetCard";
 import Table from "@mui/material/Table";
@@ -10,7 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { PlanetTableRow } from "./PlanetTableRow";
-import Image from "next/image";
+import { Settings } from "@mui/icons-material";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -100,6 +100,13 @@ const PlanetaryIteractionTable = ({
                   <Typography fontSize={theme.custom.smallText}>
                     Storage Fill rate
                   </Typography>
+                </Tooltip>
+              </TableCell>
+              <TableCell>
+                <Tooltip title="Planet settings">
+                <IconButton aria-label="settings">
+                  <Settings fontSize="small" />
+                </IconButton>
                 </Tooltip>
               </TableCell>
             </TableRow>

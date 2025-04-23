@@ -1,5 +1,5 @@
 import { AccessToken } from "@/types";
-import { Box, Stack, Typography, useTheme, Paper, IconButton } from "@mui/material";
+import { Box, Stack, Typography, useTheme, Paper, IconButton, Divider } from "@mui/material";
 import { CharacterRow } from "../Characters/CharacterRow";
 import { PlanetaryInteractionRow } from "../PlanetaryInteraction/PlanetaryInteractionRow";
 import { SessionContext } from "@/app/context/Context";
@@ -14,16 +14,35 @@ import { STORAGE_IDS } from "@/const";
 interface AccountTotals {
   monthlyEstimate: number;
   storageValue: number;
+  planetCount: number;
+  characterCount: number;
+  runningExtractors: number;
+  totalExtractors: number;
 }
 
 const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalResult | undefined): AccountTotals => {
   let totalMonthlyEstimate = 0;
   let totalStorageValue = 0;
+  let totalPlanetCount = 0;
+  let totalCharacterCount = characters.length;
+  let runningExtractors = 0;
+  let totalExtractors = 0;
 
   characters.forEach((character) => {
+    totalPlanetCount += character.planets.length;
     character.planets.forEach((planet) => {
-      const { localExports } = planetCalculations(planet);
+      const { localExports, extractors } = planetCalculations(planet);
       const planetConfig = character.planetConfig.find(p => p.planetId === planet.planet_id);
+      
+      // Count running and total extractors
+      if (!planetConfig?.excludeFromTotals) {
+        extractors.forEach(extractor => {
+          totalExtractors++;
+          if (extractor.expiry_time && new Date(extractor.expiry_time) > new Date()) {
+            runningExtractors++;
+          }
+        });
+      }
       
       // Calculate monthly estimate
       if (!planetConfig?.excludeFromTotals) {
@@ -56,7 +75,11 @@ const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalR
 
   return {
     monthlyEstimate: totalMonthlyEstimate,
-    storageValue: totalStorageValue
+    storageValue: totalStorageValue,
+    planetCount: totalPlanetCount,
+    characterCount: totalCharacterCount,
+    runningExtractors,
+    totalExtractors
   };
 };
 
@@ -64,7 +87,7 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
   const theme = useTheme();
   const [localIsCollapsed, setLocalIsCollapsed] = useState(false);
   const { planMode, piPrices } = useContext(SessionContext);
-  const { monthlyEstimate, storageValue } = calculateAccountTotals(characters, piPrices);
+  const { monthlyEstimate, storageValue, planetCount, characterCount, runningExtractors, totalExtractors } = calculateAccountTotals(characters, piPrices);
 
   // Update local collapse state when prop changes
   useEffect(() => {
@@ -116,26 +139,62 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
                 ? `Account: ${characters[0].account}`
                 : "No account name"}
             </Typography>
-            <Typography 
-              sx={{ 
-                fontSize: "0.8rem",
-                color: theme.palette.text.secondary,
-              }}
-            >
-              Monthly Estimate: {monthlyEstimate >= 1000 
-                ? `${(monthlyEstimate / 1000).toFixed(2)} B` 
-                : `${monthlyEstimate.toFixed(2)} M`} ISK
-            </Typography>
-            <Typography 
-              sx={{ 
-                fontSize: "0.8rem",
-                color: theme.palette.text.secondary,
-              }}
-            >
-              Storage Value: {storageValue >= 1000 
-                ? `${(storageValue / 1000).toFixed(2)} B` 
-                : `${storageValue.toFixed(2)} M`} ISK
-            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2,
+              flexWrap: 'wrap',
+              mt: 1,
+              alignItems: 'center'
+            }}>
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                Monthly: {monthlyEstimate >= 1000 
+                  ? `${(monthlyEstimate / 1000).toFixed(2)} B` 
+                  : `${monthlyEstimate.toFixed(2)} M`} ISK
+              </Typography>
+              <Divider orientation="vertical" flexItem sx={{ height: 16, borderColor: theme.palette.divider }} />
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                Storage: {storageValue >= 1000 
+                  ? `${(storageValue / 1000).toFixed(2)} B` 
+                  : `${storageValue.toFixed(2)} M`} ISK
+              </Typography>
+              <Divider orientation="vertical" flexItem sx={{ height: 16, borderColor: theme.palette.divider }} />
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                Planets: {planetCount}
+              </Typography>
+              <Divider orientation="vertical" flexItem sx={{ height: 16, borderColor: theme.palette.divider }} />
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                Characters: {characterCount}
+              </Typography>
+              <Divider orientation="vertical" flexItem sx={{ height: 16, borderColor: theme.palette.divider }} />
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: runningExtractors < totalExtractors ? theme.palette.error.main : theme.palette.text.secondary,
+                }}
+              >
+                Extractors: {runningExtractors}/{totalExtractors}
+              </Typography>
+            </Box>
           </Box>
           <IconButton 
             size="small" 

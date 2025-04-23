@@ -125,7 +125,12 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            cursor: 'pointer',
+            '&:hover': {
+              backgroundColor: theme.palette.action.hover,
+            },
           }}
+          onClick={() => setLocalIsCollapsed(!localIsCollapsed)}
         >
           <Box>
             <Typography 
@@ -198,7 +203,6 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
           </Box>
           <IconButton 
             size="small" 
-            onClick={() => setLocalIsCollapsed(!localIsCollapsed)}
             sx={{ 
               transform: localIsCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
               transition: 'transform 0.2s ease-in-out'

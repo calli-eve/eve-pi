@@ -3,7 +3,7 @@ import { Box, Stack, Typography, useTheme, Paper, IconButton } from "@mui/materi
 import { CharacterRow } from "../Characters/CharacterRow";
 import { PlanetaryInteractionRow } from "../PlanetaryInteraction/PlanetaryInteractionRow";
 import { SessionContext } from "@/app/context/Context";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { PlanRow } from "./PlanRow";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -60,11 +60,16 @@ const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalR
   };
 };
 
-export const AccountCard = ({ characters }: { characters: AccessToken[] }) => {
+export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { characters: AccessToken[], isCollapsed?: boolean }) => {
   const theme = useTheme();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [localIsCollapsed, setLocalIsCollapsed] = useState(false);
   const { planMode, piPrices } = useContext(SessionContext);
   const { monthlyEstimate, storageValue } = calculateAccountTotals(characters, piPrices);
+
+  // Update local collapse state when prop changes
+  useEffect(() => {
+    setLocalIsCollapsed(propIsCollapsed ?? false);
+  }, [propIsCollapsed]);
 
   return (
     <Paper
@@ -134,16 +139,16 @@ export const AccountCard = ({ characters }: { characters: AccessToken[] }) => {
           </Box>
           <IconButton 
             size="small" 
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={() => setLocalIsCollapsed(!localIsCollapsed)}
             sx={{ 
-              transform: isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+              transform: localIsCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
               transition: 'transform 0.2s ease-in-out'
             }}
           >
-            {isCollapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {localIsCollapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </Box>
-        {!isCollapsed && characters.map((c) => (
+        {!localIsCollapsed && characters.map((c) => (
           <Stack
             key={c.character.characterId}
             direction="row"

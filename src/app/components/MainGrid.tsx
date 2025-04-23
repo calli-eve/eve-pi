@@ -5,6 +5,7 @@ import {
   Grid,
   ThemeProvider,
   createTheme,
+  Button,
 } from "@mui/material";
 import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
@@ -12,6 +13,8 @@ import { CharacterContext, SessionContext } from "../context/Context";
 import ResponsiveAppBar from "./AppBar/AppBar";
 import { Summary } from "./Summary/Summary";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 interface Grouped {
   [key: string]: AccessToken[];
@@ -41,6 +44,7 @@ declare module "@mui/material/styles" {
 export const MainGrid = () => {
   const { characters, updateCharacter } = useContext(CharacterContext);
   const [accountOrder, setAccountOrder] = useState<string[]>([]);
+  const [allCollapsed, setAllCollapsed] = useState(false);
 
   // Initialize account order when characters change
   useEffect(() => {
@@ -134,6 +138,15 @@ export const MainGrid = () => {
       <Box sx={{ flexGrow: 1 }}>
         <ResponsiveAppBar />
         {compactMode ? <></> : <Summary characters={characters} />}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', padding: 1 }}>
+          <Button
+            startIcon={allCollapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+            onClick={() => setAllCollapsed(!allCollapsed)}
+            size="small"
+          >
+            {allCollapsed ? 'Expand All' : 'Collapse All'}
+          </Button>
+        </Box>
         <DragDropContextComponent onDragEnd={handleDragEnd}>
           <DroppableComponent droppableId="accounts">
             {(provided: any) => (
@@ -165,7 +178,10 @@ export const MainGrid = () => {
                         }}
                       >
                         {groupByAccount[account] && groupByAccount[account].length > 0 && (
-                          <AccountCard characters={groupByAccount[account]} />
+                          <AccountCard 
+                            characters={groupByAccount[account]} 
+                            isCollapsed={allCollapsed}
+                          />
                         )}
                       </Grid>
                     )}

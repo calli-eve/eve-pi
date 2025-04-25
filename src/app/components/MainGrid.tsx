@@ -153,7 +153,7 @@ export const MainGrid = () => {
               <Grid
                 container
                 spacing={1}
-                sx={{ padding: 1 }}
+                sx={{ padding: 1, width: '100%' }}
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >

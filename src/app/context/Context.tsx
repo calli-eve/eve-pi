@@ -37,6 +37,8 @@ export const SessionContext = createContext<{
   }) => PlanetConfig;
   balanceThreshold: number;
   setBalanceThreshold: Dispatch<SetStateAction<number>>;
+  showProductIcons: boolean;
+  setShowProductIcons: (show: boolean) => void;
 }>({
   sessionReady: false,
   refreshSession: () => {},
@@ -62,7 +64,10 @@ export const SessionContext = createContext<{
   },
   balanceThreshold: 1000,
   setBalanceThreshold: () => {},
+  showProductIcons: false,
+  setShowProductIcons: () => {},
 });
+
 export type ColorSelectionType = {
   defaultColor: string;
   expiredColor: string;
@@ -84,6 +89,7 @@ export const defaultColors = {
   dayColor: "#2F695A",
   twoDaysColor: "#2F695A",
 };
+
 export const ColorContext = createContext<{
   colors: ColorSelectionType;
   setColors: (colors: ColorSelectionType) => void;

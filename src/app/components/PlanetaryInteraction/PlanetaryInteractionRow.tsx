@@ -36,8 +36,8 @@ const PlanetaryIteractionTable = ({
 
   return (
     <StackItem width="100%">
-      <TableContainer component={Paper}>
-        <Table size="small" aria-label="a dense table">
+      <TableContainer component={Paper} sx={{ width: '100%' }}>
+        <Table size="small" aria-label="a dense table" sx={{ width: '100%' }}>
           <TableHead>
             <TableRow>
               <TableCell width="8%">

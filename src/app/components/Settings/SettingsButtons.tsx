@@ -13,13 +13,15 @@ import {
   Typography,
   TextField,
   Box,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { ColorChangeHandler, ColorResult, CompactPicker } from "react-color";
 import React, { useState, useContext } from "react";
 
 export const SettingsButton = () => {
   const { colors, setColors } = useContext(ColorContext);
-  const { balanceThreshold, setBalanceThreshold } = useContext(SessionContext);
+  const { balanceThreshold, setBalanceThreshold, showProductIcons, setShowProductIcons } = useContext(SessionContext);
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -45,6 +47,10 @@ export const SettingsButton = () => {
     }
   };
 
+  const handleShowProductIconsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setShowProductIcons(event.target.checked);
+  };
+
   return (
     <Tooltip title="Toggle settings dialog">
       <>
@@ -57,13 +63,24 @@ export const SettingsButton = () => {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-
           <DialogTitle id="alert-dialog-title">
             {"Settings"}
           </DialogTitle>
 
           <DialogContent style={{ paddingTop: "1rem" }}>
-          <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1">Display Settings</Typography>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={showProductIcons}
+                    onChange={handleShowProductIconsChange}
+                  />
+                }
+                label="Show product icons instead of names"
+              />
+            </Box>
+            <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle1">Balance Threshold</Typography>
               <TextField
                 type="number"
@@ -87,7 +104,6 @@ export const SettingsButton = () => {
                 </div>
               );
             })}
-            
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Close</Button>

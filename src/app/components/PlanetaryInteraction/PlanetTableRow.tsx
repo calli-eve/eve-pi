@@ -1,5 +1,5 @@
 import { ColorContext, SessionContext } from "@/app/context/Context";
-import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES } from "@/const";
+import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL } from "@/const";
 import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -41,6 +41,7 @@ export const PlanetTableRow = ({
   character: AccessToken;
 }) => {
   const theme = useTheme();
+  const { showProductIcons } = useContext(SessionContext);
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
@@ -153,6 +154,39 @@ export const PlanetTableRow = ({
     });
   };
 
+  const renderProductDisplay = (typeId: number, amount?: number) => {
+    if (showProductIcons) {
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+          <Image
+            src={`${EVE_IMAGE_URL}/types/${typeId}/icon?size=32`}
+            alt={PI_TYPES_MAP[typeId].name}
+            width={32}
+            height={32}
+            style={{ marginRight: "5px" }}
+          />
+          {amount !== undefined && (
+            <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px", flexShrink: 0 }}>
+              {amount}/h
+            </Typography>
+          )}
+        </div>
+      );
+    }
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+        <Typography fontSize={theme.custom.smallText}>
+          {PI_TYPES_MAP[typeId].name}
+        </Typography>
+        {amount !== undefined && (
+          <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px", flexShrink: 0 }}>
+            {amount}/h
+          </Typography>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <TableRow
@@ -238,11 +272,12 @@ export const PlanetTableRow = ({
         <TableCell className="clickable-cell">{planet.upgrade_level}</TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
+            {extractors.length === 0 &&<Typography fontSize={theme.custom.smallText}>No extractors</Typography>}
             {extractors.map((e, idx) => {
               return (
                 <div
                   key={`${e}-${idx}-${character.character.characterId}`}
-                  style={{ display: "flex" }}
+                  style={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography
                     color={timeColor(e.expiry_time, colors)}
@@ -258,12 +293,7 @@ export const PlanetTableRow = ({
                       "STOPPED"
                     )}
                   </Typography>
-                  <Typography fontSize={theme.custom.smallText}>
-                    {
-                      PI_TYPES_MAP[e.extractor_details?.product_type_id ?? 0]
-                        ?.name
-                    }
-                  </Typography>
+                  {renderProductDisplay(e.extractor_details?.product_type_id ?? 0)}
                 </div>
               );
             })}
@@ -273,12 +303,12 @@ export const PlanetTableRow = ({
           <div style={{ display: "flex", flexDirection: "column" }}>
             {Array.from(localProduction).map((schematic, idx) => {
               return (
-                <Typography
+                <div
                   key={`prod-${character.character.characterId}-${planet.planet_id}-${idx}`}
-                  fontSize={theme.custom.smallText}
+                  style={{ display: "flex", alignItems: "center" }}
                 >
-                  {schematic[1].name}
-                </Typography>
+                  {renderProductDisplay(schematic[1].outputs[0].type_id)}
+                </div>
               );
             })}
           </div>
@@ -286,24 +316,24 @@ export const PlanetTableRow = ({
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {localImports.map((i) => (
-              <Typography
+              <div
                 key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
-                fontSize={theme.custom.smallText}
+                style={{ display: "flex", alignItems: "center" }}
               >
-                {PI_TYPES_MAP[i.type_id].name} ({i.quantity * i.factoryCount}/h)
-              </Typography>
+                {renderProductDisplay(i.type_id, i.quantity * i.factoryCount)}
+              </div>
             ))}
           </div>
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
             {localExports.map((exports) => (
-              <Typography
+              <div
                 key={`export-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
-                fontSize={theme.custom.smallText}
+                style={{ display: "flex", alignItems: "center" }}
               >
-                {PI_TYPES_MAP[exports.typeId].name}
-              </Typography>
+                {renderProductDisplay(exports.typeId, exports.amount)}
+              </div>
             ))}
           </div>
         </TableCell>
@@ -371,6 +401,7 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
+            {storageFacilities.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
             {storageFacilities
               .sort((a, b) => {
                 const isALaunchpad = a.type_id === 2256 || a.type_id === 2542 || a.type_id === 2543 || a.type_id === 2544 || a.type_id === 2552 || a.type_id === 2555 || a.type_id === 2556 || a.type_id === 2557;

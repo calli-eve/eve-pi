@@ -30,6 +30,7 @@ const Home = () => {
     undefined,
   );
   const [balanceThreshold, setBalanceThreshold] = useState(1000);
+  const [showProductIcons, setShowProductIcons] = useState(false);
 
   const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
   const [alertMode, setAlertMode] = useState(false);
@@ -278,6 +279,8 @@ const Home = () => {
         readPlanetConfig,
         balanceThreshold,
         setBalanceThreshold,
+        showProductIcons,
+        setShowProductIcons,
       }}
     >
       <CharacterContext.Provider

@@ -6,15 +6,21 @@ import {
   ThemeProvider,
   createTheme,
   Button,
+  Tooltip,
 } from "@mui/material";
 import { AccountCard } from "./Account/AccountCard";
 import { AccessToken } from "@/types";
 import { CharacterContext, SessionContext } from "../context/Context";
 import ResponsiveAppBar from "./AppBar/AppBar";
 import { Summary } from "./Summary/Summary";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 interface Grouped {
   [key: string]: AccessToken[];
@@ -43,6 +49,7 @@ declare module "@mui/material/styles" {
 
 export const MainGrid = () => {
   const { characters, updateCharacter } = useContext(CharacterContext);
+  const { compactMode, toggleCompactMode, alertMode, toggleAlertMode, planMode, togglePlanMode } = useContext(SessionContext);
   const [accountOrder, setAccountOrder] = useState<string[]>([]);
   const [allCollapsed, setAllCollapsed] = useState(false);
 
@@ -54,15 +61,19 @@ export const MainGrid = () => {
         group[account ?? ""] = group[account ?? ""] ?? [];
         group[account ?? ""].push(character);
         return group;
-      }, {})
+      }, {}),
     );
 
-    const savedOrder = localStorage.getItem('accountOrder');
+    const savedOrder = localStorage.getItem("accountOrder");
     if (savedOrder) {
       try {
         const parsedOrder = JSON.parse(savedOrder);
-        const validOrder = parsedOrder.filter((account: string) => currentAccounts.includes(account));
-        const newAccounts = currentAccounts.filter(account => !validOrder.includes(account));
+        const validOrder = parsedOrder.filter((account: string) =>
+          currentAccounts.includes(account),
+        );
+        const newAccounts = currentAccounts.filter(
+          (account) => !validOrder.includes(account),
+        );
         setAccountOrder([...validOrder, ...newAccounts]);
       } catch (e) {
         setAccountOrder(currentAccounts);
@@ -74,7 +85,7 @@ export const MainGrid = () => {
 
   useEffect(() => {
     if (accountOrder.length > 0) {
-      localStorage.setItem('accountOrder', JSON.stringify(accountOrder));
+      localStorage.setItem("accountOrder", JSON.stringify(accountOrder));
     }
   }, [accountOrder]);
 
@@ -85,7 +96,6 @@ export const MainGrid = () => {
     return group;
   }, {});
 
-  const { compactMode } = useContext(SessionContext);
   const [darkTheme, setDarkTheme] = useState(
     createTheme({
       palette: {
@@ -138,14 +148,62 @@ export const MainGrid = () => {
       <Box sx={{ flexGrow: 1 }}>
         <ResponsiveAppBar />
         {compactMode ? <></> : <Summary characters={characters} />}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start', padding: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-start",
+            padding: 1,
+            gap: 1,
+          }}
+        >
           <Button
-            startIcon={allCollapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+            startIcon={
+              allCollapsed ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />
+            }
             onClick={() => setAllCollapsed(!allCollapsed)}
             size="small"
           >
-            {allCollapsed ? 'Expand All' : 'Collapse All'}
+            {allCollapsed ? "Expand All" : "Collapse All"}
           </Button>
+          <Tooltip title="Toggle compact layout for widescreen">
+            <Button
+              size="small"
+              style={{
+                backgroundColor: compactMode
+                  ? "rgba(144, 202, 249, 0.08)"
+                  : "inherit",
+              }}
+              onClick={toggleCompactMode}
+            >
+              Compact mode
+            </Button>
+          </Tooltip>
+          <Tooltip title="Toggle alert mode to show only accounts and planets that need action.">
+            <Button
+              size="small"
+              style={{
+                backgroundColor: alertMode
+                  ? "rgba(144, 202, 249, 0.08)"
+                  : "inherit",
+              }}
+              onClick={toggleAlertMode}
+            >
+              Alert mode
+            </Button>
+          </Tooltip>
+          <Tooltip title="Toggle plan mode that show layout for widescreen">
+            <Button
+              size="small"
+              style={{
+                backgroundColor: planMode
+                  ? "rgba(144, 202, 249, 0.08)"
+                  : "inherit",
+              }}
+              onClick={togglePlanMode}
+            >
+              Plan mode
+            </Button>
+          </Tooltip>
         </Box>
         <DragDropContextComponent onDragEnd={handleDragEnd}>
           <DroppableComponent droppableId="accounts">
@@ -153,7 +211,7 @@ export const MainGrid = () => {
               <Grid
                 container
                 spacing={1}
-                sx={{ padding: 1, width: '100%' }}
+                sx={{ padding: 1, width: "100%" }}
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
@@ -172,17 +230,18 @@ export const MainGrid = () => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         sx={{
-                          '& > *': {
-                            width: '100%',
+                          "& > *": {
+                            width: "100%",
                           },
                         }}
                       >
-                        {groupByAccount[account] && groupByAccount[account].length > 0 && (
-                          <AccountCard 
-                            characters={groupByAccount[account]} 
-                            isCollapsed={allCollapsed}
-                          />
-                        )}
+                        {groupByAccount[account] &&
+                          groupByAccount[account].length > 0 && (
+                            <AccountCard
+                              characters={groupByAccount[account]}
+                              isCollapsed={allCollapsed}
+                            />
+                          )}
                       </Grid>
                     )}
                   </DraggableComponent>

@@ -167,20 +167,20 @@ export const PlanetTableRow = ({
           />
           {amount !== undefined && (
             <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px", flexShrink: 0 }}>
-              {amount}/h
+              {amount}
             </Typography>
           )}
         </div>
       );
     }
     return (
-      <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
         <Typography fontSize={theme.custom.smallText}>
           {PI_TYPES_MAP[typeId].name}
         </Typography>
         {amount !== undefined && (
           <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px", flexShrink: 0 }}>
-            {amount}/h
+            {amount}
           </Typography>
         )}
       </div>

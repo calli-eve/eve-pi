@@ -84,8 +84,8 @@ const PlanetaryIteractionTable = ({
                 </Tooltip>
               </TableCell>
               <TableCell width="2%">
-                <Tooltip title="How many units per hour factories are producing">
-                  <Typography fontSize={theme.custom.smallText}>u/h</Typography>
+                <Tooltip title="How many units per hour factories are producing on this planet">
+                  <Typography fontSize={theme.custom.smallText}>uph</Typography>
                 </Tooltip>
               </TableCell>
               <TableCell width="4%" align="right">
@@ -98,7 +98,7 @@ const PlanetaryIteractionTable = ({
               <TableCell width="10%">
                 <Tooltip title="Storage facility fill rate">
                   <Typography fontSize={theme.custom.smallText}>
-                    Storage Fill rate
+                    Storage%
                   </Typography>
                 </Tooltip>
               </TableCell>

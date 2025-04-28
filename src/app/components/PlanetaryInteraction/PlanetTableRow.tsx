@@ -1,5 +1,5 @@
 import { ColorContext, SessionContext } from "@/app/context/Context";
-import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL } from "@/const";
+import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL, PI_SCHEMATICS } from "@/const";
 import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -155,6 +155,21 @@ export const PlanetTableRow = ({
   };
 
   const renderProductDisplay = (typeId: number, amount?: number) => {
+    if (!typeId || !PI_TYPES_MAP[typeId]) {
+      return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+          <Typography fontSize={theme.custom.smallText} color="text.secondary">
+            No product
+          </Typography>
+          {amount !== undefined && (
+            <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px", flexShrink: 0 }}>
+              {amount}
+            </Typography>
+          )}
+        </div>
+      );
+    }
+
     if (showProductIcons) {
       return (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
@@ -319,14 +334,51 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {localImports.map((i) => (
-              <div
-                key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                {renderProductDisplay(i.type_id, i.quantity * i.factoryCount)}
-              </div>
-            ))}
+            {localImports.map((i) => {
+              // Find all storage facilities (including launchpads) containing this import
+              const storagesWithImport = storageFacilities.filter(storage => 
+                storage.contents?.some(content => content.type_id === i.type_id)
+              );
+              
+              // Get the total amount in all storage facilities
+              const totalAmount = storagesWithImport.reduce((sum, storage) => {
+                const content = storage.contents?.find(content => content.type_id === i.type_id);
+                return sum + (content?.amount ?? 0);
+              }, 0);
+
+              // Calculate consumption rate per hour
+              const schematic = PI_SCHEMATICS.find(s => s.schematic_id === i.schematic_id);
+              const cycleTime = schematic?.cycle_time ?? 3600;
+              const consumptionPerHour = i.quantity * i.factoryCount * (3600 / cycleTime);
+
+              // Calculate time until depletion in hours
+              const hoursUntilDepletion = consumptionPerHour > 0 ? totalAmount / consumptionPerHour : 0;
+
+              return (
+                <div
+                  key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  {renderProductDisplay(i.type_id, i.quantity * i.factoryCount)}
+                  {totalAmount > 0 && (
+                    <Tooltip title={
+                      <>
+                        <div>Total: {totalAmount.toFixed(1)} units</div>
+                        <div>Will be depleted in {hoursUntilDepletion.toFixed(1)} hours</div>
+                      </>
+                    }>
+                      <Typography 
+                        fontSize={theme.custom.smallText} 
+                        color={hoursUntilDepletion < 24 ? 'error' : hoursUntilDepletion < 48 ? 'warning' : 'success'}
+                        sx={{ ml: 1 }}
+                      >
+                        ({hoursUntilDepletion.toFixed(1)}h)
+                      </Typography>
+                    </Tooltip>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </TableCell>
         <TableCell className="clickable-cell">

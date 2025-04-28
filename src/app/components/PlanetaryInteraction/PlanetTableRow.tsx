@@ -1,5 +1,5 @@
 import { ColorContext, SessionContext } from "@/app/context/Context";
-import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL, PI_SCHEMATICS } from "@/const";
+import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL, PI_SCHEMATICS, LAUNCHPAD_IDS } from "@/const";
 import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -466,25 +466,18 @@ export const PlanetTableRow = ({
             {storageFacilities.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
             {storageFacilities
               .sort((a, b) => {
-                const isALaunchpad = a.type_id === 2256 || a.type_id === 2542 || a.type_id === 2543 || a.type_id === 2544 || a.type_id === 2552 || a.type_id === 2555 || a.type_id === 2556 || a.type_id === 2557;
-                const isBLaunchpad = b.type_id === 2256 || b.type_id === 2542 || b.type_id === 2543 || b.type_id === 2544 || b.type_id === 2552 || b.type_id === 2555 || b.type_id === 2556 || b.type_id === 2557;
+                const isALaunchpad = LAUNCHPAD_IDS.includes(a.type_id);
+                const isBLaunchpad = LAUNCHPAD_IDS.includes(b.type_id);
                 return isALaunchpad === isBLaunchpad ? 0 : isALaunchpad ? -1 : 1;
               })
               .map((storage) => {
                 const storageInfo = getStorageInfo(storage);
                 if (!storageInfo) return null;
                 
-                const isLaunchpad = storage.type_id === 2256 || 
-                                  storage.type_id === 2542 || 
-                                  storage.type_id === 2543 || 
-                                  storage.type_id === 2544 || 
-                                  storage.type_id === 2552 || 
-                                  storage.type_id === 2555 || 
-                                  storage.type_id === 2556 || 
-                                  storage.type_id === 2557;
+                const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
                 
                 const fillRate = storageInfo.fillRate;
-                const color = fillRate > 95 ? '#ff0000' : fillRate > 80 ? '#ffd700' : 'inherit';
+                const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
                 
                 return (
                   <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.pin_id}`} style={{ display: "flex", alignItems: "center" }}>

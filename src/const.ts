@@ -1080,3 +1080,5 @@ export const STORAGE_CAPACITIES: Record<number, number> = {
   2556: 10000, // Plasma Launchpad
   2557: 10000, // Storm Launchpad
 };
+
+export const LAUNCHPAD_IDS = [2256, 2542, 2543, 2544, 2552, 2555, 2556, 2557];

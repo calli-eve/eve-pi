@@ -1,7 +1,8 @@
 import { AccessToken } from "@/types";
-import { extractCharacterFromToken } from "@/utils";
+import { extractCharacterFromToken } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import crypto from "crypto-js";
+import logger from "@/utils/logger";
 
 const EVE_SSO_TOKEN_URL = "https://login.eveonline.com/v2/oauth/token";
 const EVE_SSO_CLIENT_ID = process.env.EVE_SSO_CLIENT_ID ?? "";
@@ -10,6 +11,14 @@ const EVE_SSO_SECRET = process.env.EVE_SSO_SECRET ?? "";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const accessToken: AccessToken = req.body;
+    logger.info({ 
+      event: 'token_refresh_start',
+      character: {
+        name: accessToken.character.name,
+        characterId: accessToken.character.characterId
+      }
+    });
+
     const params = new URLSearchParams({
       grant_type: "refresh_token",
       refresh_token: crypto.AES.decrypt(
@@ -33,7 +42,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         body: params,
         headers,
       }).then((res) => res.json());
+
       const character = extractCharacterFromToken(response);
+      if (!character) {
+        logger.error({ 
+          event: 'token_refresh_failed',
+          reason: 'character_extraction_failed',
+          character: {
+            name: accessToken.character.name,
+            characterId: accessToken.character.characterId
+          }
+        });
+        return res.json({ ...accessToken, needsLogin: true });
+      }
+
       const token: AccessToken = {
         access_token: response.access_token,
         token_type: response.token_type,
@@ -51,12 +73,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         planetConfig: accessToken.planetConfig ?? [],
       };
 
-      console.log("Refresh", character.name, character.characterId);
+      logger.info({ 
+        event: 'token_refresh_success',
+        character: {
+          name: character.name,
+          characterId: character.characterId
+        }
+      });
 
       return res.json(token);
     } catch (e) {
-      console.log(e);
-      res.json({ ...accessToken, needsLogin: true });
+      logger.error({ 
+        event: 'token_refresh_failed',
+        reason: 'api_error',
+        error: e,
+        character: {
+          name: accessToken.character.name,
+          characterId: accessToken.character.characterId
+        }
+      });
+      return res.json({ ...accessToken, needsLogin: true });
     }
   } else {
     res.status(404).end();

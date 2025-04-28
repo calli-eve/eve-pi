@@ -1,5 +1,3 @@
----
-version: "2.1"
 services:
   eve-pi:
     image: ghcr.io/calli-eve/eve-pi:latest

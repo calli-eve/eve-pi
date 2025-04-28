@@ -351,8 +351,12 @@ export const PlanetTableRow = ({
               const cycleTime = schematic?.cycle_time ?? 3600;
               const consumptionPerHour = i.quantity * i.factoryCount * (3600 / cycleTime);
 
-              // Calculate time until depletion in hours
-              const hoursUntilDepletion = consumptionPerHour > 0 ? totalAmount / consumptionPerHour : 0;
+              // Calculate time until depletion in hours, starting from last_update
+              const lastUpdate = DateTime.fromISO(planet.last_update);
+              const now = DateTime.now();
+              const hoursSinceUpdate = now.diff(lastUpdate, 'hours').hours;
+              const remainingAmount = Math.max(0, totalAmount - (consumptionPerHour * hoursSinceUpdate));
+              const hoursUntilDepletion = consumptionPerHour > 0 ? remainingAmount / consumptionPerHour : 0;
 
               return (
                 <div
@@ -363,7 +367,9 @@ export const PlanetTableRow = ({
                   {totalAmount > 0 && (
                     <Tooltip title={
                       <>
-                        <div>Total: {totalAmount.toFixed(1)} units</div>
+                        <div>Total in storage: {totalAmount.toFixed(1)} units</div>
+                        <div>Consumption rate: {consumptionPerHour.toFixed(1)} units/hour</div>
+                        <div>Last update: {lastUpdate.toFormat('yyyy-MM-dd HH:mm:ss')}</div>
                         <div>Will be depleted in {hoursUntilDepletion.toFixed(1)} hours</div>
                       </>
                     }>

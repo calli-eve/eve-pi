@@ -10,6 +10,7 @@ services:
       - EVE_SSO_SECRET=${EVE_SSO_SECRET}
       - NEXT_PUBLIC_PRAISAL_URL=${NEXT_PUBLIC_PRAISAL_URL}
       - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - LOG_LEVEL=warn
     ports:
       - 3000:3000
     restart: unless-stopped

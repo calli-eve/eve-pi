@@ -49,7 +49,7 @@ declare module "@mui/material/styles" {
 
 export const MainGrid = () => {
   const { characters, updateCharacter } = useContext(CharacterContext);
-  const { compactMode, toggleCompactMode, alertMode, toggleAlertMode, planMode, togglePlanMode } = useContext(SessionContext);
+  const { compactMode, toggleCompactMode, alertMode, toggleAlertMode, planMode, togglePlanMode, extractionTimeMode, toggleExtractionTimeMode } = useContext(SessionContext);
   const [accountOrder, setAccountOrder] = useState<string[]>([]);
   const [allCollapsed, setAllCollapsed] = useState(false);
 
@@ -202,6 +202,19 @@ export const MainGrid = () => {
               onClick={togglePlanMode}
             >
               Plan mode
+            </Button>
+          </Tooltip>
+          <Tooltip title="Toggle extraction time display mode">
+            <Button
+              size="small"
+              style={{
+                backgroundColor: extractionTimeMode
+                  ? "rgba(144, 202, 249, 0.08)"
+                  : "inherit",
+              }}
+              onClick={toggleExtractionTimeMode}
+            >
+              Extraction datetime
             </Button>
           </Tooltip>
         </Box>

@@ -26,6 +26,8 @@ export const SessionContext = createContext<{
   togglePlanMode: () => void;
   alertMode: boolean;
   toggleAlertMode: () => void;
+  extractionTimeMode: boolean;
+  toggleExtractionTimeMode: () => void;
   piPrices: EvePraisalResult | undefined;
   updatePlanetConfig: (config: PlanetConfig) => void;
   readPlanetConfig: ({
@@ -51,6 +53,8 @@ export const SessionContext = createContext<{
   togglePlanMode: () => {},
   alertMode: false,
   toggleAlertMode: () => {},
+  extractionTimeMode: false,
+  toggleExtractionTimeMode: () => {},
   piPrices: undefined,
   updatePlanetConfig: () => {},
   readPlanetConfig: ({

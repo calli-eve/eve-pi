@@ -31,6 +31,7 @@ const Home = () => {
   );
   const [balanceThreshold, setBalanceThreshold] = useState(1000);
   const [showProductIcons, setShowProductIcons] = useState(false);
+  const [extractionTimeMode, setExtractionTimeMode] = useState(false);
 
   const [colors, setColors] = useState<ColorSelectionType>(defaultColors);
   const [alertMode, setAlertMode] = useState(false);
@@ -149,6 +150,10 @@ const Home = () => {
     setAlertMode(!alertMode);
   };
 
+  const toggleExtractionTimeMode = () => {
+    setExtractionTimeMode(!extractionTimeMode);
+  };
+
   const updatePlanetConfig = (config: PlanetConfig) => {
     const charactersToSave = characters.map((c) => {
       if (c.character.characterId === config.characterId) {
@@ -225,6 +230,17 @@ const Home = () => {
   }, [colors]);
 
   useEffect(() => {
+    const savedMode = localStorage.getItem('extractionTimeMode');
+    if (savedMode) {
+      setExtractionTimeMode(savedMode === 'true');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('extractionTimeMode', extractionTimeMode.toString());
+  }, [extractionTimeMode]);
+
+  useEffect(() => {
     fetch("api/env")
       .then((r) => r.json())
       .then((env) => {
@@ -275,6 +291,8 @@ const Home = () => {
         piPrices,
         alertMode,
         toggleAlertMode,
+        extractionTimeMode,
+        toggleExtractionTimeMode,
         updatePlanetConfig,
         readPlanetConfig,
         balanceThreshold,

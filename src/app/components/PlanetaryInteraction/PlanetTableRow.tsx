@@ -41,7 +41,7 @@ export const PlanetTableRow = ({
   character: AccessToken;
 }) => {
   const theme = useTheme();
-  const { showProductIcons } = useContext(SessionContext);
+  const { showProductIcons, extractionTimeMode } = useContext(SessionContext);
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
@@ -285,10 +285,14 @@ export const PlanetTableRow = ({
                     paddingRight={1}
                   >
                     {e ? (
-                      <Countdown
-                        overtime={true}
-                        date={DateTime.fromISO(e.expiry_time ?? "").toMillis()}
-                      />
+                      extractionTimeMode ? (
+                        DateTime.fromISO(e.expiry_time ?? "").toFormat('yyyy-MM-dd HH:mm:ss')
+                      ) : (
+                        <Countdown
+                          overtime={true}
+                          date={DateTime.fromISO(e.expiry_time ?? "").toMillis()}
+                        />
+                      )
                     ) : (
                       "STOPPED"
                     )}

@@ -358,30 +358,37 @@ export const PlanetTableRow = ({
               const remainingAmount = Math.max(0, totalAmount - (consumptionPerHour * hoursSinceUpdate));
               const hoursUntilDepletion = consumptionPerHour > 0 ? remainingAmount / consumptionPerHour : 0;
 
+              // Calculate monthly cost
+              const price = piPrices?.appraisal.items.find((a) => a.typeID === i.type_id)?.prices.sell.min ?? 0;
+              const monthlyCost = (consumptionPerHour * 24 * 30 * price) / 1000000; // Cost in millions
+
               return (
                 <div
                   key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
                   style={{ display: "flex", alignItems: "center" }}
                 >
-                  {renderProductDisplay(i.type_id, i.quantity * i.factoryCount)}
-                  {totalAmount > 0 && (
-                    <Tooltip title={
-                      <>
-                        <div>Total in storage: {totalAmount.toFixed(1)} units</div>
-                        <div>Consumption rate: {consumptionPerHour.toFixed(1)} units/hour</div>
-                        <div>Last update: {lastUpdate.toFormat('yyyy-MM-dd HH:mm:ss')}</div>
-                        <div>Will be depleted in {hoursUntilDepletion.toFixed(1)} hours</div>
-                      </>
-                    }>
-                      <Typography 
-                        fontSize={theme.custom.smallText} 
-                        color={hoursUntilDepletion < 24 ? 'error' : hoursUntilDepletion < 48 ? 'warning' : 'success'}
-                        sx={{ ml: 1 }}
-                      >
-                        ({hoursUntilDepletion.toFixed(1)}h)
-                      </Typography>
-                    </Tooltip>
-                  )}
+                  <Tooltip title={
+                    <>
+                      <div>Total in storage: {totalAmount.toFixed(1)} units</div>
+                      <div>Consumption rate: {consumptionPerHour.toFixed(1)} units/hour</div>
+                      <div>Last update: {lastUpdate.toFormat('yyyy-MM-dd HH:mm:ss')}</div>
+                      <div>Will be depleted in {hoursUntilDepletion.toFixed(1)} hours</div>
+                      <div>Monthly cost: {monthlyCost.toFixed(2)}M ISK</div>
+                    </>
+                  }>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      {renderProductDisplay(i.type_id, i.quantity * i.factoryCount)}
+                      {totalAmount > 0 && (
+                        <Typography 
+                          fontSize={theme.custom.smallText} 
+                          color={hoursUntilDepletion < 24 ? 'error' : hoursUntilDepletion < 48 ? 'warning' : 'success'}
+                          sx={{ ml: 1 }}
+                        >
+                          ({hoursUntilDepletion.toFixed(1)}h)
+                        </Typography>
+                      )}
+                    </div>
+                  </Tooltip>
                 </div>
               );
             })}

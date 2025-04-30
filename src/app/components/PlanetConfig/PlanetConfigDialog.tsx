@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { DateTime } from "luxon";
 import Countdown from "react-countdown";
-import { timeColor } from "../PlanetaryInteraction/timeColors";
+import { timeColor } from "../PlanetaryInteraction/alerts";
 import Image from "next/image";
 import { ColorContext, SessionContext } from "@/app/context/Context";
 import { useContext } from "react";

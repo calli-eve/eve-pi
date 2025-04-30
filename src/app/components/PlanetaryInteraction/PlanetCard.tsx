@@ -13,7 +13,7 @@ import {
   alertModeVisibility,
   extractorsHaveExpired,
   timeColor,
-} from "./timeColors";
+} from "./alerts";
 import { ColorContext, SessionContext } from "@/app/context/Context";
 import { ExtractionSimulationTooltip } from "./ExtractionSimulationTooltip";
 

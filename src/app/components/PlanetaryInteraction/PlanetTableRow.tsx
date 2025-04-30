@@ -18,7 +18,7 @@ import React, { forwardRef, useContext, useState } from "react";
 import Countdown from "react-countdown";
 import { PlanetConfigDialog } from "../PlanetConfig/PlanetConfigDialog";
 import PinsCanvas3D from "./PinsCanvas3D";
-import { alertModeVisibility, timeColor } from "./timeColors";
+import { alertModeVisibility, timeColor } from "./alerts";
 import { ExtractionSimulationDisplay } from './ExtractionSimulationDisplay';
 import { ExtractionSimulationTooltip } from './ExtractionSimulationTooltip';
 import { ProductionNode } from './ExtractionSimulation';

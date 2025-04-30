@@ -7,7 +7,7 @@ import {
 } from "@/types";
 import { Api } from "@/esi-api";
 import { EXTRACTOR_TYPE_IDS, FACTORY_IDS, PI_SCHEMATICS } from "@/const";
-import { extractorsHaveExpired } from "./app/components/PlanetaryInteraction/timeColors";
+import { extractorsHaveExpired } from "./app/components/PlanetaryInteraction/alerts";
 
 export const getPlanets = async (character: AccessToken): Promise<Planet[]> => {
   const api = new Api();

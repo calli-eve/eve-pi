@@ -23,6 +23,9 @@ import { timeColor } from "./alerts";
 import { ExtractionSimulationDisplay } from './ExtractionSimulationDisplay';
 import { ExtractionSimulationTooltip } from './ExtractionSimulationTooltip';
 import { Collapse, Box, Stack } from "@mui/material";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -399,30 +402,109 @@ export const PlanetTableRow = ({
           </div>
         </TableCell>
         <TableCell className="clickable-cell">
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {planetDetails.storageInfo.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
-            {planetDetails.storageInfo.map((storage: StorageInfo) => {
-              const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
-              const fillRate = storage.fillRate;
-              const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
-              
-              return (
-                <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}`} style={{ display: "flex", alignItems: "center" }}>
-                  <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
-                    {isLaunchpad ? 'L' : 'S'}
-                  </Typography>
-                  <Typography fontSize={theme.custom.smallText} style={{ color }}>
-                    {fillRate.toFixed(1)}%
-                  </Typography>
-                  {storage.value > 0 && (
-                    <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
-                      ({Math.round(storage.value / 1000000)}M)
+          <Tooltip
+            title={
+              <Box sx={{ p: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  Storage Facilities
+                </Typography>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Type</TableCell>
+                      <TableCell align="right">Capacity</TableCell>
+                      <TableCell align="right">Used</TableCell>
+                      <TableCell align="right">Fill Rate</TableCell>
+                      <TableCell align="right">Value</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {planetDetails.storageInfo.map((storage: StorageInfo) => {
+                      const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
+                      const fillRate = storage.fillRate;
+                      const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
+                      const contents = planet.info.pins.find(p => p.type_id === storage.type_id)?.contents || [];
+                      
+                      return (
+                        <React.Fragment key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}`}>
+                          <TableRow>
+                            <TableCell>{isLaunchpad ? 'Launchpad' : 'Storage'}</TableCell>
+                            <TableCell align="right">{storage.capacity.toFixed(1)} m³</TableCell>
+                            <TableCell align="right">{storage.used.toFixed(1)} m³</TableCell>
+                            <TableCell align="right" sx={{ color }}>{fillRate.toFixed(1)}%</TableCell>
+                            <TableCell align="right">
+                              {storage.value > 0 ? (
+                                storage.value >= 1000000000 
+                                  ? `${(storage.value / 1000000000).toFixed(2)} B` 
+                                  : `${(storage.value / 1000000).toFixed(0)} M`
+                              ) : '-'} ISK
+                            </TableCell>
+                          </TableRow>
+                          {contents.length > 0 && (
+                            <TableRow>
+                              <TableCell colSpan={5} sx={{ pt: 0, pb: 0 }}>
+                                <Table size="small">
+                                  <TableBody>
+                                    {contents.map(content => (
+                                      <TableRow key={content.type_id}>
+                                        <TableCell sx={{ pl: 2 }}>
+                                          {PI_TYPES_MAP[content.type_id]?.name}
+                                        </TableCell>
+                                        <TableCell align="right" colSpan={4}>
+                                          {content.amount.toFixed(1)} units
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </Box>
+            }
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  bgcolor: 'background.paper',
+                  '& .MuiTooltip-arrow': {
+                    color: 'background.paper',
+                  },
+                  maxWidth: 'none',
+                  width: 'fit-content'
+                }
+              }
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {planetDetails.storageInfo.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
+              {planetDetails.storageInfo.map((storage: StorageInfo) => {
+                const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
+                const fillRate = storage.fillRate;
+                const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
+                
+                return (
+                  <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}`} style={{ display: "flex", alignItems: "center" }}>
+                    <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
+                      {isLaunchpad ? 'L' : 'S'}
                     </Typography>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                    <Typography fontSize={theme.custom.smallText} style={{ color }}>
+                      {fillRate.toFixed(1)}%
+                    </Typography>
+                    {storage.value > 0 && (
+                      <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
+                        ({Math.round(storage.value / 1000000)}M)
+                      </Typography>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Tooltip>
         </TableCell>
         <TableCell className="menu-cell">
           <IconButton

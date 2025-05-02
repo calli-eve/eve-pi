@@ -170,7 +170,7 @@ export const MainGrid = () => {
               size="small"
               style={{
                 backgroundColor: compactMode
-                  ? "rgba(144, 202, 249, 0.08)"
+                  ? "rgba(144, 202, 249, 0.16)"
                   : "inherit",
               }}
               onClick={toggleCompactMode}
@@ -183,7 +183,7 @@ export const MainGrid = () => {
               size="small"
               style={{
                 backgroundColor: alertMode
-                  ? "rgba(144, 202, 249, 0.08)"
+                  ? "rgba(144, 202, 249, 0.16)"
                   : "inherit",
               }}
               onClick={toggleAlertMode}
@@ -196,7 +196,7 @@ export const MainGrid = () => {
               size="small"
               style={{
                 backgroundColor: planMode
-                  ? "rgba(144, 202, 249, 0.08)"
+                  ? "rgba(144, 202, 249, 0.16)"
                   : "inherit",
               }}
               onClick={togglePlanMode}
@@ -209,7 +209,7 @@ export const MainGrid = () => {
               size="small"
               style={{
                 backgroundColor: extractionTimeMode
-                  ? "rgba(144, 202, 249, 0.08)"
+                  ? "rgba(144, 202, 249, 0.16)"
                   : "inherit",
               }}
               onClick={toggleExtractionTimeMode}

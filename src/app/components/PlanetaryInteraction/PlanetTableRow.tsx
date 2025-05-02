@@ -419,14 +419,14 @@ export const PlanetTableRow = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {planetDetails.storageInfo.map((storage: StorageInfo) => {
+                    {planetDetails.storageInfo.map((storage: StorageInfo, idx: number) => {
                       const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
                       const fillRate = storage.fillRate;
                       const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
                       const contents = planet.info.pins.find(p => p.type_id === storage.type_id)?.contents || [];
                       
                       return (
-                        <React.Fragment key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}`}>
+                        <React.Fragment key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`}>
                           <TableRow>
                             <TableCell>{isLaunchpad ? 'Launchpad' : 'Storage'}</TableCell>
                             <TableCell align="right">{storage.capacity.toFixed(1)} m³</TableCell>
@@ -445,8 +445,8 @@ export const PlanetTableRow = ({
                               <TableCell colSpan={5} sx={{ pt: 0, pb: 0 }}>
                                 <Table size="small">
                                   <TableBody>
-                                    {contents.map(content => (
-                                      <TableRow key={content.type_id}>
+                                    {contents.map((content, idy) => (
+                                      <TableRow key={`content-${character.character.characterId}-${planet.planet_id}-${storage.type}-${content.type_id}-${idx}-${idy}`}>
                                         <TableCell sx={{ pl: 2 }}>
                                           {PI_TYPES_MAP[content.type_id]?.name}
                                         </TableCell>
@@ -482,13 +482,13 @@ export const PlanetTableRow = ({
           >
             <div style={{ display: "flex", flexDirection: "column" }}>
               {planetDetails.storageInfo.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
-              {planetDetails.storageInfo.map((storage: StorageInfo) => {
+              {planetDetails.storageInfo.map((storage: StorageInfo, idx: number) => {
                 const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
                 const fillRate = storage.fillRate;
                 const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
                 
                 return (
-                  <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}`} style={{ display: "flex", alignItems: "center" }}>
+                  <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`} style={{ display: "flex", alignItems: "center" }}>
                     <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
                       {isLaunchpad ? 'L' : 'S'}
                     </Typography>

@@ -1,5 +1,5 @@
 import { AccessToken } from "@/types";
-import { Icon, IconButton, Stack, Tooltip, Typography, styled, useTheme } from "@mui/material";
+import { IconButton, Stack, Tooltip, Typography, styled, useTheme } from "@mui/material";
 import { PlanetCard } from "./PlanetCard";
 import { NoPlanetCard } from "./NoPlanetCard";
 import Table from "@mui/material/Table";
@@ -11,6 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { PlanetTableRow } from "./PlanetTableRow";
 import { Settings } from "@mui/icons-material";
+import { PlanetCalculations } from "@/types/planet";
 
 const StackItem = styled(Stack)(({ theme }) => ({
   ...theme.typography.body2,
@@ -22,8 +23,10 @@ const StackItem = styled(Stack)(({ theme }) => ({
 
 const PlanetaryIteractionTable = ({
   character,
+  planetDetails,
 }: {
   character: AccessToken;
+  planetDetails: Record<number, PlanetCalculations>;
 }) => {
   const theme = useTheme();
 
@@ -117,6 +120,7 @@ const PlanetaryIteractionTable = ({
                 key={`${character.character.characterId}-${planet.planet_id}`}
                 planet={planet}
                 character={character}
+                planetDetails={planetDetails[planet.planet_id]}
               />
             ))}
           </TableBody>
@@ -128,8 +132,10 @@ const PlanetaryIteractionTable = ({
 
 const PlanetaryInteractionIconsRow = ({
   character,
+  planetDetails,
 }: {
   character: AccessToken;
+  planetDetails: Record<number, PlanetCalculations>;
 }) => {
   return (
     <StackItem>
@@ -139,6 +145,7 @@ const PlanetaryInteractionIconsRow = ({
             key={`${character.character.characterId}-${planet.planet_id}`}
             planet={planet}
             character={character}
+            planetDetails={planetDetails[planet.planet_id]}
           />
         ))}
         {Array.from(Array(6 - character.planets.length).keys()).map((i, id) => (
@@ -153,14 +160,16 @@ const PlanetaryInteractionIconsRow = ({
 
 export const PlanetaryInteractionRow = ({
   character,
+  planetDetails,
 }: {
   character: AccessToken;
+  planetDetails: Record<number, PlanetCalculations>;
 }) => {
   const theme = useTheme();
 
   return theme.custom.compactMode ? (
-    <div style={{ marginTop: "1.2rem" }}><PlanetaryInteractionIconsRow character={character} /></div>
+    <div style={{ marginTop: "1.2rem" }}><PlanetaryInteractionIconsRow character={character} planetDetails={planetDetails} /></div>
   ) : (
-    <div style={{ marginTop: "1.4rem" }}><PlanetaryIteractionTable character={character} /></div>
+    <div style={{ marginTop: "1.4rem" }}><PlanetaryIteractionTable character={character} planetDetails={planetDetails} /></div>
   );
 };

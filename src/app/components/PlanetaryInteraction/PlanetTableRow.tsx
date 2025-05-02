@@ -2,6 +2,7 @@ import { ColorContext, SessionContext } from "@/app/context/Context";
 import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL, PI_SCHEMATICS, LAUNCHPAD_IDS } from "@/const";
 import { planetCalculations } from "@/planets";
 import { AccessToken, PlanetWithInfo } from "@/types";
+import { PlanetCalculations, StorageInfo } from "@/types/planet";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Button, Tooltip, Typography, useTheme, Menu, MenuItem, IconButton, Checkbox, FormControlLabel } from "@mui/material";
@@ -18,10 +19,9 @@ import React, { forwardRef, useContext, useState } from "react";
 import Countdown from "react-countdown";
 import { PlanetConfigDialog } from "../PlanetConfig/PlanetConfigDialog";
 import PinsCanvas3D from "./PinsCanvas3D";
-import { alertModeVisibility, timeColor } from "./alerts";
+import { timeColor } from "./alerts";
 import { ExtractionSimulationDisplay } from './ExtractionSimulationDisplay';
 import { ExtractionSimulationTooltip } from './ExtractionSimulationTooltip';
-import { ProductionNode } from './ExtractionSimulation';
 import { Collapse, Box, Stack } from "@mui/material";
 
 const Transition = forwardRef(function Transition(
@@ -33,15 +33,28 @@ const Transition = forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+interface SchematicInput {
+  type_id: number;
+  quantity: number;
+}
+
+interface SchematicOutput {
+  type_id: number;
+  quantity: number;
+}
+
 export const PlanetTableRow = ({
   planet,
   character,
+  planetDetails,
 }: {
   planet: PlanetWithInfo;
   character: AccessToken;
+  planetDetails: PlanetCalculations;
 }) => {
   const theme = useTheme();
-  const { showProductIcons, extractionTimeMode } = useContext(SessionContext);
+  const { showProductIcons, extractionTimeMode, alertMode } = useContext(SessionContext);
+  const { colors } = useContext(ColorContext);
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
   const [planetConfigOpen, setPlanetConfigOpen] = useState(false);
@@ -72,80 +85,13 @@ export const PlanetTableRow = ({
     setPlanetConfigOpen(false);
   };
 
-  const { piPrices, alertMode, updatePlanetConfig, readPlanetConfig, balanceThreshold } = useContext(SessionContext);
+  const { piPrices, updatePlanetConfig, readPlanetConfig } = useContext(SessionContext);
   const planetInfo = planet.info;
   const planetInfoUniverse = planet.infoUniverse;
-  const { expired, extractors, localProduction, localImports, localExports } =
-    planetCalculations(planet);
   const planetConfig = readPlanetConfig({
     characterId: character.character.characterId,
     planetId: planet.planet_id,
   });
-  const { colors } = useContext(ColorContext);
-  // Convert local production to ProductionNode array for simulation
-  const productionNodes: ProductionNode[] = Array.from(localProduction).map(([schematicId, schematic]) => ({
-    schematicId: schematicId,
-    typeId: schematic.outputs[0].type_id,
-    name: schematic.name,
-    inputs: schematic.inputs.map(input => ({
-      typeId: input.type_id,
-      quantity: input.quantity
-    })),
-    outputs: schematic.outputs.map(output => ({
-      typeId: output.type_id,
-      quantity: output.quantity
-    })),
-    cycleTime: schematic.cycle_time,
-    factoryCount: schematic.count || 1
-  }));
-
-  // Calculate extractor averages and check for large differences
-  const extractorAverages = extractors
-    .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
-    .map(e => {
-      const cycleTime = e.extractor_details?.cycle_time || 3600;
-      const qtyPerCycle = e.extractor_details?.qty_per_cycle || 0;
-      return {
-        typeId: e.extractor_details!.product_type_id!,
-        averagePerHour: (qtyPerCycle * 3600) / cycleTime
-      };
-    });
-
-  const hasLargeExtractorDifference = extractorAverages.length === 2 && 
-    Math.abs(extractorAverages[0].averagePerHour - extractorAverages[1].averagePerHour) > balanceThreshold;
-
-  const storageFacilities = planetInfo.pins.filter(pin => 
-    STORAGE_IDS().some(storage => storage.type_id === pin.type_id)
-  );
-
-  const getStorageInfo = (pin: any) => {
-    if (!pin || !pin.contents) return null;
-
-    const storageType = PI_TYPES_MAP[pin.type_id].name;
-    const storageCapacity = STORAGE_CAPACITIES[pin.type_id] || 0;
-    
-    const totalVolume = (pin.contents || [])
-      .reduce((sum: number, item: any) => {
-        const volume = PI_PRODUCT_VOLUMES[item.type_id] || 0;
-        return sum + (item.amount * volume);
-      }, 0);
-
-    const totalValue = (pin.contents || [])
-      .reduce((sum: number, item: any) => {
-        const price = piPrices?.appraisal.items.find((a) => a.typeID === item.type_id)?.prices.sell.min ?? 0;
-        return sum + (item.amount * price);
-      }, 0);
-
-    const fillRate = storageCapacity > 0 ? (totalVolume / storageCapacity) * 100 : 0;
-
-    return {
-      type: storageType,
-      capacity: storageCapacity,
-      used: totalVolume,
-      fillRate: fillRate,
-      value: totalValue
-    };
-  };
 
   const handleExcludeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     updatePlanetConfig({
@@ -153,6 +99,19 @@ export const PlanetTableRow = ({
       excludeFromTotals: event.target.checked,
     });
   };
+
+  // Check if there are any alerts
+  const hasAlerts = alertMode && (
+    planetDetails.expired ||
+    planetDetails.storageInfo.some(storage => storage.fillRate > 60) ||
+    planetDetails.importDepletionTimes.some(depletion => depletion.hoursUntilDepletion < 24) ||
+    planetDetails.hasLargeExtractorDifference
+  );
+
+  // If in alert mode and no alerts, hide the row
+  if (alertMode && !hasAlerts) {
+    return null;
+  }
 
   const renderProductDisplay = (typeId: number, amount?: number) => {
     if (!typeId || !PI_TYPES_MAP[typeId]) {
@@ -205,7 +164,7 @@ export const PlanetTableRow = ({
   return (
     <>
       <TableRow
-        style={{ visibility: alertModeVisibility(alertMode, expired) }}
+        style={{ visibility: planetDetails.visibility }}
         sx={{ 
           "&:last-child td, &:last-child th": { border: 0 },
           cursor: 'pointer',
@@ -213,7 +172,7 @@ export const PlanetTableRow = ({
             backgroundColor: 'action.hover'
           }
         }}
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent<HTMLTableRowElement>) => {
           if (!(e.target as HTMLElement).closest('.clickable-cell')) return;
           setSimulationOpen(!simulationOpen);
         }}
@@ -236,9 +195,9 @@ export const PlanetTableRow = ({
               <Tooltip
                 placement="right"
                 title={
-                  extractors.length > 0 ? (
+                  planetDetails.extractors.length > 0 ? (
                     <ExtractionSimulationTooltip
-                      extractors={extractors
+                      extractors={planetDetails.extractors
                         .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
                         .map(e => ({
                           typeId: e.extractor_details!.product_type_id!,
@@ -266,11 +225,11 @@ export const PlanetTableRow = ({
                 <Stack spacing={0}>
                   <Typography 
                     fontSize={theme.custom.smallText}
-                    color={hasLargeExtractorDifference ? 'error' : 'inherit'}
+                    color={planetDetails.hasLargeExtractorDifference ? 'error' : 'inherit'}
                   >
                     {planetInfoUniverse?.name}
                   </Typography>
-                  {hasLargeExtractorDifference && (
+                  {planetDetails.hasLargeExtractorDifference && (
                     <Typography 
                       fontSize={theme.custom.smallText}
                       color="error"
@@ -287,8 +246,8 @@ export const PlanetTableRow = ({
         <TableCell className="clickable-cell">{planet.upgrade_level}</TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {extractors.length === 0 &&<Typography fontSize={theme.custom.smallText}>No extractors</Typography>}
-            {extractors.map((e, idx) => {
+            {planetDetails.extractors.length === 0 &&<Typography fontSize={theme.custom.smallText}>No extractors</Typography>}
+            {planetDetails.extractors.map((e, idx) => {
               return (
                 <div
                   key={`${e}-${idx}-${character.character.characterId}`}
@@ -320,7 +279,7 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {Array.from(localProduction).map((schematic, idx) => {
+            {Array.from(planetDetails.localProduction).map((schematic, idx) => {
               return (
                 <div
                   key={`prod-${character.character.characterId}-${planet.planet_id}-${idx}`}
@@ -334,34 +293,8 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {localImports.map((i) => {
-              // Find all storage facilities (including launchpads) containing this import
-              const storagesWithImport = storageFacilities.filter(storage => 
-                storage.contents?.some(content => content.type_id === i.type_id)
-              );
-              
-              // Get the total amount in all storage facilities
-              const totalAmount = storagesWithImport.reduce((sum, storage) => {
-                const content = storage.contents?.find(content => content.type_id === i.type_id);
-                return sum + (content?.amount ?? 0);
-              }, 0);
-
-              // Calculate consumption rate per hour
-              const schematic = PI_SCHEMATICS.find(s => s.schematic_id === i.schematic_id);
-              const cycleTime = schematic?.cycle_time ?? 3600;
-              const consumptionPerHour = i.quantity * i.factoryCount * (3600 / cycleTime);
-
-              // Calculate time until depletion in hours, starting from last_update
-              const lastUpdate = DateTime.fromISO(planet.last_update);
-              const now = DateTime.now();
-              const hoursSinceUpdate = now.diff(lastUpdate, 'hours').hours;
-              const remainingAmount = Math.max(0, totalAmount - (consumptionPerHour * hoursSinceUpdate));
-              const hoursUntilDepletion = consumptionPerHour > 0 ? remainingAmount / consumptionPerHour : 0;
-
-              // Calculate monthly cost
-              const price = piPrices?.appraisal.items.find((a) => a.typeID === i.type_id)?.prices.sell.min ?? 0;
-              const monthlyCost = (consumptionPerHour * 24 * 30 * price) / 1000000; // Cost in millions
-
+            {planetDetails.localImports.map((i) => {
+              const depletionTime = planetDetails.importDepletionTimes.find(d => d.typeId === i.type_id);
               return (
                 <div
                   key={`import-${character.character.characterId}-${planet.planet_id}-${i.type_id}`}
@@ -369,22 +302,19 @@ export const PlanetTableRow = ({
                 >
                   <Tooltip title={
                     <>
-                      <div>Total in storage: {totalAmount.toFixed(1)} units</div>
-                      <div>Consumption rate: {consumptionPerHour.toFixed(1)} units/hour</div>
-                      <div>Last update: {lastUpdate.toFormat('yyyy-MM-dd HH:mm:ss')}</div>
-                      <div>Will be depleted in {hoursUntilDepletion.toFixed(1)} hours</div>
-                      <div>Monthly cost: {monthlyCost.toFixed(2)}M ISK</div>
+                      <div>Will be depleted in {depletionTime?.hoursUntilDepletion.toFixed(1)} hours</div>
+                      <div>Monthly cost: {depletionTime?.monthlyCost.toFixed(2)}M ISK</div>
                     </>
                   }>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {renderProductDisplay(i.type_id, i.quantity * i.factoryCount)}
-                      {totalAmount > 0 && (
+                      {depletionTime && (
                         <Typography 
                           fontSize={theme.custom.smallText} 
-                          color={hoursUntilDepletion < 24 ? 'error' : hoursUntilDepletion < 48 ? 'warning' : 'success'}
+                          color={depletionTime.hoursUntilDepletion < 24 ? 'error' : depletionTime.hoursUntilDepletion < 48 ? 'warning' : 'success'}
                           sx={{ ml: 1 }}
                         >
-                          ({hoursUntilDepletion.toFixed(1)}h)
+                          ({depletionTime.hoursUntilDepletion.toFixed(1)}h)
                         </Typography>
                       )}
                     </div>
@@ -396,21 +326,21 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {localExports.map((exports) => (
+            {planetDetails.localExports.map((exports) => (
               <div
-                key={`export-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
+                key={`export-${character.character.characterId}-${planet.planet_id}-${exports.type_id}`}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                {renderProductDisplay(exports.typeId, exports.amount)}
+                {renderProductDisplay(exports.type_id, exports.quantity * exports.factoryCount)}
               </div>
             ))}
           </div>
         </TableCell>
         <TableCell>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {localExports.map((exports) => (
+            {planetDetails.localExports.map((exports) => (
               <FormControlLabel
-                key={`export-excluded-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
+                key={`export-excluded-${character.character.characterId}-${planet.planet_id}-${exports.type_id}`}
                 control={
                   <Checkbox
                     checked={planetConfig.excludeFromTotals}
@@ -425,12 +355,12 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {localExports.map((exports) => (
+            {planetDetails.localExports.map((exports) => (
               <Typography
-                key={`export-uph-${character.character.characterId}-${planet.planet_id}-${exports.typeId}`}
+                key={`export-uph-${character.character.characterId}-${planet.planet_id}-${exports.type_id}`}
                 fontSize={theme.custom.smallText}
               >
-                {exports.amount}
+                {exports.quantity * exports.factoryCount}
               </Typography>
             ))}
           </div>
@@ -444,11 +374,11 @@ export const PlanetTableRow = ({
               textAlign: "end",
             }}
           >
-            {localExports.map((e) => {
+            {planetDetails.localExports.map((e) => {
               const valueInMillions =
-                (((piPrices?.appraisal.items.find((a) => a.typeID === e.typeId)
+                (((piPrices?.appraisal.items.find((a) => a.typeID === e.type_id)
                   ?.prices.sell.min ?? 0) *
-                  e.amount) /
+                  e.quantity * e.factoryCount) /
                   1000000) *
                 24 *
                 30;
@@ -459,7 +389,7 @@ export const PlanetTableRow = ({
 
               return (
                 <Typography
-                  key={`export-praisal-${character.character.characterId}-${planet.planet_id}-${e.typeId}`}
+                  key={`export-praisal-${character.character.characterId}-${planet.planet_id}-${e.type_id}`}
                   fontSize={theme.custom.smallText}
                 >
                   {displayValue}
@@ -470,38 +400,28 @@ export const PlanetTableRow = ({
         </TableCell>
         <TableCell className="clickable-cell">
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {storageFacilities.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
-            {storageFacilities
-              .sort((a, b) => {
-                const isALaunchpad = LAUNCHPAD_IDS.includes(a.type_id);
-                const isBLaunchpad = LAUNCHPAD_IDS.includes(b.type_id);
-                return isALaunchpad === isBLaunchpad ? 0 : isALaunchpad ? -1 : 1;
-              })
-              .map((storage) => {
-                const storageInfo = getStorageInfo(storage);
-                if (!storageInfo) return null;
-                
-                const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
-                
-                const fillRate = storageInfo.fillRate;
-                const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
-                
-                return (
-                  <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.pin_id}`} style={{ display: "flex", alignItems: "center" }}>
-                    <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
-                      {isLaunchpad ? 'L' : 'S'}
+            {planetDetails.storageInfo.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
+            {planetDetails.storageInfo.map((storage: StorageInfo) => {
+              const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
+              const fillRate = storage.fillRate;
+              const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
+              
+              return (
+                <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}`} style={{ display: "flex", alignItems: "center" }}>
+                  <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
+                    {isLaunchpad ? 'L' : 'S'}
+                  </Typography>
+                  <Typography fontSize={theme.custom.smallText} style={{ color }}>
+                    {fillRate.toFixed(1)}%
+                  </Typography>
+                  {storage.value > 0 && (
+                    <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
+                      ({Math.round(storage.value / 1000000)}M)
                     </Typography>
-                    <Typography fontSize={theme.custom.smallText} style={{ color }}>
-                      {fillRate.toFixed(1)}%
-                    </Typography>
-                    {storageInfo.value > 0 && (
-                      <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
-                        ({Math.round(storageInfo.value / 1000000)}M)
-                      </Typography>
-                    )}
-                  </div>
-                );
-              })}
+                  )}
+                </div>
+              );
+            })}
           </div>
         </TableCell>
         <TableCell className="menu-cell">
@@ -540,7 +460,7 @@ export const PlanetTableRow = ({
           <Collapse in={simulationOpen} timeout="auto" unmountOnExit>
             <Box sx={{ my: 2 }}>
               <ExtractionSimulationDisplay
-                extractors={extractors
+                extractors={planetDetails.extractors
                   .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
                   .map(e => ({
                     typeId: e.extractor_details!.product_type_id!,
@@ -549,7 +469,21 @@ export const PlanetTableRow = ({
                     installTime: e.install_time ?? "",
                     expiryTime: e.expiry_time ?? ""
                   }))}
-                productionNodes={productionNodes}
+                productionNodes={Array.from(planetDetails.localProduction).map(([schematicId, schematic]) => ({
+                  schematicId: schematicId,
+                  typeId: schematic.outputs[0].type_id,
+                  name: schematic.name,
+                  inputs: schematic.inputs.map((input: SchematicInput) => ({
+                    typeId: input.type_id,
+                    quantity: input.quantity
+                  })),
+                  outputs: schematic.outputs.map((output: SchematicOutput) => ({
+                    typeId: output.type_id,
+                    quantity: output.quantity
+                  })),
+                  cycleTime: schematic.cycle_time,
+                  factoryCount: schematic.factoryCount || 1
+                }))}
               />
             </Box>
           </Collapse>

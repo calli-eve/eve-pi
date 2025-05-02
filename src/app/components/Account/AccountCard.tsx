@@ -1,4 +1,4 @@
-import { AccessToken } from "@/types";
+import { AccessToken, PlanetWithInfo, Pin } from "@/types";
 import { Box, Stack, Typography, useTheme, Paper, IconButton, Divider } from "@mui/material";
 import { CharacterRow } from "../Characters/CharacterRow";
 import { PlanetaryInteractionRow } from "../PlanetaryInteraction/PlanetaryInteractionRow";
@@ -9,7 +9,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { planetCalculations } from "@/planets";
 import { EvePraisalResult } from "@/eve-praisal";
-import { STORAGE_IDS } from "@/const";
+import { STORAGE_IDS, PI_SCHEMATICS, PI_PRODUCT_VOLUMES, STORAGE_CAPACITIES } from "@/const";
+import { DateTime } from "luxon";
+import { PlanetCalculations, AlertState, StorageContent, StorageInfo } from "@/types/planet";
 
 interface AccountTotals {
   monthlyEstimate: number;
@@ -19,6 +21,146 @@ interface AccountTotals {
   runningExtractors: number;
   totalExtractors: number;
 }
+
+const calculateAlertState = (planetDetails: PlanetCalculations): AlertState => {
+  const hasLowStorage = planetDetails.storageInfo.some(storage => storage.fillRate > 60);
+  const hasLowImports = planetDetails.importDepletionTimes.some(depletion => depletion.hoursUntilDepletion < 24);
+  
+  return {
+    expired: planetDetails.expired,
+    hasLowStorage,
+    hasLowImports,
+    hasLargeExtractorDifference: planetDetails.hasLargeExtractorDifference
+  };
+};
+
+const calculatePlanetDetails = (planet: PlanetWithInfo, piPrices: EvePraisalResult | undefined, balanceThreshold: number): PlanetCalculations => {
+  const { expired, extractors, localProduction: rawProduction, localImports, localExports: rawExports } = planetCalculations(planet);
+  
+  // Convert localProduction to include factoryCount
+  const localProduction = new Map(Array.from(rawProduction).map(([key, value]) => [
+    key,
+    {
+      ...value,
+      factoryCount: value.count || 1
+    }
+  ]));
+
+  // Calculate extractor averages and check for large differences
+  const extractorAverages = extractors
+    .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
+    .map(e => {
+      const cycleTime = e.extractor_details?.cycle_time || 3600;
+      const qtyPerCycle = e.extractor_details?.qty_per_cycle || 0;
+      return {
+        typeId: e.extractor_details!.product_type_id!,
+        averagePerHour: (qtyPerCycle * 3600) / cycleTime
+      };
+    });
+
+  const hasLargeExtractorDifference = extractorAverages.length === 2 && 
+    Math.abs(extractorAverages[0].averagePerHour - extractorAverages[1].averagePerHour) > balanceThreshold;
+
+  // Calculate storage info
+  const storageFacilities = planet.info.pins.filter((pin: Pin) => 
+    STORAGE_IDS().some(storage => storage.type_id === pin.type_id)
+  );
+
+  const storageInfo = storageFacilities.map((storage: Pin) => {
+    if (!storage || !storage.contents) return null;
+
+    const storageType = STORAGE_IDS().find(s => s.type_id === storage.type_id)?.name || 'Unknown';
+    const storageCapacity = STORAGE_CAPACITIES[storage.type_id] || 0;
+    
+    const totalVolume = (storage.contents || [])
+      .reduce((sum: number, item: StorageContent) => {
+        const volume = PI_PRODUCT_VOLUMES[item.type_id] || 0;
+        return sum + (item.amount * volume);
+      }, 0);
+
+    const totalValue = (storage.contents || [])
+      .reduce((sum: number, item: StorageContent) => {
+        const price = piPrices?.appraisal.items.find((a) => a.typeID === item.type_id)?.prices.sell.min ?? 0;
+        return sum + (item.amount * price);
+      }, 0);
+
+    const fillRate = storageCapacity > 0 ? (totalVolume / storageCapacity) * 100 : 0;
+
+    return {
+      type: storageType,
+      type_id: storage.type_id,
+      capacity: storageCapacity,
+      used: totalVolume,
+      fillRate: fillRate,
+      value: totalValue
+    };
+  }).filter(Boolean) as StorageInfo[];
+
+  // Calculate import depletion times
+  const importDepletionTimes = localImports.map(i => {
+    // Find all storage facilities containing this import
+    const storagesWithImport = storageFacilities.filter((storage: Pin) => 
+      storage.contents?.some((content: StorageContent) => content.type_id === i.type_id)
+    );
+    
+    // Get the total amount in all storage facilities
+    const totalAmount = storagesWithImport.reduce((sum: number, storage: Pin) => {
+      const content = storage.contents?.find((content: StorageContent) => content.type_id === i.type_id);
+      return sum + (content?.amount ?? 0);
+    }, 0);
+
+    // Calculate consumption rate per hour
+    const schematic = PI_SCHEMATICS.find(s => s.schematic_id === i.schematic_id);
+    const cycleTime = schematic?.cycle_time ?? 3600;
+    const consumptionPerHour = i.quantity * i.factoryCount * (3600 / cycleTime);
+
+    // Calculate time until depletion in hours, starting from last_update
+    const lastUpdate = DateTime.fromISO(planet.last_update);
+    const now = DateTime.now();
+    const hoursSinceUpdate = now.diff(lastUpdate, 'hours').hours;
+    const remainingAmount = Math.max(0, totalAmount - (consumptionPerHour * hoursSinceUpdate));
+    const hoursUntilDepletion = consumptionPerHour > 0 ? remainingAmount / consumptionPerHour : 0;
+
+    // Calculate monthly cost
+    const price = piPrices?.appraisal.items.find((a) => a.typeID === i.type_id)?.prices.sell.min ?? 0;
+    const monthlyCost = (consumptionPerHour * 24 * 30 * price) / 1000000; // Cost in millions
+
+    return {
+      typeId: i.type_id,
+      hoursUntilDepletion,
+      monthlyCost
+    };
+  });
+
+  // Convert localExports to match the LocalExport interface
+  const localExports = rawExports.map(e => {
+    const schematic = PI_SCHEMATICS.flatMap(s => s.outputs)
+      .find(s => s.type_id === e.typeId)?.schematic_id ?? 0;
+    const factoryCount = planet.info.pins
+      .filter(p => p.schematic_id === schematic)
+      .length;
+    
+    return {
+      type_id: e.typeId,
+      schematic_id: schematic,
+      quantity: e.amount / factoryCount, // Convert total amount back to per-factory quantity
+      factoryCount
+    };
+  });
+
+  return {
+    expired,
+    extractors,
+    localProduction,
+    localImports,
+    localExports,
+    storageInfo,
+    extractorAverages,
+    hasLargeExtractorDifference,
+    importDepletionTimes,
+    visibility: 'visible' as const
+  };
+};
 
 const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalResult | undefined): AccountTotals => {
   let totalMonthlyEstimate = 0;
@@ -86,13 +228,48 @@ const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalR
 export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { characters: AccessToken[], isCollapsed?: boolean }) => {
   const theme = useTheme();
   const [localIsCollapsed, setLocalIsCollapsed] = useState(false);
-  const { planMode, piPrices } = useContext(SessionContext);
+  const { planMode, piPrices, alertMode, balanceThreshold } = useContext(SessionContext);
   const { monthlyEstimate, storageValue, planetCount, characterCount, runningExtractors, totalExtractors } = calculateAccountTotals(characters, piPrices);
+
+  // Calculate planet details and alert states for each planet
+  const planetDetails = characters.reduce((acc, character) => {
+    character.planets.forEach(planet => {
+      const details = calculatePlanetDetails(planet, piPrices, balanceThreshold);
+      acc[`${character.character.characterId}-${planet.planet_id}`] = {
+        ...details,
+        alertState: calculateAlertState(details)
+      };
+    });
+    return acc;
+  }, {} as Record<string, PlanetCalculations & { alertState: AlertState }>);
 
   // Update local collapse state when prop changes
   useEffect(() => {
     setLocalIsCollapsed(propIsCollapsed ?? false);
   }, [propIsCollapsed]);
+
+  const getAlertVisibility = (alertState: AlertState) => {
+    if (!alertMode) return 'visible';
+    if (alertState.expired) return 'visible';
+    if (alertState.hasLowStorage) return 'visible';
+    if (alertState.hasLowImports) return 'visible';
+    if (alertState.hasLargeExtractorDifference) return 'visible';
+    return 'hidden';
+  };
+
+  // Check if any planet in the account has alerts
+  const hasAnyAlerts = Object.values(planetDetails).some(details => {
+    const alertState = calculateAlertState(details);
+    return alertState.expired || 
+           alertState.hasLowStorage || 
+           alertState.hasLowImports || 
+           alertState.hasLargeExtractorDifference;
+  });
+
+  // If in alert mode and no alerts, hide the entire card
+  if (alertMode && !hasAnyAlerts) {
+    return null;
+  }
 
   return (
     <Paper
@@ -221,7 +398,17 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
             {planMode ? (
               <PlanRow character={c} />
             ) : (
-              <PlanetaryInteractionRow character={c} />
+              <PlanetaryInteractionRow 
+                character={c} 
+                planetDetails={c.planets.reduce((acc, planet) => {
+                  const details = planetDetails[`${c.character.characterId}-${planet.planet_id}`];
+                  acc[planet.planet_id] = {
+                    ...details,
+                    visibility: getAlertVisibility(details.alertState)
+                  };
+                  return acc;
+                }, {} as Record<number, PlanetCalculations & { visibility: string }>)}
+              />
             )}
           </Stack>
         ))}

@@ -1,6 +1,5 @@
 import { ColorContext, SessionContext } from "@/app/context/Context";
-import { PI_TYPES_MAP, STORAGE_IDS, STORAGE_CAPACITIES, PI_PRODUCT_VOLUMES, EVE_IMAGE_URL, PI_SCHEMATICS, LAUNCHPAD_IDS } from "@/const";
-import { planetCalculations } from "@/planets";
+import { PI_TYPES_MAP, EVE_IMAGE_URL, LAUNCHPAD_IDS } from "@/const";
 import { AccessToken, PlanetWithInfo } from "@/types";
 import { PlanetCalculations, StorageInfo } from "@/types/planet";
 import CloseIcon from "@mui/icons-material/Close";

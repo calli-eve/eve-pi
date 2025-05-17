@@ -418,50 +418,55 @@ export const PlanetTableRow = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {planetDetails.storageInfo.map((storage: StorageInfo, idx: number) => {
-                      const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
-                      const fillRate = storage.fillRate;
-                      const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
-                      const contents = planet.info.pins.find(p => p.type_id === storage.type_id)?.contents || [];
-                      
-                      return (
-                        <React.Fragment key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`}>
-                          <TableRow>
-                            <TableCell>{isLaunchpad ? 'Launchpad' : 'Storage'}</TableCell>
-                            <TableCell align="right">{storage.capacity.toFixed(1)} m³</TableCell>
-                            <TableCell align="right">{storage.used.toFixed(1)} m³</TableCell>
-                            <TableCell align="right" sx={{ color }}>{fillRate.toFixed(1)}%</TableCell>
-                            <TableCell align="right">
-                              {storage.value > 0 ? (
-                                storage.value >= 1000000000 
-                                  ? `${(storage.value / 1000000000).toFixed(2)} B` 
-                                  : `${(storage.value / 1000000).toFixed(0)} M`
-                              ) : '-'} ISK
-                            </TableCell>
-                          </TableRow>
-                          {contents.length > 0 && (
+                    {planetDetails.storageInfo
+                      .map(storage => ({
+                        ...storage,
+                        isLaunchpad: LAUNCHPAD_IDS.includes(storage.type_id)
+                      }))
+                      .sort((a, b) => (b.isLaunchpad ? 1 : 0) - (a.isLaunchpad ? 1 : 0))
+                      .map((storage, idx) => {
+                        const fillRate = storage.fillRate;
+                        const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
+                        const contents = planet.info.pins.find(p => p.type_id === storage.type_id)?.contents || [];
+                        
+                        return (
+                          <React.Fragment key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`}>
                             <TableRow>
-                              <TableCell colSpan={5} sx={{ pt: 0, pb: 0 }}>
-                                <Table size="small">
-                                  <TableBody>
-                                    {contents.map((content, idy) => (
-                                      <TableRow key={`content-${character.character.characterId}-${planet.planet_id}-${storage.type}-${content.type_id}-${idx}-${idy}`}>
-                                        <TableCell sx={{ pl: 2 }}>
-                                          {PI_TYPES_MAP[content.type_id]?.name}
-                                        </TableCell>
-                                        <TableCell align="right" colSpan={4}>
-                                          {content.amount.toFixed(1)} units
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
+                              <TableCell>{storage.isLaunchpad ? 'Launchpad' : 'Storage'}</TableCell>
+                              <TableCell align="right">{storage.capacity.toFixed(1)} m³</TableCell>
+                              <TableCell align="right">{storage.used.toFixed(1)} m³</TableCell>
+                              <TableCell align="right" sx={{ color }}>{fillRate.toFixed(1)}%</TableCell>
+                              <TableCell align="right">
+                                {storage.value > 0 ? (
+                                  storage.value >= 1000000000 
+                                    ? `${(storage.value / 1000000000).toFixed(2)} B` 
+                                    : `${(storage.value / 1000000).toFixed(0)} M`
+                                ) : '-'} ISK
                               </TableCell>
                             </TableRow>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
+                            {contents.length > 0 && (
+                              <TableRow>
+                                <TableCell colSpan={5} sx={{ pt: 0, pb: 0 }}>
+                                  <Table size="small">
+                                    <TableBody>
+                                      {contents.map((content, idy) => (
+                                        <TableRow key={`content-${character.character.characterId}-${planet.planet_id}-${storage.type}-${content.type_id}-${idx}-${idy}`}>
+                                          <TableCell sx={{ pl: 2 }}>
+                                            {PI_TYPES_MAP[content.type_id]?.name}
+                                          </TableCell>
+                                          <TableCell align="right" colSpan={4}>
+                                            {content.amount.toFixed(1)} units
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
                   </TableBody>
                 </Table>
               </Box>
@@ -481,27 +486,32 @@ export const PlanetTableRow = ({
           >
             <div style={{ display: "flex", flexDirection: "column" }}>
               {planetDetails.storageInfo.length === 0 &&<Typography fontSize={theme.custom.smallText}>No storage</Typography>}
-              {planetDetails.storageInfo.map((storage: StorageInfo, idx: number) => {
-                const isLaunchpad = LAUNCHPAD_IDS.includes(storage.type_id);
-                const fillRate = storage.fillRate;
-                const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
-                
-                return (
-                  <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`} style={{ display: "flex", alignItems: "center" }}>
-                    <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
-                      {isLaunchpad ? 'L' : 'S'}
-                    </Typography>
-                    <Typography fontSize={theme.custom.smallText} style={{ color }}>
-                      {fillRate.toFixed(1)}%
-                    </Typography>
-                    {storage.value > 0 && (
-                      <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
-                        ({Math.round(storage.value / 1000000)}M)
+              {planetDetails.storageInfo
+                .map(storage => ({
+                  ...storage,
+                  isLaunchpad: LAUNCHPAD_IDS.includes(storage.type_id)
+                }))
+                .sort((a, b) => (b.isLaunchpad ? 1 : 0) - (a.isLaunchpad ? 1 : 0))
+                .map((storage, idx) => {
+                  const fillRate = storage.fillRate;
+                  const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
+                  
+                  return (
+                    <div key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`} style={{ display: "flex", alignItems: "center" }}>
+                      <Typography fontSize={theme.custom.smallText} style={{ marginRight: "5px" }}>
+                        {storage.isLaunchpad ? 'L' : 'S'}
                       </Typography>
-                    )}
-                  </div>
-                );
-              })}
+                      <Typography fontSize={theme.custom.smallText} style={{ color }}>
+                        {fillRate.toFixed(1)}%
+                      </Typography>
+                      {storage.value > 0 && (
+                        <Typography fontSize={theme.custom.smallText} style={{ marginLeft: "5px" }}>
+                          ({Math.round(storage.value / 1000000)}M)
+                        </Typography>
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           </Tooltip>
         </TableCell>

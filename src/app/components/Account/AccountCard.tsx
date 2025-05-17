@@ -376,6 +376,24 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
               >
                 Extractors: {runningExtractors}/{totalExtractors}
               </Typography>
+              <Divider orientation="vertical" flexItem sx={{ height: 16, borderColor: theme.palette.divider }} />
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: Object.values(planetDetails).some(d => d.alertState.hasLowStorage) ? theme.palette.error.main : theme.palette.text.secondary,
+                }}
+              >
+                Storage Alerts: {Object.values(planetDetails).filter(d => d.alertState.hasLowStorage).length}
+              </Typography>
+              <Divider orientation="vertical" flexItem sx={{ height: 16, borderColor: theme.palette.divider }} />
+              <Typography 
+                sx={{ 
+                  fontSize: "0.8rem",
+                  color: Object.values(planetDetails).some(d => d.alertState.hasLargeExtractorDifference) ? theme.palette.error.main : theme.palette.text.secondary,
+                }}
+              >
+                Balance Alerts: {Object.values(planetDetails).filter(d => d.alertState.hasLargeExtractorDifference).length}
+              </Typography>
             </Box>
           </Box>
           <IconButton 

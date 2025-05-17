@@ -78,7 +78,7 @@ const Home = () => {
   };
 
   const refreshSession = async (characters: AccessToken[]) => {
-    return processInBatches(characters, 5, async (c) => {
+    return processInBatches(characters, 50, async (c) => {
       try {
         return await refreshToken(c);
       } catch {
@@ -120,7 +120,7 @@ const Home = () => {
   const initializeCharacterPlanets = (
     characters: AccessToken[],
   ): Promise<AccessToken[]> =>
-    processInBatches(characters, 3, async (c) => {
+    processInBatches(characters, 50, async (c) => {
       if (c.needsLogin || c.character === undefined)
         return { ...c, planets: [] };
       const planets = await getPlanets(c);

@@ -4,7 +4,7 @@ export const DiscordButton = () => {
     <Box>
       <Tooltip title="Come nerd out in discord about PI and this tool">
         <Button
-          href="https://discord.gg/GPtw5kfuJu"
+          href="https://discord.gg/bCdXzU8PHK"
           target="_blank"
           style={{ width: "100%" }}
           sx={{ color: "white", display: "block" }}

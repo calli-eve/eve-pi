@@ -19,6 +19,21 @@ import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
 import { getPlanet, getPlanetUniverse, getPlanets } from "@/planets";
 import { PlanetConfig } from "@/types";
 
+// Add batch processing utility
+const processInBatches = async <T, R>(
+  items: T[],
+  batchSize: number,
+  processFn: (item: T) => Promise<R>
+): Promise<R[]> => {
+  const results: R[] = [];
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    const batchResults = await Promise.all(batch.map(processFn));
+    results.push(...batchResults);
+  }
+  return results;
+};
+
 const Home = () => {
   const searchParams = useSearchParams();
   const [characters, setCharacters] = useState<AccessToken[]>([]);
@@ -63,15 +78,13 @@ const Home = () => {
   };
 
   const refreshSession = async (characters: AccessToken[]) => {
-    return Promise.all(
-      characters.map((c) => {
-        try {
-          return refreshToken(c);
-        } catch {
-          return { ...c, needsLogin: true };
-        }
-      }),
-    );
+    return processInBatches(characters, 5, async (c) => {
+      try {
+        return await refreshToken(c);
+      } catch {
+        return { ...c, needsLogin: true };
+      }
+    });
   };
 
   const handleCallback = async (
@@ -107,24 +120,24 @@ const Home = () => {
   const initializeCharacterPlanets = (
     characters: AccessToken[],
   ): Promise<AccessToken[]> =>
-    Promise.all(
-      characters.map(async (c) => {
-        if (c.needsLogin || c.character === undefined)
-          return { ...c, planets: [] };
-        const planets = await getPlanets(c);
-        const planetsWithInfo: PlanetWithInfo[] = await Promise.all(
-          planets.map(async (p) => ({
-            ...p,
-            info: await getPlanet(c, p),
-            infoUniverse: await getPlanetUniverse(p),
-          })),
-        );
-        return {
-          ...c,
-          planets: planetsWithInfo,
-        };
-      }),
-    );
+    processInBatches(characters, 3, async (c) => {
+      if (c.needsLogin || c.character === undefined)
+        return { ...c, planets: [] };
+      const planets = await getPlanets(c);
+      const planetsWithInfo: PlanetWithInfo[] = await processInBatches(
+        planets,
+        3,
+        async (p) => ({
+          ...p,
+          info: await getPlanet(c, p),
+          infoUniverse: await getPlanetUniverse(p),
+        })
+      );
+      return {
+        ...c,
+        planets: planetsWithInfo,
+      };
+    });
 
   const saveCharacters = (characters: AccessToken[]): AccessToken[] => {
     localStorage.setItem("characters", JSON.stringify(characters));

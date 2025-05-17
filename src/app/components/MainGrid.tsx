@@ -48,7 +48,7 @@ declare module "@mui/material/styles" {
 }
 
 export const MainGrid = () => {
-  const { characters, updateCharacter } = useContext(CharacterContext);
+  const { characters } = useContext(CharacterContext);
   const { compactMode, toggleCompactMode, alertMode, toggleAlertMode, planMode, togglePlanMode, extractionTimeMode, toggleExtractionTimeMode } = useContext(SessionContext);
   const [accountOrder, setAccountOrder] = useState<string[]>([]);
   const [allCollapsed, setAllCollapsed] = useState(false);

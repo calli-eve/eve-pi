@@ -4,7 +4,7 @@ Simple tool to track your PI planet extractors. Login with your characters and e
 
 Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://discord.gg/bCdXzU8PHK)
 
-## [Avanto hosted PI tool](https://pi.avanto.tk)
+## [Hosted PI tool](https://pi.calli.fi)
 
 ![Screenshot of PI tool](https://github.com/calli-eve/eve-pi/blob/main/images/eve-pi.png)
 ![3D render of a planet](https://github.com/calli-eve/eve-pi/blob/main/images/3dplanet.png)

@@ -22,10 +22,51 @@ export const getPlanets = async (character: AccessToken): Promise<Planet[]> => {
   return planets;
 };
 
+interface CachedPlanetData {
+  data: PlanetInfo;
+  timestamp: number;
+}
+
+const CACHE_DURATION_MS = 60_000; // 1 minute
+const CACHE_STORAGE_KEY = "planet_cache";
+
+const loadCacheFromStorage = (): Map<string, CachedPlanetData> => {
+  try {
+    const stored = localStorage.getItem(CACHE_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return new Map(Object.entries(parsed));
+    }
+  } catch (error) {
+    console.error("Failed to load planet cache from localStorage:", error);
+  }
+  return new Map();
+};
+
+const saveCacheToStorage = (cache: Map<string, CachedPlanetData>) => {
+  try {
+    const obj = Object.fromEntries(cache);
+    localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(obj));
+  } catch (error) {
+    console.error("Failed to save planet cache to localStorage:", error);
+  }
+};
+
+const planetCache = loadCacheFromStorage();
+
 export const getPlanet = async (
   character: AccessToken,
   planet: Planet,
 ): Promise<PlanetInfo> => {
+  const cacheKey = `${character.character.characterId}-${planet.planet_id}`;
+  const cached = planetCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION_MS) {
+    console.log(`[Cache HIT] Planet ${planet.planet_id} for character ${character.character.characterId}`);
+    return cached.data;
+  }
+
+  console.log(`[Cache MISS] Fetching planet ${planet.planet_id} for character ${character.character.characterId}`);
   const api = new Api();
   const planetInfo = (
     await api.v3.getCharactersCharacterIdPlanetsPlanetId(
@@ -36,6 +77,14 @@ export const getPlanet = async (
       },
     )
   ).data;
+
+  planetCache.set(cacheKey, {
+    data: planetInfo,
+    timestamp: Date.now(),
+  });
+
+  saveCacheToStorage(planetCache);
+
   return planetInfo;
 };
 

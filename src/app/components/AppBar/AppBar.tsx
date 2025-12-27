@@ -15,6 +15,7 @@ import { CCPButton } from "../CCP/CCPButton";
 import { DiscordButton } from "../Discord/DiscordButton";
 import { GitHubButton } from "../Github/GitHubButton";
 import { LoginButton } from "../Login/LoginButton";
+import { PartnerCodeButton } from "../PartnerCode/PartnerCodeButton";
 import { SettingsButton } from "../Settings/SettingsButtons";
 import {
   Button,
@@ -128,6 +129,9 @@ function ResponsiveAppBar() {
               <MenuItem onClick={handleCloseNavMenu}>
                 <CCPButton />
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <PartnerCodeButton />
+              </MenuItem>
             </Menu>
           </Box>
           <PublicIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
@@ -162,12 +166,13 @@ function ResponsiveAppBar() {
             <UploadButton />
             <DiscordButton />
             <GitHubButton />
-           
+
             <SettingsButton />
             <Button onClick={() => setFaqOpen(true)} color="inherit">
               FAQ
             </Button>
             <CCPButton />
+            <PartnerCodeButton />
           </Box>
         </Toolbar>
       </Container>

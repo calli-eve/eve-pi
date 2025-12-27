@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { EvePraisalResult, fetchAllPrices } from "@/eve-praisal";
 import { getPlanet, getPlanetUniverse, getPlanets } from "@/planets";
 import { PlanetConfig } from "@/types";
+import { saveCharacters as saveCharactersDB, loadCharacters } from "@/storage";
 
 // Add batch processing utility
 const processInBatches = async <T, R>(
@@ -108,13 +109,8 @@ const Home = () => {
     return Promise.resolve(characters);
   };
 
-  const initializeCharacters = useCallback((): AccessToken[] => {
-    const localStorageCharacters = localStorage.getItem("characters");
-    if (localStorageCharacters) {
-      const characterArray: AccessToken[] = JSON.parse(localStorageCharacters);
-      return characterArray.filter((c) => c.access_token && c.character);
-    }
-    return [];
+  const initializeCharacters = useCallback(async (): Promise<AccessToken[]> => {
+    return await loadCharacters();
   }, []);
 
   const initializeCharacterPlanets = (
@@ -139,9 +135,8 @@ const Home = () => {
       };
     });
 
-  const saveCharacters = (characters: AccessToken[]): AccessToken[] => {
-    localStorage.setItem("characters", JSON.stringify(characters));
-    return characters;
+  const saveCharacters = async (characters: AccessToken[]): Promise<AccessToken[]> => {
+    return await saveCharactersDB(characters);
   };
 
   const restoreCharacters = (characters: AccessToken[]) => {
@@ -279,8 +274,8 @@ const Home = () => {
 
   useEffect(() => {
     const ESI_CACHE_TIME_MS = 3000000;
-    const interval = setInterval(() => {
-      const characters = initializeCharacters();
+    const interval = setInterval(async () => {
+      const characters = await initializeCharacters();
       refreshSession(characters)
         .then(saveCharacters)
         .then(initializeCharacterPlanets)

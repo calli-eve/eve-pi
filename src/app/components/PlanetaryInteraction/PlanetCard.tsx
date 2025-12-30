@@ -8,7 +8,7 @@ import { PlanetCalculations } from "@/types/planet";
 import React, { useContext } from "react";
 import { DateTime } from "luxon";
 import Countdown from "react-countdown";
-import { ColorContext } from "@/app/context/Context";
+import { ColorContext, SessionContext } from "@/app/context/Context";
 import { ExtractionSimulationTooltip } from "./ExtractionSimulationTooltip";
 import { timeColor } from "./alerts";
 
@@ -40,6 +40,7 @@ export const PlanetCard = ({
 }) => {
   const theme = useTheme();
   const { colors } = useContext(ColorContext);
+  const { minExtractionRate } = useContext(SessionContext);
 
   const extractorConfigs: ExtractorConfig[] = planetDetails.extractors
     .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
@@ -50,6 +51,8 @@ export const PlanetCard = ({
       installTime: e.install_time ?? "",
       expiryTime: e.expiry_time ?? ""
     }));
+
+  const hasLowExtractionRate = planetDetails.extractorAverages.length > 0 && minExtractionRate > 0 && planetDetails.extractorAverages.some(avg => avg.averagePerHour < minExtractionRate);
 
   return (
     <Tooltip
@@ -114,9 +117,30 @@ export const PlanetCard = ({
           />
         )}
         <div style={{ position: "absolute", top: 5, left: 10 }}>
-          <Typography fontSize={theme.custom.smallText}>
+          <Typography
+            fontSize={theme.custom.smallText}
+            color={(planetDetails.hasLargeExtractorDifference || hasLowExtractionRate) ? 'error' : 'inherit'}
+          >
             {planet.infoUniverse?.name}
           </Typography>
+          {planetDetails.hasLargeExtractorDifference && (
+            <Typography
+              fontSize={theme.custom.smallText}
+              color="error"
+              sx={{ opacity: 0.7 }}
+            >
+              off-balance
+            </Typography>
+          )}
+          {hasLowExtractionRate && (
+            <Typography
+              fontSize={theme.custom.smallText}
+              color="error"
+              sx={{ opacity: 0.7 }}
+            >
+              low-extraction
+            </Typography>
+          )}
           {planetDetails.extractors.map((e, idx) => {
             const average = planetDetails.extractorAverages[idx];
             return (

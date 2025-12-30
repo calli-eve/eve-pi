@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Box, Paper, Typography, Stack } from '@mui/material';
 import { Line } from 'react-chartjs-2';
 import { getProgramOutputPrediction } from './ExtractionSimulation';
 import { PI_TYPES_MAP } from '@/const';
+import { SessionContext } from '@/app/context/Context';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -41,6 +42,7 @@ interface ExtractionSimulationTooltipProps {
 export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipProps> = ({
   extractors
 }) => {
+  const { minExtractionRate } = useContext(SessionContext);
   const CYCLE_TIME = 30 * 60; // 30 minutes in seconds
 
   // Calculate program duration and cycles for each extractor
@@ -159,8 +161,15 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                     <Typography variant="body2">
                       • Average per Cycle: {(totalOutput / cycles).toFixed(1)} units
                     </Typography>
-                    <Typography variant="body2">
-                      • Average per hour: {(totalOutput / cycles  * 2).toFixed(1)} units
+                    <Typography
+                      variant="body2"
+                      color={
+                        minExtractionRate > 0 && (extractors[idx].baseValue * 3600) / extractors[idx].cycleTime < minExtractionRate
+                          ? 'error'
+                          : 'inherit'
+                      }
+                    >
+                      • Average per hour: {((extractors[idx].baseValue * 3600) / extractors[idx].cycleTime).toFixed(1)} units
                     </Typography>
                     <Typography variant="body2">
                       • Expires in: <Countdown overtime={true} date={DateTime.fromISO(expiryTime).toMillis()} />

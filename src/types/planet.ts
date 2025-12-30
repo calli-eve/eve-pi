@@ -32,6 +32,7 @@ export interface AlertState {
   hasLowStorage: boolean;
   hasLowImports: boolean;
   hasLargeExtractorDifference: boolean;
+  hasLowExtractionRate: boolean;
 }
 
 export interface ExtractorAverage {

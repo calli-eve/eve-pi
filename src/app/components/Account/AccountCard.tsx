@@ -22,15 +22,17 @@ interface AccountTotals {
   totalExtractors: number;
 }
 
-const calculateAlertState = (planetDetails: PlanetCalculations): AlertState => {
+const calculateAlertState = (planetDetails: PlanetCalculations, minExtractionRate: number): AlertState => {
   const hasLowStorage = planetDetails.storageInfo.some(storage => storage.fillRate > 60);
   const hasLowImports = planetDetails.importDepletionTimes.some(depletion => depletion.hoursUntilDepletion < 24);
-  
+  const hasLowExtractionRate = planetDetails.extractorAverages.length > 0 && minExtractionRate > 0 && planetDetails.extractorAverages.some(avg => avg.averagePerHour < minExtractionRate);
+
   return {
     expired: planetDetails.expired,
     hasLowStorage,
     hasLowImports,
-    hasLargeExtractorDifference: planetDetails.hasLargeExtractorDifference
+    hasLargeExtractorDifference: planetDetails.hasLargeExtractorDifference,
+    hasLowExtractionRate
   };
 };
 
@@ -228,7 +230,7 @@ const calculateAccountTotals = (characters: AccessToken[], piPrices: EvePraisalR
 export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { characters: AccessToken[], isCollapsed?: boolean }) => {
   const theme = useTheme();
   const [localIsCollapsed, setLocalIsCollapsed] = useState(false);
-  const { planMode, piPrices, alertMode, balanceThreshold } = useContext(SessionContext);
+  const { planMode, piPrices, alertMode, balanceThreshold, minExtractionRate } = useContext(SessionContext);
   const { monthlyEstimate, storageValue, planetCount, characterCount, runningExtractors, totalExtractors } = calculateAccountTotals(characters, piPrices);
 
   // Calculate planet details and alert states for each planet
@@ -237,7 +239,7 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
       const details = calculatePlanetDetails(planet, piPrices, balanceThreshold);
       acc[`${character.character.characterId}-${planet.planet_id}`] = {
         ...details,
-        alertState: calculateAlertState(details)
+        alertState: calculateAlertState(details, minExtractionRate)
       };
     });
     return acc;
@@ -254,16 +256,18 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
     if (alertState.hasLowStorage) return 'visible';
     if (alertState.hasLowImports) return 'visible';
     if (alertState.hasLargeExtractorDifference) return 'visible';
+    if (alertState.hasLowExtractionRate) return 'visible';
     return 'hidden';
   };
 
   // Check if any planet in the account has alerts
   const hasAnyAlerts = Object.values(planetDetails).some(details => {
-    const alertState = calculateAlertState(details);
-    return alertState.expired || 
-           alertState.hasLowStorage || 
-           alertState.hasLowImports || 
-           alertState.hasLargeExtractorDifference;
+    const alertState = calculateAlertState(details, minExtractionRate);
+    return alertState.expired ||
+           alertState.hasLowStorage ||
+           alertState.hasLowImports ||
+           alertState.hasLargeExtractorDifference ||
+           alertState.hasLowExtractionRate;
   });
 
   // If in alert mode and no alerts, hide the entire card

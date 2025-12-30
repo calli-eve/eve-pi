@@ -21,7 +21,7 @@ import React, { useState, useContext } from "react";
 
 export const SettingsButton = () => {
   const { colors, setColors } = useContext(ColorContext);
-  const { balanceThreshold, setBalanceThreshold, showProductIcons, setShowProductIcons } = useContext(SessionContext);
+  const { balanceThreshold, setBalanceThreshold, minExtractionRate, setMinExtractionRate, showProductIcons, setShowProductIcons } = useContext(SessionContext);
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -49,6 +49,13 @@ export const SettingsButton = () => {
 
   const handleShowProductIconsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setShowProductIcons(event.target.checked);
+  };
+
+  const handleMinExtractionRateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value);
+    if (!isNaN(value) && value >= 0 && value <= 100000) {
+      setMinExtractionRate(value);
+    }
   };
 
   return (
@@ -91,6 +98,19 @@ export const SettingsButton = () => {
                 inputProps={{ min: 0, max: 100000 }}
                 helperText="Set the threshold for balance alerts (0-100,000)"
                 error={balanceThreshold < 0 || balanceThreshold > 100000}
+              />
+            </Box>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1">Minimum Extraction Rate</Typography>
+              <TextField
+                type="number"
+                value={minExtractionRate}
+                onChange={handleMinExtractionRateChange}
+                fullWidth
+                margin="normal"
+                inputProps={{ min: 0, max: 100000 }}
+                helperText="Alert if extraction per hour is below this value (0-100,000, 0 = disabled)"
+                error={minExtractionRate < 0 || minExtractionRate > 100000}
               />
             </Box>
             {Object.keys(colors).map((key) => {

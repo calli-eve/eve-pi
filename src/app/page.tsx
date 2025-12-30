@@ -46,6 +46,7 @@ const Home = () => {
     undefined,
   );
   const [balanceThreshold, setBalanceThreshold] = useState(1000);
+  const [minExtractionRate, setMinExtractionRate] = useState(0);
   const [showProductIcons, setShowProductIcons] = useState(false);
   const [extractionTimeMode, setExtractionTimeMode] = useState(false);
 
@@ -305,6 +306,8 @@ const Home = () => {
         readPlanetConfig,
         balanceThreshold,
         setBalanceThreshold,
+        minExtractionRate,
+        setMinExtractionRate,
         showProductIcons,
         setShowProductIcons,
       }}

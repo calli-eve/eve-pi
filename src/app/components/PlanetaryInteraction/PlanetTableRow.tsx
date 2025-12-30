@@ -55,7 +55,7 @@ export const PlanetTableRow = ({
   planetDetails: PlanetCalculations;
 }) => {
   const theme = useTheme();
-  const { showProductIcons, extractionTimeMode, alertMode } = useContext(SessionContext);
+  const { showProductIcons, extractionTimeMode, alertMode, minExtractionRate } = useContext(SessionContext);
   const { colors } = useContext(ColorContext);
 
   const [planetRenderOpen, setPlanetRenderOpen] = useState(false);
@@ -103,11 +103,13 @@ export const PlanetTableRow = ({
   };
 
   // Check if there are any alerts
+  const hasLowExtractionRate = planetDetails.extractorAverages.length > 0 && minExtractionRate > 0 && planetDetails.extractorAverages.some(avg => avg.averagePerHour < minExtractionRate);
   const hasAlerts = alertMode && (
     planetDetails.expired ||
     planetDetails.storageInfo.some(storage => storage.fillRate > 60) ||
     planetDetails.importDepletionTimes.some(depletion => depletion.hoursUntilDepletion < 24) ||
-    planetDetails.hasLargeExtractorDifference
+    planetDetails.hasLargeExtractorDifference ||
+    hasLowExtractionRate
   );
 
   // If in alert mode and no alerts, hide the row
@@ -225,19 +227,28 @@ export const PlanetTableRow = ({
                 }}
               >
                 <Stack spacing={0}>
-                  <Typography 
+                  <Typography
                     fontSize={theme.custom.smallText}
-                    color={planetDetails.hasLargeExtractorDifference ? 'error' : 'inherit'}
+                    color={(planetDetails.hasLargeExtractorDifference || hasLowExtractionRate) ? 'error' : 'inherit'}
                   >
                     {planetInfoUniverse?.name}
                   </Typography>
                   {planetDetails.hasLargeExtractorDifference && (
-                    <Typography 
+                    <Typography
                       fontSize={theme.custom.smallText}
                       color="error"
                       sx={{ opacity: 0.7 }}
                     >
                       off-balance
+                    </Typography>
+                  )}
+                  {hasLowExtractionRate && (
+                    <Typography
+                      fontSize={theme.custom.smallText}
+                      color="error"
+                      sx={{ opacity: 0.7 }}
+                    >
+                      low-extraction
                     </Typography>
                   )}
                 </Stack>

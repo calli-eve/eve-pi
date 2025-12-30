@@ -39,6 +39,8 @@ export const SessionContext = createContext<{
   }) => PlanetConfig;
   balanceThreshold: number;
   setBalanceThreshold: Dispatch<SetStateAction<number>>;
+  minExtractionRate: number;
+  setMinExtractionRate: Dispatch<SetStateAction<number>>;
   showProductIcons: boolean;
   setShowProductIcons: (show: boolean) => void;
 }>({
@@ -68,6 +70,8 @@ export const SessionContext = createContext<{
   },
   balanceThreshold: 1000,
   setBalanceThreshold: () => {},
+  minExtractionRate: 0,
+  setMinExtractionRate: () => {},
   showProductIcons: false,
   setShowProductIcons: () => {},
 });

@@ -62,11 +62,9 @@ export const getPlanet = async (
   const cached = planetCache.get(cacheKey);
 
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION_MS) {
-    console.log(`[Cache HIT] Planet ${planet.planet_id} for character ${character.character.characterId}`);
     return cached.data;
   }
 
-  console.log(`[Cache MISS] Fetching planet ${planet.planet_id} for character ${character.character.characterId}`);
   const api = new Api();
   const planetInfo = (
     await api.v3.getCharactersCharacterIdPlanetsPlanetId(

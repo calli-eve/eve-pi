@@ -12,6 +12,7 @@ import { EvePraisalResult } from "@/eve-praisal";
 import { STORAGE_IDS, PI_SCHEMATICS, PI_PRODUCT_VOLUMES, STORAGE_CAPACITIES } from "@/const";
 import { DateTime } from "luxon";
 import { PlanetCalculations, AlertState, StorageContent, StorageInfo } from "@/types/planet";
+import { getProgramOutputPrediction } from "../PlanetaryInteraction/ExtractionSimulation";
 
 interface AccountTotals {
   monthlyEstimate: number;
@@ -49,18 +50,27 @@ const calculatePlanetDetails = (planet: PlanetWithInfo, piPrices: EvePraisalResu
   ]));
 
   // Calculate extractor averages and check for large differences
+  const CYCLE_TIME = 30 * 60; // 30 minutes in seconds
   const extractorAverages = extractors
     .filter(e => e.extractor_details?.product_type_id && e.extractor_details?.qty_per_cycle)
     .map(e => {
-      const cycleTime = e.extractor_details?.cycle_time || 3600;
+      const installDate = new Date(e.install_time ?? "");
+      const expiryDate = new Date(e.expiry_time ?? "");
+      const programDuration = (expiryDate.getTime() - installDate.getTime()) / 1000;
+      const cycles = Math.floor(programDuration / CYCLE_TIME);
+
       const qtyPerCycle = e.extractor_details?.qty_per_cycle || 0;
+      const prediction = getProgramOutputPrediction(qtyPerCycle, CYCLE_TIME, cycles);
+      const totalOutput = prediction.reduce((sum, val) => sum + val, 0);
+      const averagePerHour = totalOutput / cycles * 2;
+
       return {
         typeId: e.extractor_details!.product_type_id!,
-        averagePerHour: (qtyPerCycle * 3600) / cycleTime
+        averagePerHour
       };
     });
 
-  const hasLargeExtractorDifference = extractorAverages.length === 2 && 
+  const hasLargeExtractorDifference = extractorAverages.length === 2 &&
     Math.abs(extractorAverages[0].averagePerHour - extractorAverages[1].averagePerHour) > balanceThreshold;
 
   // Calculate storage info

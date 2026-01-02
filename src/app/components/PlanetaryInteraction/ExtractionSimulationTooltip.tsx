@@ -159,7 +159,7 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                       • Program Cycles: {cycles}
                     </Typography>
                     <Typography variant="body2">
-                      • Average per Cycle: {(totalOutput / cycles).toFixed(1)} units
+                      • Average per Cycle: {(totalOutput / (cycles)).toFixed(1)} units
                     </Typography>
                     <Typography
                       variant="body2"
@@ -169,7 +169,7 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                           : 'inherit'
                       }
                     >
-                      • Average per hour: {((extractors[idx].baseValue * 3600) / extractors[idx].cycleTime).toFixed(1)} units
+                      • Average per hour: {(totalOutput / cycles * 2).toFixed(1)} units
                     </Typography>
                     <Typography variant="body2">
                       • Expires in: <Countdown overtime={true} date={DateTime.fromISO(expiryTime).toMillis()} />
@@ -185,17 +185,24 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                 </Typography>
                 <Stack spacing={0.5}>
                   {extractors.map((extractor, index) => {
-                    const averagePerHour = (extractor.baseValue * 3600) / extractor.cycleTime;
+                    const prediction = getProgramOutputPrediction(
+                      extractor.baseValue,
+                      CYCLE_TIME,
+                      extractorPrograms[index].cycles
+                    );
+                    const totalOutput = prediction.reduce((sum, val) => sum + val, 0);
+                    const cycles = extractorPrograms[index].cycles;
+                    const averagePerHour = totalOutput / cycles * 2;
                     return (
                       <Typography key={index} variant="body2">
                         • {PI_TYPES_MAP[extractor.typeId]?.name}: {averagePerHour.toFixed(1)} u/h
                       </Typography>
                     );
                   })}
-                  <Typography 
-                    variant="body2" 
+                  <Typography
+                    variant="body2"
                     color="error"
-                    sx={{ 
+                    sx={{
                       mt: 1,
                       fontWeight: 'bold',
                       borderTop: '1px solid',
@@ -203,10 +210,27 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                       pt: 1
                     }}
                   >
-                    Difference: {Math.abs(
-                      (extractors[0].baseValue * 3600 / extractors[0].cycleTime) - 
-                      (extractors[1].baseValue * 3600 / extractors[1].cycleTime)
-                    ).toFixed(1)} u/h
+                    Difference: {(() => {
+                      const prediction0 = getProgramOutputPrediction(
+                        extractors[0].baseValue,
+                        CYCLE_TIME,
+                        extractorPrograms[0].cycles
+                      );
+                      const totalOutput0 = prediction0.reduce((sum, val) => sum + val, 0);
+                      const cycles0 = extractorPrograms[0].cycles;
+                      const avg0 = totalOutput0 / cycles0 * 2;
+
+                      const prediction1 = getProgramOutputPrediction(
+                        extractors[1].baseValue,
+                        CYCLE_TIME,
+                        extractorPrograms[1].cycles
+                      );
+                      const totalOutput1 = prediction1.reduce((sum, val) => sum + val, 0);
+                      const cycles1 = extractorPrograms[1].cycles;
+                      const avg1 = totalOutput1 / cycles1 * 2;
+
+                      return Math.abs(avg0 - avg1).toFixed(1);
+                    })()} u/h
                   </Typography>
                 </Stack>
               </Paper>

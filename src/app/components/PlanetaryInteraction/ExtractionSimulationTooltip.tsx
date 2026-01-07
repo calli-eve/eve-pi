@@ -135,7 +135,7 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack spacing={1}>
-            {extractorPrograms.map(({ typeId, cycleTime, cycles, installTime, expiryTime }, idx) => {
+            {extractorPrograms.map(({ typeId, cycleTime, cycles, expiryTime }, idx) => {
               const prediction = getProgramOutputPrediction(
                 extractors[idx].baseValue,
                 CYCLE_TIME,
@@ -159,7 +159,7 @@ export const ExtractionSimulationTooltip: React.FC<ExtractionSimulationTooltipPr
                       • Program Cycles: {cycles}
                     </Typography>
                     <Typography variant="body2">
-                      • Average per Cycle: {(totalOutput / (cycles)).toFixed(1)} units
+                      • Average per Cycle: {(totalOutput / cycles).toFixed(1)} units
                     </Typography>
                     <Typography
                       variant="body2"

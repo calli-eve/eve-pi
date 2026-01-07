@@ -17,6 +17,7 @@ import { GitHubButton } from "../Github/GitHubButton";
 import { LoginButton } from "../Login/LoginButton";
 import { PartnerCodeButton } from "../PartnerCode/PartnerCodeButton";
 import { SettingsButton } from "../Settings/SettingsButtons";
+import { BuyMeCoffeeButton } from "../BuyMeCoffee/BuyMeCoffeeButton";
 import {
   Button,
   Dialog,
@@ -132,6 +133,9 @@ function ResponsiveAppBar() {
               <MenuItem onClick={handleCloseNavMenu}>
                 <PartnerCodeButton />
               </MenuItem>
+              <MenuItem onClick={handleCloseNavMenu}>
+                <BuyMeCoffeeButton />
+              </MenuItem>
             </Menu>
           </Box>
           <PublicIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
@@ -173,6 +177,7 @@ function ResponsiveAppBar() {
             </Button>
             <CCPButton />
             <PartnerCodeButton />
+            <BuyMeCoffeeButton />
           </Box>
         </Toolbar>
       </Container>

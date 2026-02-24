@@ -2,7 +2,9 @@
 
 Simple tool to track your PI planet extractors. Login with your characters and enjoy the PI!
 
-Any questions, feedback or suggestions are welcome at [EVE PI Discord](https://discord.gg/bCdXzU8PHK)
+Any questions, feedback or suggestions are welcome at 
+[EVE PI Matrix](https://matrix.to/#/#eve-pi:calli.fi)
+[EVE PI Discord](https://discord.gg/bCdXzU8PHK)
 
 ## Partner code
 

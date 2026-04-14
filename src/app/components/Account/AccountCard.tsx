@@ -7,6 +7,8 @@ import { useContext, useState, useEffect } from "react";
 import { PlanRow } from "./PlanRow";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { planetCalculations } from "@/planets";
 import { EvePraisalResult } from "@/eve-praisal";
 import { STORAGE_IDS, PI_SCHEMATICS, PI_PRODUCT_VOLUMES, STORAGE_CAPACITIES } from "@/const";
@@ -242,6 +244,69 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
   const theme = useTheme();
   const [localIsCollapsed, setLocalIsCollapsed] = useState(false);
   const { planMode, piPrices, alertMode, balanceThreshold, minExtractionRate } = useContext(SessionContext);
+  const accountName = characters.length > 0 ? (characters[0].account ?? "-") : "-";
+  const [characterOrder, setCharacterOrder] = useState<number[]>(() => {
+    try {
+      const saved = localStorage.getItem(`characterOrder-${accountName}`);
+      if (saved) {
+        const parsed: number[] = JSON.parse(saved);
+        const ids = characters.map(c => c.character.characterId);
+        const valid = parsed.filter(id => ids.includes(id));
+        const newIds = ids.filter(id => !valid.includes(id));
+        return [...valid, ...newIds];
+      }
+    } catch {}
+    return characters.map(c => c.character.characterId);
+  });
+
+  useEffect(() => {
+    const ids = characters.map(c => c.character.characterId);
+    setCharacterOrder(prev => {
+      const valid = prev.filter(id => ids.includes(id));
+      const newIds = ids.filter(id => !valid.includes(id));
+      return [...valid, ...newIds];
+    });
+  }, [characters]);
+
+  useEffect(() => {
+    if (characterOrder.length > 0) {
+      localStorage.setItem(`characterOrder-${accountName}`, JSON.stringify(characterOrder));
+    }
+  }, [characterOrder, accountName]);
+
+  const [collapsedCharacters, setCollapsedCharacters] = useState<Set<number>>(() => {
+    try {
+      const saved = localStorage.getItem(`collapsedCharacters-${accountName}`);
+      if (saved) return new Set<number>(JSON.parse(saved));
+    } catch {}
+    return new Set<number>();
+  });
+
+  const toggleCharacterCollapsed = (characterId: number) => {
+    setCollapsedCharacters(prev => {
+      const next = new Set(prev);
+      if (next.has(characterId)) next.delete(characterId);
+      else next.add(characterId);
+      localStorage.setItem(`collapsedCharacters-${accountName}`, JSON.stringify(Array.from(next)));
+      return next;
+    });
+  };
+
+  const orderedCharacters = characterOrder
+    .map(id => characters.find(c => c.character.characterId === id))
+    .filter((c): c is AccessToken => c !== undefined);
+
+  const handleCharacterDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    const items = Array.from(characterOrder);
+    const [moved] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, moved);
+    setCharacterOrder(items);
+  };
+
+  const DragDropContextComponent = DragDropContext as any;
+  const DroppableComponent = Droppable as any;
+  const DraggableComponent = Draggable as any;
   const { monthlyEstimate, storageValue, planetCount, characterCount, runningExtractors, totalExtractors } = calculateAccountTotals(characters, piPrices);
 
   // Calculate planet details and alert states for each planet
@@ -421,30 +486,94 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
             {localIsCollapsed ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </Box>
-        {!localIsCollapsed && characters.map((c) => (
-          <Stack
-            key={c.character.characterId}
-            direction="row"
-            alignItems="flex-start"
-          >
-            <CharacterRow character={c} />
-            {planMode ? (
-              <PlanRow character={c} />
-            ) : (
-              <PlanetaryInteractionRow 
-                character={c} 
-                planetDetails={c.planets.reduce((acc, planet) => {
-                  const details = planetDetails[`${c.character.characterId}-${planet.planet_id}`];
-                  acc[planet.planet_id] = {
-                    ...details,
-                    visibility: getAlertVisibility(details.alertState)
-                  };
-                  return acc;
-                }, {} as Record<number, PlanetCalculations & { visibility: string }>)}
-              />
-            )}
-          </Stack>
-        ))}
+        {!localIsCollapsed && (
+          <DragDropContextComponent onDragEnd={handleCharacterDragEnd}>
+            <DroppableComponent droppableId={`characters-${accountName}`} direction="vertical">
+              {(provided: any) => (
+                <Box ref={provided.innerRef} {...provided.droppableProps}>
+                  {orderedCharacters.map((c, index) => (
+                    <DraggableComponent
+                      key={c.character.characterId}
+                      draggableId={`char-${c.character.characterId}`}
+                      index={index}
+                    >
+                      {(provided: any, snapshot: any) => (
+                        <Stack
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          direction="row"
+                          alignItems="flex-start"
+                          sx={{
+                            opacity: snapshot.isDragging ? 0.8 : 1,
+                            backgroundColor: snapshot.isDragging ? theme.palette.action.hover : 'transparent',
+                            borderRadius: 1,
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              pt: 1,
+                              gap: 0.5,
+                            }}
+                          >
+                            <Box
+                              {...provided.dragHandleProps}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                cursor: 'grab',
+                                px: 0.5,
+                                color: theme.palette.text.disabled,
+                                '&:hover': { color: theme.palette.text.secondary },
+                                '&:active': { cursor: 'grabbing' },
+                              }}
+                            >
+                              ⠿
+                            </Box>
+                            <IconButton
+                              size="small"
+                              onClick={() => toggleCharacterCollapsed(c.character.characterId)}
+                              sx={{
+                                p: 0.25,
+                                color: theme.palette.text.disabled,
+                                '&:hover': { color: theme.palette.text.secondary },
+                                transform: collapsedCharacters.has(c.character.characterId) ? 'rotate(0deg)' : 'rotate(90deg)',
+                                transition: 'transform 0.2s ease-in-out',
+                              }}
+                            >
+                              <ChevronRightIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
+                          <CharacterRow character={c} />
+                          {!collapsedCharacters.has(c.character.characterId) && (
+                            planMode ? (
+                              <PlanRow character={c} />
+                            ) : (
+                              <PlanetaryInteractionRow
+                                character={c}
+                                planetDetails={c.planets.reduce((acc, planet) => {
+                                  const details = planetDetails[`${c.character.characterId}-${planet.planet_id}`];
+                                  acc[planet.planet_id] = {
+                                    ...details,
+                                    visibility: getAlertVisibility(details.alertState)
+                                  };
+                                  return acc;
+                                }, {} as Record<number, PlanetCalculations & { visibility: string }>)}
+                              />
+                            )
+                          )}
+                        </Stack>
+                      )}
+                    </DraggableComponent>
+                  ))}
+                  {provided.placeholder}
+                </Box>
+              )}
+            </DroppableComponent>
+          </DragDropContextComponent>
+        )}
       </Box>
     </Paper>
   );

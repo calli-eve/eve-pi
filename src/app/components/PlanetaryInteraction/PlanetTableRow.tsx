@@ -438,7 +438,7 @@ export const PlanetTableRow = ({
                       .map((storage, idx) => {
                         const fillRate = storage.fillRate;
                         const color = fillRate > 90 ? '#ff0000' : fillRate > 80 ? '#ffa500' : fillRate > 60 ? '#ffd700' : 'inherit';
-                        const contents = planet.info.pins.find(p => p.type_id === storage.type_id)?.contents || [];
+                        const contents = planet.info.pins.find(p => p.pin_id === storage.pin_id)?.contents || [];
                         
                         return (
                           <React.Fragment key={`storage-${character.character.characterId}-${planet.planet_id}-${storage.type}-${idx}`}>

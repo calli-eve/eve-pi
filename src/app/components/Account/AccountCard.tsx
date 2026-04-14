@@ -99,6 +99,7 @@ const calculatePlanetDetails = (planet: PlanetWithInfo, piPrices: EvePraisalResu
     const fillRate = storageCapacity > 0 ? (totalVolume / storageCapacity) * 100 : 0;
 
     return {
+      pin_id: storage.pin_id,
       type: storageType,
       type_id: storage.type_id,
       capacity: storageCapacity,

@@ -6,6 +6,7 @@ export interface StorageContent {
 }
 
 export interface StorageInfo {
+  pin_id: number;
   type: string;
   type_id: number;
   capacity: number;

@@ -31,6 +31,7 @@ const CACHE_DURATION_MS = 60_000; // 1 minute
 const CACHE_STORAGE_KEY = "planet_cache";
 
 const loadCacheFromStorage = (): Map<string, CachedPlanetData> => {
+  if (typeof window === "undefined") return new Map();
   try {
     const stored = localStorage.getItem(CACHE_STORAGE_KEY);
     if (stored) {
@@ -44,6 +45,7 @@ const loadCacheFromStorage = (): Map<string, CachedPlanetData> => {
 };
 
 const saveCacheToStorage = (cache: Map<string, CachedPlanetData>) => {
+  if (typeof window === "undefined") return;
   try {
     const obj = Object.fromEntries(cache);
     localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(obj));

@@ -255,7 +255,7 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
         const newIds = ids.filter(id => !valid.includes(id));
         return [...valid, ...newIds];
       }
-    } catch {}
+    } catch (_) { /* ignore corrupt localStorage */ }
     return characters.map(c => c.character.characterId);
   });
 
@@ -278,7 +278,7 @@ export const AccountCard = ({ characters, isCollapsed: propIsCollapsed }: { char
     try {
       const saved = localStorage.getItem(`collapsedCharacters-${accountName}`);
       if (saved) return new Set<number>(JSON.parse(saved));
-    } catch {}
+    } catch (_) { /* ignore corrupt localStorage */ }
     return new Set<number>();
   });
 

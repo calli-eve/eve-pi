@@ -3,7 +3,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import { memo, useCallback, useEffect, useState, Suspense } from "react";
+import { memo, useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { AccessToken, CharacterUpdate, Env, PlanetWithInfo } from "../types";
 import { MainGrid } from "./components/MainGrid";
 import { refreshToken } from "@/esi-sso";
@@ -37,6 +37,7 @@ const processInBatches = async <T, R>(
 
 const Home = () => {
   const searchParams = useSearchParams();
+  const callbackHandled = useRef(false);
   const [characters, setCharacters] = useState<AccessToken[]>([]);
   const [sessionReady, setSessionReady] = useState(false);
   const [environment, setEnvironment] = useState<Env | undefined>(undefined);
@@ -93,7 +94,16 @@ const Home = () => {
     characters: AccessToken[],
   ): Promise<AccessToken[]> => {
     const code = searchParams?.get("code");
-    if (code) {
+    const returnedState = searchParams?.get("state");
+    if (code && !callbackHandled.current) {
+      callbackHandled.current = true;
+      const expectedState = localStorage.getItem("oauth_state");
+      localStorage.removeItem("oauth_state");
+      if (!expectedState || returnedState !== expectedState) {
+        console.error("OAuth state mismatch — possible CSRF attack");
+        window.history.replaceState(null, "", "/");
+        return Promise.resolve(characters);
+      }
       window.history.replaceState(null, "", "/");
       const res = await fetch(`api/token?code=${code}`);
       const newCharacter: AccessToken = await res.json();

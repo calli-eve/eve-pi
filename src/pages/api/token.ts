@@ -20,9 +20,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(404).end();
     }
 
-    logger.info({ 
+    logger.info({
       event: 'token_request_start',
-      code: code
     });
 
     const params = new URLSearchParams({
@@ -88,11 +87,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       };
       return res.json(token);
     } catch (e) {
-      logger.error({ 
+      logger.error({
         event: 'token_request_failed',
         reason: 'api_error',
         error: e,
-        code: code
       });
       return res.status(500).end();
     }

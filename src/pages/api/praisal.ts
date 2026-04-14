@@ -9,11 +9,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     });
 
     try {
-      const praisalRequest: { quantity: number; type_id: number }[] = JSON.parse(
-        req.body
+      const parsed = JSON.parse(req.body);
+
+      if (!Array.isArray(parsed)) {
+        return res.status(400).json({ error: 'Invalid input' });
+      }
+
+      const praisalRequest: { quantity: number; type_id: number }[] = parsed.filter(
+        (item): item is { quantity: number; type_id: number } =>
+          item !== null &&
+          typeof item === 'object' &&
+          typeof item.quantity === 'number' &&
+          Number.isFinite(item.quantity) &&
+          item.quantity >= 0 &&
+          typeof item.type_id === 'number' &&
+          Number.isInteger(item.type_id) &&
+          item.type_id > 0
       );
 
-      logger.info({ 
+      logger.info({
         event: 'praisal_request_parsed',
         items: praisalRequest.length
       });
@@ -27,10 +41,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       return res.json(praisal);
     } catch (e) {
-      logger.error({ 
+      logger.error({
         event: 'praisal_request_failed',
         error: e,
-        body: req.body
       });
       return res.status(500).json({ error: 'Failed to get praisal' });
     }

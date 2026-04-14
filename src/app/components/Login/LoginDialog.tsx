@@ -19,7 +19,6 @@ export const LoginDialog = ({
     DEFAULT_SCOPES_TO_SELECT
   );
   const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
-  const [loginUrl, setLoginUrl] = useState<string | undefined>(undefined);
 
   const { EVE_SSO_CLIENT_ID, EVE_SSO_CALLBACK_URL } =
     useContext(SessionContext);
@@ -29,15 +28,6 @@ export const LoginDialog = ({
       setSsoUrl(json.securityDefinitions.evesso.authorizationUrl);
     });
   }, []);
-
-  useEffect(() => {
-    if (!ssoUrl || selectedScopes.length === 0) return;
-    loginParameters(
-      selectedScopes,
-      EVE_SSO_CLIENT_ID,
-      EVE_SSO_CALLBACK_URL
-    ).then((res) => setLoginUrl(ssoUrl + "?" + res));
-  }, [selectedScopes, ssoUrl, EVE_SSO_CLIENT_ID, EVE_SSO_CALLBACK_URL]);
 
   return (
     <Dialog open={open} onClose={closeDialog}>
@@ -59,8 +49,11 @@ export const LoginDialog = ({
       <DialogActions>
         <Button
           variant="contained"
+          disabled={!ssoUrl || selectedScopes.length === 0}
           onClick={() => {
-            window.open(loginUrl, "_self");
+            if (!ssoUrl) return;
+            const params = loginParameters(selectedScopes, EVE_SSO_CLIENT_ID, EVE_SSO_CALLBACK_URL);
+            window.open(ssoUrl + "?" + params, "_self");
           }}
         >
           Login

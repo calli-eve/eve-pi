@@ -37,17 +37,19 @@ export const revokeToken = async (
   });
 };
 
-export const loginParameters = async (
+export const loginParameters = (
   selectedScopes: string[],
   EVE_SSO_CLIENT_ID: string,
   EVE_SSO_CALLBACK_URL: string,
 ) => {
+  const state = crypto.randomUUID();
+  localStorage.setItem("oauth_state", state);
   return new URLSearchParams({
     response_type: "code",
     redirect_uri: EVE_SSO_CALLBACK_URL,
     client_id: EVE_SSO_CLIENT_ID,
     scope: selectedScopes.join(" "),
-    state: "asfe",
+    state,
   }).toString();
 };
 

@@ -54,7 +54,7 @@ export const loginParameters = (
 };
 
 export const eveSwagger = async () => {
-  return fetch("https://esi.evetech.net/latest/swagger.json").then((res) =>
+  return fetch("https://esi.evetech.net/meta/openapi-3.0.json").then((res) =>
     res.json(),
   );
 };

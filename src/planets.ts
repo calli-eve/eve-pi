@@ -10,16 +10,20 @@ import { EXTRACTOR_TYPE_IDS, FACTORY_IDS, PI_SCHEMATICS } from "@/const";
 import { extractorsHaveExpired } from "./app/components/PlanetaryInteraction/alerts";
 
 export const getPlanets = async (character: AccessToken): Promise<Planet[]> => {
-  const api = new Api();
+  const api = createApi(character.access_token);
   const planets = (
-    await api.v1.getCharactersCharacterIdPlanets(
-      character.character.characterId,
-      {
-        token: character.access_token,
-      },
-    )
+    await api.characters.getCharactersCharacterIdPlanets(character.character.characterId)
   ).data;
   return planets;
+};
+
+const createApi = (accessToken?: string) => {
+  const api = new Api({
+    securityWorker: (token) =>
+      token ? { headers: { Authorization: `Bearer ${token}` } } : {},
+  });
+  if (accessToken) api.setSecurityData(accessToken);
+  return api;
 };
 
 interface CachedPlanetData {
@@ -67,14 +71,11 @@ export const getPlanet = async (
     return cached.data;
   }
 
-  const api = new Api();
+  const api = createApi(character.access_token);
   const planetInfo = (
-    await api.v3.getCharactersCharacterIdPlanetsPlanetId(
+    await api.characters.getCharactersCharacterIdPlanetsPlanetId(
       character.character.characterId,
       planet.planet_id,
-      {
-        token: character.access_token,
-      },
     )
   ).data;
 
@@ -92,7 +93,7 @@ export const getPlanetUniverse = async (
   planet: Planet,
 ): Promise<PlanetInfoUniverse> => {
   const api = new Api();
-  const planetInfo = (await api.v1.getUniversePlanetsPlanetId(planet.planet_id))
+  const planetInfo = (await api.universe.getUniversePlanetsPlanetId(planet.planet_id))
     .data;
   return planetInfo;
 };

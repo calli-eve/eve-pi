@@ -25,7 +25,10 @@ export const LoginDialog = ({
 
   useEffect(() => {
     eveSwagger().then((json) => {
-      setSsoUrl(json.securityDefinitions.evesso.authorizationUrl);
+      setSsoUrl(
+        json.components.securitySchemes.OAuth2.flows.authorizationCode
+          .authorizationUrl,
+      );
     });
   }, []);
 
